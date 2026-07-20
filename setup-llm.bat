@@ -30,9 +30,9 @@ if errorlevel 1 goto :fail
 echo.
 echo Done. To give your villagers this mind:
 echo   1. Start the game (run.bat) and pick a class.
-echo   2. Menu ^> Help ^> tick "God mode", then open the God mode tab.
+echo   2. Open Menu ^> Settings.
 echo   3. Backend "Local server", URL http://localhost:11434/v1, model %MODEL%.
-echo   4. Press "Initialize local LLM".
+echo   4. Enable villager conversations and press "Load / connect".
 pause
 exit /b 0
 

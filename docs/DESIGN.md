@@ -24,6 +24,10 @@ This is the ground truth, built on real microeconomics:
 
 This layer alone produces a playable, coherent world. It is cheap (thousands of agents are feasible), reproducible, and impossible for a language model to break.
 
+### Update budgets and simulation detail
+
+NPC state is authoritative regardless of rendering distance, but not every task needs the same clock. On-screen movement and combat run at the render rate; nearby off-screen agents run at 10 Hz; distant agents run near 3 Hz. Targets, schedules, and threat scans are cached between those ticks. Economic and social state advances on the daily simulation clock, while language inference is event-driven only when the player starts a conversation. This keeps animation responsive without turning distance into a different set of economic rules.
+
 ### Layer 2 — the bounded LLM planner (optional, local, swappable)
 
 A local open-weights LLM adds judgment on top. Critically, it is **bounded**:
@@ -52,5 +56,5 @@ The key mechanic is **self-update**: at low frequency (nightly, in simulation ti
 
 - **RPG at heart**: classes, skill trees, gear with grid inventory, combat with combos/parries, a dungeon, quests. The simulation is the setting, not homework.
 - **Legibility**: everything the simulation "thinks" is inspectable in God mode — needs bars, relationship ledgers, plan rationales, the LLM's last decision. Ordinary play hides it; curiosity reveals it.
-- **One file, every screen**: the entire game is a single HTML file that runs on desktop and mobile browsers, installable as a PWA. No build step, no engine, no asset pipeline — the lowest possible barrier for contributors.
+- **One-file release, modular source**: contributors work in focused files for simulation, combat, dialogue, UI, rendering, and styles. A zero-dependency Node script combines them into one `index.html` that runs on desktop and mobile browsers and remains installable as a PWA. There is still no engine or external asset pipeline.
 - **Local-first AI**: no cloud calls, no cost per decision, no telemetry. Your villagers think on your hardware.

@@ -41,7 +41,7 @@ cat <<EOF
 
 Done. To give your villagers this mind:
   1. Start the game (node serve.js) and pick a class.
-  2. Menu > Help > tick "God mode", then open the God mode tab.
-  3. Backend "Local server", URL http://localhost:11434/v1, model $MODEL.
-  4. Press "Initialize local LLM".
+  2. Open Menu > Settings.
+  3. Choose "Local server", URL http://localhost:11434/v1, model $MODEL.
+  4. Enable villager conversations and press "Load / connect".
 EOF

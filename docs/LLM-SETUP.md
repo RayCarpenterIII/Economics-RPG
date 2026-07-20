@@ -1,17 +1,23 @@
-# Running the villagers' minds on your own GPU/CPU
+# Running the villagers' minds
 
-The game talks to any **OpenAI-compatible** local inference server. That means the underlying model is completely swappable: pull a different open-weights model, restart nothing, re-initialize in-game, done. No API keys, no cloud, no cost per token.
+The zero-setup default is **HuggingFaceTB/SmolLM2-135M-Instruct** in 4-bit form. Transformers.js runs it on CPU/WASM in the browser, without WebGPU. It downloads on the first conversation and is then kept in the browser cache. The tiny model handles speech only; deterministic rules continue to make dependable household and council decisions.
 
-In-game configuration lives in **Menu → Help → God mode checkbox → God mode tab → Bounded planner** card:
+The game can also talk to any **OpenAI-compatible** local inference server. This lets you swap in a stronger open-weights model for higher-quality conversation and bounded planning. No API keys or per-token cloud cost are required.
 
-1. **Backend**: "Local server" (recommended) or "In-browser (WebGPU)".
+In-game configuration lives in **Menu → Settings → Villager LLM**:
+
+1. **Backend**: keep "Lightweight browser CPU" for the smooth default, choose "Local server" for Ollama/LM Studio, or try experimental WebGPU on compatible hardware.
 2. **Server URL**: where your inference server listens (defaults to Ollama's `http://localhost:11434/v1`).
 3. **Model id**: leave blank to use the first model the server reports, or name one explicitly.
-4. Press **Initialize local LLM**. The status line reports success or the exact failure.
+4. Press **Load / connect**. The status line reports success or the exact failure.
 
-Decisions made by the model are validated against the simulation's legal candidate list; anything invalid is rejected and the deterministic planner's choice stands.
+Decisions made by larger models are validated against the simulation's legal candidate list; anything invalid is rejected and the deterministic planner's choice stands. Conversations are grounded in each villager's current family, traits, work, memories, and town state. Recent turns and important facts the traveler shares are saved per villager; routine questions are not treated as permanent memories.
 
-## Option A — Ollama (easiest)
+## Option A — Lightweight browser CPU (default)
+
+No setup is needed. Talk to a villager and send the first line; the game downloads the tiny 4-bit model and displays progress in Settings. Later visits use the browser cache. This backend is the best starting point on Android or machines where WebGPU is unavailable.
+
+## Option B — Ollama (easiest stronger model)
 
 1. Install from <https://ollama.com/download> (Windows/macOS/Linux). Ollama automatically uses your NVIDIA/AMD GPU if present, otherwise the CPU.
 2. Pull a small instruct model — the planner's prompts are short, so 1–4 B models respond quickly:
@@ -31,13 +37,13 @@ setx OLLAMA_ORIGINS *
 
 (then restart Ollama; on macOS/Linux export the same variables).
 
-## Option B — LM Studio
+## Option C — LM Studio
 
 1. Install from <https://lmstudio.ai>, download any open model in the app (GGUF; it uses GPU offload automatically).
 2. Open the **Developer / Local Server** tab, enable **CORS**, and start the server (default `http://localhost:1234/v1`).
 3. In-game, set the server URL to `http://localhost:1234/v1` and initialize.
 
-## Option C — llama.cpp
+## Option D — llama.cpp
 
 ```
 llama-server -m your-model.gguf --port 8080 -ngl 99
@@ -45,7 +51,7 @@ llama-server -m your-model.gguf --port 8080 -ngl 99
 
 `-ngl 99` offloads all layers to the GPU; omit it for CPU-only. In-game URL: `http://localhost:8080/v1`. CORS is enabled by default.
 
-## Option D — vLLM (serious GPUs)
+## Option E — vLLM (serious GPUs)
 
 ```
 vllm serve Qwen/Qwen2.5-3B-Instruct
@@ -53,16 +59,18 @@ vllm serve Qwen/Qwen2.5-3B-Instruct
 
 In-game URL: `http://localhost:8000/v1`.
 
-## Option E — In-browser (WebLLM / WebGPU)
+## Option F — In-browser (WebLLM / WebGPU, experimental)
 
-No install at all: choose the **In-browser** backend and initialize. The browser downloads a small quantized model (hundreds of MB, cached afterwards) and runs it on WebGPU. Requires a WebGPU-capable browser (recent Chrome/Edge; on Android, Chrome with WebGPU enabled). Best for demos; the server backends are faster and more flexible.
+Choose the **WebGPU** backend and initialize. The browser downloads a larger quantized model (hundreds of MB, cached afterwards) and runs it on WebGPU. It requires a WebGPU-capable browser and is deliberately not the default on mobile.
 
 ## Choosing models
 
-The planner sends compact JSON decision prompts (~300–600 tokens) and expects a JSON object back. Practical guidance:
+Planning sends compact JSON decision prompts (~300–600 tokens), while conversations include a small state snapshot and recent dialogue history. Practical guidance:
 
-- **1–4 B instruct models** (Qwen 2.5 3B, Llama 3.2 3B, Gemma 2 2B, Phi-3.5-mini) are the sweet spot: fast enough to keep up with daily council/household decisions even on CPU.
-- **7–8 B models** give noticeably better rationales if you have ≥6 GB VRAM.
+- **SmolLM2 135M Instruct (default)** is the smallest, smoothest browser option. It is suited to short in-character speech; deterministic code handles planning.
+- **SmolLM2 360M Instruct** is the next model worth testing through a compatible local server if 135M is not coherent enough; it costs more memory and responds more slowly.
+- **1–4 B instruct models** (Qwen 2.5 3B, Llama 3.2 3B, Gemma 2 2B, Phi-3.5-mini) are responsive enough for daily planning and basic conversation even on CPU.
+- **7–8 B models** give noticeably more coherent multi-turn dialogue and better rationales if you have ≥6 GB VRAM.
 - Anything that reliably emits JSON works — the game validates every choice, so a weak model degrades gracefully to the deterministic planner rather than breaking the world.
 
 ## Troubleshooting

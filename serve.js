@@ -5,6 +5,7 @@
  *   node serve.js            serve on http://localhost:8420 and open the browser
  *   node serve.js --lan      also listen on your LAN IP so a phone on the same
  *                            Wi-Fi can play (the phone URL is printed at start)
+ *   node serve.js --dev      load separate source files for easier debugging
  *   node serve.js --port N   use a different port
  *   node serve.js --no-open  do not open a browser window
  */
@@ -17,6 +18,7 @@ const { exec } = require("child_process");
 
 const args = process.argv.slice(2);
 const lan = args.includes("--lan");
+const dev = args.includes("--dev");
 const noOpen = args.includes("--no-open");
 const portIdx = args.indexOf("--port");
 const port = portIdx >= 0 ? Number(args[portIdx + 1]) || 8420 : 8420;
@@ -39,7 +41,8 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   const urlPath = decodeURIComponent((req.url || "/").split("?")[0]);
-  let filePath = path.normalize(path.join(root, urlPath === "/" ? "index.html" : urlPath));
+  const entry = dev ? "dev.html" : "index.html";
+  let filePath = path.normalize(path.join(root, urlPath === "/" ? entry : urlPath));
   if (!filePath.startsWith(root)) {
     res.writeHead(403).end("Forbidden");
     return;
@@ -71,6 +74,7 @@ server.listen(port, host, () => {
   const local = "http://localhost:" + port;
   console.log("");
   console.log("  The Egg Lands — development server");
+  console.log("  Source mode:            " + (dev ? "modular (src files)" : "standalone build"));
   console.log("  Play on this computer:  " + local);
   if (lan) {
     for (const addr of lanAddresses()) {

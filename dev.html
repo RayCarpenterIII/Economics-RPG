@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f1218">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>The Egg Lands</title>
+<link rel="stylesheet" href="src/styles/game.css">
+</head>
+<body>
+<header>
+  <h1>The Egg Lands</h1>
+  <div id="topStats"><span>Day <b id="dayNo">1</b></span><span id="phaseText">Morning</span><span>Coins <b id="coins">24</b></span><span>Heartstone <b id="relics">0</b></span><span>Bag <b id="materialCount">0/40</b></span><span>Road <b id="road">62%</b></span></div>
+</header>
+<div id="ledger" aria-live="polite"></div>
+<div id="questbar"></div>
+<div id="stage">
+  <canvas id="game" width="640" height="400"></canvas>
+
+  <section id="classPanel" class="overlay open" role="dialog" aria-label="Choose your class">
+    <h2>Choose one Specialty</h2>
+    <div class="sub">Your combat Specialty is permanent: Warrior, Mage, or Noble. Gathering Skills remain open to every character who has the right equipment.</div>
+    <div id="classCards"></div>
+  </section>
+
+  <section id="marketPanel" class="overlay" role="dialog" aria-label="Town market">
+    <h2 id="marketTitle">Market</h2>
+    <div class="sub" id="marketSummary"></div>
+    <table id="marketTable"><thead><tr><th>Good</th><th>Price</th><th>Stock</th><th>You carry</th><th>Trade</th></tr></thead><tbody id="marketRows"></tbody></table>
+    <div id="materialMarket"><div class="sub">Gathered materials · sell now or reserve them for construction</div><div id="materialRows"></div></div>
+    <div id="equipmentMarket"><div class="sub">Gathering equipment · tools are permanent and unlock their Skills tree</div><div id="equipmentRows"></div></div>
+    <div id="cargoLine"></div>
+    <button class="uibtn" data-close="marketPanel">Leave market [Esc]</button>
+  </section>
+
+  <section id="buildPanel" class="overlay" role="dialog" aria-label="Construction">
+    <h2 id="buildTitle">Town project</h2>
+    <div class="sub">A Heartstone from the old mine anchors one permanent civic work. Materials must be carried in your pack.</div>
+    <div id="buildCards"></div>
+    <button class="uibtn" data-close="buildPanel">Leave site [Esc]</button>
+  </section>
+
+  <section id="menuPanel" class="overlay" role="dialog" aria-label="Game menu">
+    <div id="menuShell">
+      <div id="menuHeader"><h2>Game menu</h2><div id="menuTabs">
+        <button class="uibtn menuTabBtn active" data-menu-tab="inventory">Bag</button><button class="uibtn menuTabBtn" data-menu-tab="map">Map</button><button class="uibtn menuTabBtn" data-menu-tab="skills">Skills</button><button class="uibtn menuTabBtn" data-menu-tab="crafting">Craft</button><button class="uibtn menuTabBtn" data-menu-tab="chronicle">Journal</button><button class="uibtn menuTabBtn" data-menu-tab="home">Town</button><button class="uibtn menuTabBtn" data-menu-tab="settings">Settings</button><button class="uibtn menuTabBtn" data-menu-tab="help">Help</button><button class="uibtn menuTabBtn godOnly" id="godTabBtn" data-menu-tab="god">God mode</button>
+      </div></div>
+      <div id="menuBody">
+        <section class="menuTab active" id="inventoryTab"><h2>Inventory</h2><div class="sub menuLead">Your carried goods, gathered resources, equipment, and progression at a glance.</div><div id="inventoryContent"></div></section>
+        <section class="menuTab" id="mapTab"><h2>Valley map</h2><div class="sub menuLead">Three settlements, their roads, gathering grounds, and your present position.</div><canvas id="menuMap" width="720" height="480"></canvas><div id="mapLegend"></div></section>
+        <section class="menuTab" id="skillsTab"><div id="skillScroll">
+          <div class="skillSection" id="specialtySection"><h2>Specialty · <span id="skillPts">0</span> points</h2><div class="sub" id="specialtySummary"></div><div id="skillCols"></div><div class="sub">Scroll down for gathering Skills ↓</div></div>
+          <hr class="skillDivider">
+          <div class="skillSection" id="lifeSection"><h2>Skills · <span id="lifeSkillPts">0</span> points</h2><div class="sub">Spend points in any gathering tree after acquiring its equipment. Each level grants one Specialty point and one Skills point.</div><div id="lifeSkillTrees"></div><div class="sub">↑ Scroll up to return to your combat Specialty</div></div>
+        </div></section>
+        <section class="menuTab" id="craftingTab"><h2>Crafting</h2><div class="sub menuLead" id="craftingLead">Make practical equipment anywhere. Specialty gear requires its matching town shop.</div><div id="craftingContent"></div></section>
+        <section class="menuTab" id="chronicleTab"><h2>Valley Chronicle</h2><div class="sub menuLead">The public record of plans, shortages, celebrations, rescues, feuds, migrations, and council decisions.</div><div id="chronicleFilters"><label for="chronicleTown">Settlement</label><select id="chronicleTown"></select></div><div id="chronicleContent"></div></section>
+        <section class="menuTab" id="helpTab"><h2>How to play</h2><div class="helpGrid">
+          <span class="key">WASD / arrows</span><span>Walk through the valley and dungeon.</span>
+          <span class="key">E</span><span>Talk, trade, build, enter the mine, or use equipped gathering tools.</span>
+          <span class="key">Resources</span><span>Buy a rod, axe, pickaxe, or salvage kit at a market. Trees yield logs and disappear when felled; rocks yield stone and break into rubble. Both regrow after several days.</span>
+          <span class="key">Backpack</span><span>Every stack and item has a grid footprint. Click crafted gear in the bag to equip it; click an equipped slot to pack it again.</span>
+          <span class="key">Crafting</span><span>General recipes work anywhere. Enter a Watchpost, Academy Annex, or Civic Court to craft its unique Specialty equipment.</span>
+          <span class="key">Mouse</span><span>Aim freely. Left-click attacks toward the reticle.</span>
+          <span class="key">Space</span><span>Attack toward your aim; time presses for a three-hit combo.</span>
+          <span class="key">F / Q</span><span>Use your combat Specialty or daily economic influence.</span>
+          <span class="key">X</span><span>Jump. Press X again in the air to double-jump over low attacks.</span>
+          <span class="key">Shift</span><span>Dash. Dashing during a jump keeps your aerial momentum.</span>
+          <span class="key">C / right-click</span><span>Block toward your aim. A last-moment block parries and bounces the attacker back.</span>
+          <span class="key">M / Menu</span><span>Open Inventory first, then switch among Map, Skills, Crafting, Chronicle, Help, and Home Town.</span>
+          <span class="key">K</span><span>Open the Menu directly to Skills.</span>
+          <span class="key">Phone landscape</span><span>Left pad moves; double-tap a direction to dash. Attack strikes, Block guards and can parry, Skill uses your Specialty (hold for influence), and Jump can be pressed twice.</span>
+          <span class="key">⛶</span><span>On a phone, request browser fullscreen while keeping the landscape HUD.</span>
+          <span class="key">Goal</span><span>Trade among three towns, keep a caravan alive, recover the Heartstone, and construct a civic building.</span>
+        </div></section>
+        <section class="menuTab" id="homeTab"><h2 id="homeTownTitle">Home town</h2><div class="sub menuLead" id="homeTownLead"></div><div id="homeTownContent"></div></section>
+        <section class="menuTab" id="settingsTab"><h2>Settings</h2><div class="sub menuLead">Choose how villagers think and adjust developer access.</div><div id="settingsContent">
+          <div class="menuCard"><h3>Villager LLM</h3><div class="settingField"><label for="settingsLLMBackend">Runs on</label><select id="settingsLLMBackend"><option value="browser-lite">Lightweight browser CPU (recommended)</option><option value="server">Local server (Ollama / LM Studio)</option><option value="webllm">WebGPU (larger, experimental)</option></select></div><div class="settingField"><label for="settingsLLMModel">Model</label><input id="settingsLLMModel" list="settingsModelChoices"><datalist id="settingsModelChoices"><option value="onnx-community/SmolLM2-135M-Instruct-ONNX-MHA"><option value="Llama-3.2-1B-Instruct-q4f16_1-MLC"><option value="qwen3:4b"><option value="qwen3:8b"></datalist></div><div class="settingField" id="settingsServerField"><label for="settingsLLMUrl">Server address</label><input id="settingsLLMUrl" placeholder="http://localhost:11434/v1"></div><label><input type="checkbox" id="settingsLLMToggle"> Use this model for villager conversations</label><div class="sub" id="settingsLLMNote" style="margin-top:8px"></div><div class="aiStatus" id="settingsLLMStatus"></div><div class="settingActions"><button class="uibtn" id="settingsLLMInit">Load / connect</button><button class="uibtn" id="settingsRunPlanners">Refresh village plans</button></div></div>
+          <div class="menuCard"><h3>Sound and developer options</h3><label><input type="checkbox" id="musicToggle" checked> 16-bit adventure music</label><br><label><input type="checkbox" id="sfxToggle" checked> Combat and world sounds</label><div class="settingActions"><button class="uibtn" id="audioPreview">Preview sound</button></div><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><label><input type="checkbox" id="godModeToggle"> God mode</label><div class="sub" style="margin-top:8px">Reveals private needs, relationships, memories, household plans, and council scores in a separate inspector tab.</div></div>
+        </div></section>
+        <section class="menuTab" id="godTab"><h2>God mode · Village Inspector</h2><div class="sub menuLead">Inspect the simulation's private state. The LLM may choose only from validated plans; the deterministic simulation remains authoritative.</div><div id="godControls"><label>Town <select id="godTown"></select></label><label>Villager <select id="godAgent"></select></label><button class="uibtn mini" id="godRefresh">Refresh</button></div><div id="godContent"></div></section>
+      </div>
+    </div>
+    <div id="menuFooter"><button class="uibtn" id="menuSave">Save</button><button class="uibtn" id="menuLoad">Load</button><button class="uibtn" data-close="menuPanel">Close [M]</button></div>
+  </section>
+
+  <section id="dialogue" class="overlay" role="dialog" aria-label="Conversation">
+    <div id="dialogueBox">
+      <div><span id="speaker"></span> <span class="npcMeta" id="npcMeta"></span></div>
+      <div id="dialogueText"></div>
+      <div class="row">
+        <input id="dialogueInput" maxlength="300" placeholder="Say anything… they remember this conversation.">
+        <button class="uibtn" id="dialogueSend">Send</button>
+        <button class="uibtn" id="dialogueLeave">Leave</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="bottom">
+  <div id="hint">WASD move · X double jump · CLICK/SPACE combo · E interact · C block · F specialty · Q influence · SHIFT dash</div>
+  <div class="row">
+    <button class="uibtn" id="helpBtn">Menu</button>
+    <button class="uibtn" id="saveBtn">Save</button>
+    <button class="uibtn" id="loadBtn">Load</button>
+    <button class="uibtn" id="newBtn">New world</button>
+  </div>
+</div>
+
+<div id="touch">
+  <div id="dpad">
+    <button class="pad blank"></button><button class="pad" data-key="ArrowUp">▲</button><button class="pad blank"></button>
+    <button class="pad" data-key="ArrowLeft">◀</button><button class="pad blank"></button><button class="pad" data-key="ArrowRight">▶</button>
+    <button class="pad blank"></button><button class="pad" data-key="ArrowDown">▼</button><button class="pad blank"></button>
+  </div>
+  <div id="touchActions">
+    <button class="pad round" id="touchAtk">Attack</button><button class="pad round" id="touchJump">Jump</button>
+    <button class="pad round" id="touchUse">Use</button><button class="pad round" id="touchSpec">Skill<br><small>hold influence</small></button><button class="pad round" id="touchBlock">Block</button>
+  </div>
+  <button class="pad" id="mobileMenu" aria-label="Open menu">☰</button>
+  <button class="pad" id="mobileFullscreen" aria-label="Toggle fullscreen">⛶</button>
+</div>
+
+<script src="src/js/00-state-economy.js"></script>
+<script src="src/js/01-villages-npcs.js"></script>
+<script src="src/js/02-world-terrain.js"></script>
+<script src="src/js/03-dungeon.js"></script>
+<script src="src/js/04-shops.js"></script>
+<script src="src/js/05-player-combat.js"></script>
+<script src="src/js/06-time-schedules.js"></script>
+<script src="src/js/07-markets-building.js"></script>
+<script src="src/js/08-interactions.js"></script>
+<script src="src/js/09-dialogue-llm.js"></script>
+<script src="src/js/10-ui-panels.js"></script>
+<script src="src/js/11-save-load.js"></script>
+<script src="src/js/12-rendering.js"></script>
+<script src="src/js/13-input-boot.js"></script>
+</body>
+</html>
