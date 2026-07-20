@@ -1,6 +1,6 @@
 {
-  "name": "The Emberfold Valley",
-  "short_name": "Emberfold",
+  "name": "The Egg Lands",
+  "short_name": "Egg Lands",
   "description": "A living-economy RPG where every villager lives a simulated life: needs, memories, relationships, plans, and an optional local LLM mind.",
   "start_url": ".",
   "display": "fullscreen",

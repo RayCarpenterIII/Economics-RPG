@@ -1,4 +1,4 @@
-# The Egg Valley
+# The Egg Lands
 
 A base-building economy RPG where every inhabitant lives a simulated life instead of following a script. Villagers have needs, memories, relationships, household plans, and town politics — all driven by a deterministic economic simulation, with an optional **local, open-source LLM** acting as a bounded planner on top. The goal: a retro-styled world that feels alive because of the *depth* of each NPC, not the pixel count.
 

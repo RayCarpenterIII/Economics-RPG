@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Zero-dependency development server for The Emberfold Valley.
+ * Zero-dependency development server for The Egg Lands.
  *
  *   node serve.js            serve on http://localhost:8420 and open the browser
  *   node serve.js --lan      also listen on your LAN IP so a phone on the same
@@ -70,7 +70,7 @@ function lanAddresses() {
 server.listen(port, host, () => {
   const local = "http://localhost:" + port;
   console.log("");
-  console.log("  The Emberfold Valley — development server");
+  console.log("  The Egg Lands — development server");
   console.log("  Play on this computer:  " + local);
   if (lan) {
     for (const addr of lanAddresses()) {

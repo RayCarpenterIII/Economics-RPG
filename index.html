@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>The Emberfold Valley</title>
+<title>The Egg Lands</title>
 <style>
   :root{
     --bg:#0f1218;--panel:#1a202a;--panel2:#202735;--line:#354052;
@@ -125,7 +125,7 @@
 </head>
 <body>
 <header>
-  <h1>The Emberfold Valley</h1>
+  <h1>The Egg Lands</h1>
   <div id="topStats"><span>Day <b id="dayNo">1</b></span><span id="phaseText">Morning</span><span>Coins <b id="coins">24</b></span><span>Heartstone <b id="relics">0</b></span><span>Bag <b id="materialCount">0/40</b></span><span>Road <b id="road">62%</b></span></div>
 </header>
 <div id="ledger" aria-live="polite"></div>
@@ -274,6 +274,7 @@ const TOWN_W=16,TOWN_H=12;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const keyOf=(x,y)=>x+","+y;
+const townTitle=name=>name.toLowerCase().replace(/(^|\s)[a-z]/g,c=>c.toUpperCase());
 const goodIndex=g=>GOODS.indexOf(g);
 
 let seed=1,rand=Math.random,tiles=[],solid=new Set(),worldCanvas=null;
@@ -324,7 +325,7 @@ class Agent{
   constructor(id,cls,town){
     this.id=id;this.cls=cls;this.town=town;
     const bank=NAME_BANK[cls];
-    this.firstName=bank[id%bank.length];this.name=this.firstName+" of "+town.name[0]+town.name.slice(1).toLowerCase();
+    this.firstName=bank[id%bank.length];this.name=this.firstName+" of "+townTitle(town.name);
     this.alphas=jitterAlphas(CLASS_ALPHAS[cls]);
     this.productivity=BASE_PROD[cls]*(.86+rand()*.28);
     this.wealth=18+rand()*8;this.utility=1;this.lastUtility=1;this.trend="steady";
@@ -594,9 +595,9 @@ function runLifeCycle(){
   for(const town of towns){
     for(const a of town.agents.slice()){a.age++;if(a.ageGroup==="child"&&a.age>=18){a.ageGroup="adult";a.gender=a.gender==="girl"?"woman":"man";recordVillageEvent(town,"COMING OF AGE",a.firstName+" "+a.familyName+" comes of age and may enter a full trade.",{actorId:a.id,salience:7})}}
     const singles=town.agents.filter(a=>a.ageGroup!=="child"&&a.spouseId==null&&a.age>=20&&a.age<60);
-    if(singles.length>=2&&rand()<.24){const a=singles[0],b=singles.find(x=>x!==a&&householdFor(a)!==householdFor(x)&&householdFor(a).residentIds.length<4);if(b){a.spouseId=b.id;b.spouseId=a.id;releaseHouse(b);assignHouse(b,town,a.houseId);b.familyName=a.familyName;b.name=b.firstName+" "+b.familyName+" of "+town.name[0]+town.name.slice(1).toLowerCase();changeRelationship(a,b,{affection:55,trust:45,obligation:50});recordVillageEvent(town,"MARRIAGE",a.firstName+" and "+b.firstName+" establish a shared household.",{actorId:a.id,targetId:b.id,emotion:"joy",salience:9})}}
+    if(singles.length>=2&&rand()<.24){const a=singles[0],b=singles.find(x=>x!==a&&householdFor(a)!==householdFor(x)&&householdFor(a).residentIds.length<4);if(b){a.spouseId=b.id;b.spouseId=a.id;releaseHouse(b);assignHouse(b,town,a.houseId);b.familyName=a.familyName;b.name=b.firstName+" "+b.familyName+" of "+townTitle(town.name);changeRelationship(a,b,{affection:55,trust:45,obligation:50});recordVillageEvent(town,"MARRIAGE",a.firstName+" and "+b.firstName+" establish a shared household.",{actorId:a.id,targetId:b.id,emotion:"joy",salience:9})}}
     const couples=town.agents.filter(a=>a.gender==="woman"&&a.spouseId!=null&&a.age>=20&&a.age<44&&householdFor(a)?.residentIds.length<4);
-    if(couples.length&&rand()<.18){const parent=couples[Math.floor(rand()*couples.length)],other=agents.find(a=>a.id===parent.spouseId),id=Math.max(-1,...agents.map(a=>a.id))+1,child=new Agent(id,parent.cls,town);child.ageGroup="child";child.age=0;child.gender=rand()<.5?"boy":"girl";child.parentIds=[parent.id,other.id];child.familyName=parent.familyName;child.name=child.firstName+" "+child.familyName+" of "+town.name[0]+town.name.slice(1).toLowerCase();parent.childrenIds.push(child.id);other.childrenIds.push(child.id);assignHouse(child,town,parent.houseId);child.x=child.home.x;child.y=child.home.y;town.agents.push(child);agents.push(child);initializeAgentMind(child);initializeRelationships(town);updateAgentSpecialization(child);initializeHousehold(town,householdFor(child));recordVillageEvent(town,"BIRTH",parent.firstName+" and "+other.firstName+" welcome "+child.firstName+" into the "+parent.familyName+" household.",{actorId:parent.id,targetId:child.id,emotion:"joy",salience:9})}
+    if(couples.length&&rand()<.18){const parent=couples[Math.floor(rand()*couples.length)],other=agents.find(a=>a.id===parent.spouseId),id=Math.max(-1,...agents.map(a=>a.id))+1,child=new Agent(id,parent.cls,town);child.ageGroup="child";child.age=0;child.gender=rand()<.5?"boy":"girl";child.parentIds=[parent.id,other.id];child.familyName=parent.familyName;child.name=child.firstName+" "+child.familyName+" of "+townTitle(town.name);parent.childrenIds.push(child.id);other.childrenIds.push(child.id);assignHouse(child,town,parent.houseId);child.x=child.home.x;child.y=child.home.y;town.agents.push(child);agents.push(child);initializeAgentMind(child);initializeRelationships(town);updateAgentSpecialization(child);initializeHousehold(town,householdFor(child));recordVillageEvent(town,"BIRTH",parent.firstName+" and "+other.firstName+" welcome "+child.firstName+" into the "+parent.familyName+" household.",{actorId:parent.id,targetId:child.id,emotion:"joy",salience:9})}
     for(const a of town.agents.slice().filter(x=>x.age>=78)){if(rand()<(a.age>90?.28:.055)){recordVillageEvent(town,"DEATH",a.firstName+" "+a.familyName+" dies at age "+a.age+". The household keeps their memory.",{actorId:a.id,emotion:"grief",salience:10});releaseHouse(a);town.agents=town.agents.filter(x=>x!==a);agents=agents.filter(x=>x!==a);for(const survivor of agents){if(survivor.spouseId===a.id)survivor.spouseId=null;survivor.parentIds=(survivor.parentIds||[]).filter(id=>id!==a.id);survivor.childrenIds=(survivor.childrenIds||[]).filter(id=>id!==a.id)}}}
     initializeInstitutions(town)
   }
@@ -710,7 +711,7 @@ function formFamilies(town){
       const husband=family[0],wife=family[1];husband.gender="man";wife.gender="woman";husband.age=28+Math.floor(rand()*25);wife.age=25+Math.floor(rand()*24);husband.spouseId=wife.id;wife.spouseId=husband.id;
       for(const child of family.slice(2)){child.ageGroup="child";child.age=6+Math.floor(rand()*11);child.gender=rand()<.5?"boy":"girl";child.parentIds=[husband.id,wife.id];husband.childrenIds.push(child.id);wife.childrenIds.push(child.id)}
     }
-    family.forEach(a=>{a.name=a.firstName+" "+surname+" of "+town.name[0]+town.name.slice(1).toLowerCase()});
+    family.forEach(a=>{a.name=a.firstName+" "+surname+" of "+townTitle(town.name)});
   }
 }
 function roadKey(from,to){return from.id+">"+to.id}
@@ -739,7 +740,7 @@ function generateWorld(newSeed){
   const thirdName=REGIONAL_NAMES[Math.floor(rand()*REGIONAL_NAMES.length)];
   towns=[];
   spots.forEach((spot,index)=>{
-    const rx=spot[0],ry=spot[1],name=index===0?"EMBERFOLD":index===1?"DUSKMERE":thirdName,isCapital=index===0;
+    const rx=spot[0],ry=spot[1],name=index===0?"EGG LANDS":index===1?"DUSKMERE":thirdName,isCapital=index===0;
     for(let y=ry;y<ry+TOWN_H;y++)for(let x=rx;x<rx+TOWN_W;x++){tiles[y][x]=7;solid.delete(keyOf(x,y))}
     const dominant=isCapital?0:Math.floor(rand()*4),advantages={};
     GOODS.forEach((g,i)=>advantages[g]=isCapital?[1.24,1.08,1.03,1.10][i]:(i===dominant?1.45:.78+rand()*.34));
@@ -1256,7 +1257,7 @@ const keys={};let blockHeld=false;
 function cargoCount(){return player.cargo.reduce((a,b)=>a+b,0)}
 function materialCount(){return player.materials.reduce((a,b)=>a+b,0)}
 function materialPrice(town,index){
-  const factor=town.name==="EMBERFOLD"?[1.05,.92,1.18,1.22][index]:[1.30,1.16,.94,1.04][index];
+  const factor=town.name==="EGG LANDS"?[1.05,.92,1.18,1.22][index]:[1.30,1.16,.94,1.04][index];
   return Math.max(.35,MATERIAL_BASE_PRICE[index]*factor/(1+town.materialStock[index]/24));
 }
 function resourceDefinition(tile){
@@ -1505,7 +1506,7 @@ function hurtPlayer(amount,source=null){
   if(player.hp<=0){
     player.coins=Math.max(0,player.coins-5);player.hp=player.maxHp;
     scene="world";const town=towns[0];player.x=town.marketPoint.x;player.y=town.marketPoint.y+18;
-    toast("You wake in Emberfold's market, five coins lighter.");
+    toast("You wake in the Egg Lands market, five coins lighter.");
   }
   updateUI();
 }
@@ -2197,7 +2198,7 @@ function updatePhase(){
 /* ============================================================
    SAVE / LOAD
    ============================================================ */
-const SAVE_KEY="emberfold_duskmere_v2";
+const SAVE_KEY="egglands_v1";
 function snapshot(){
   return {
     version:6,seed,dayNo,dayClock,roadSafety,kills,selectedClass,spentPoints,purchased:[...purchased],quest,
@@ -2256,7 +2257,7 @@ function applySave(data){
       a.lifeSkills=Object.assign({fishing:0,forestry:0,mining:0,hunting:0},saved&&saved.lifeSkills||a.lifeSkills||{});
       a.equipment=Object.assign({fishing:false,forestry:false,mining:false,hunting:false},saved&&saved.equipment||a.equipment||{});
       initializeAgentMind(a);
-      if(data.version<5)a.name=a.firstName+" "+a.familyName+" of "+a.town.name[0]+a.town.name.slice(1).toLowerCase();
+      if(data.version<5)a.name=a.firstName+" "+a.familyName+" of "+townTitle(a.town.name);
       assignHouse(a,a.town,saved&&Number.isFinite(saved.houseId)?saved.houseId:null);a.x=a.home.x;a.y=a.home.y;a.town.agents.push(a);updateAgentSpecialization(a);buildDailySchedule(a);
     }
   }

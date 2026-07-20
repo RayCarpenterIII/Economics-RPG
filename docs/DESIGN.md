@@ -2,7 +2,7 @@
 
 ## The premise
 
-Most base-building games fake their inhabitants: NPCs are animation loops with a job title. The Emberfold Valley starts from the opposite end — **the economy and the people are the real game**, and the RPG you play happens inside their world. The player is one inhabitant among many, not the center of the universe.
+Most base-building games fake their inhabitants: NPCs are animation loops with a job title. The Egg Lands starts from the opposite end — **the economy and the people are the real game**, and the RPG you play happens inside their world. The player is one inhabitant among many, not the center of the universe.
 
 The design bet: a world feels alive not because of graphical fidelity but because of the **depth of each individual** — their needs, their imperfect memories, their grudges and loyalties, their plans that sometimes fail. Retro pixel visuals are a feature here: they set expectations low so the behavioral depth lands harder.
 
