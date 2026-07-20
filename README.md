@@ -9,8 +9,8 @@ The whole game is a single HTML file. It runs in any modern browser, on desktop 
 You need [Node.js](https://nodejs.org) (any recent version — used only as a tiny static file server).
 
 ```
-git clone <this repo>
-cd emberfold-valley
+git clone https://github.com/RayCarpenterIII/Economics-RPG.git
+cd Economics-RPG
 node serve.js
 ```
 
