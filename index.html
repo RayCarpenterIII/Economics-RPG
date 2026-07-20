@@ -656,7 +656,7 @@ async function initializeLocalLLM(){
   try{
     if(llmConfig.backend==="webllm")await initializeWebLLM();else await initializeServerLLM();
     llmConfig.enabled=true;runAllPlanners(true);
-  }catch(error){llmEngine=null;llmConfig.enabled=false;llmConfig.status="Local LLM unavailable; deterministic planning continues. "+String(error.message||error).slice(0,150)}finally{llmBusy=false;renderGodMode()}
+  }catch(error){llmEngine=null;llmConfig.enabled=false;llmConfig.status="Local LLM unavailable; deterministic planning continues. "+String(error.message||error).slice(0,150)}finally{llmBusy=false;renderGodMode();pumpLLMQueue()}
 }
 function runAllPlanners(withLLM=false){for(const town of towns){town.houses.forEach(h=>chooseHouseholdPlan(town,h,withLLM));runTownCouncil(town,withLLM)}}
 
