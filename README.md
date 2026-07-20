@@ -4,6 +4,10 @@ A base-building economy RPG where every inhabitant lives a simulated life instea
 
 The whole game is a single HTML file. It runs in any modern browser, on desktop and on phones (a translucent touch HUD appears automatically in landscape).
 
+## Play online
+
+**▶ https://raycarpenteriii.github.io/Economics-RPG/** — nothing to install, works on phones (add to home screen for fullscreen). For AI-driven villagers with zero setup, pick the **In-browser (WebGPU)** backend in God mode: the model downloads once from a CDN and is cached by your browser.
+
 ## Quick start
 
 You need [Node.js](https://nodejs.org) (any recent version — used only as a tiny static file server).
@@ -26,7 +30,7 @@ and open the printed `http://<your-pc-ip>:8420` URL on the phone. Add it to your
 
 ## The local LLM mind (optional)
 
-The simulation is fully playable with its deterministic utility-driven planner. If you want villagers' households and town councils to be steered by a real language model running **on your own GPU/CPU**, see **[docs/LLM-SETUP.md](docs/LLM-SETUP.md)**. Two backends are supported, switchable in-game:
+The simulation is fully playable with its deterministic utility-driven planner. If you want villagers' households and town councils to be steered by a real language model running **on your own GPU/CPU**, run the one-command setup — `setup-llm.bat` (Windows) or `./setup-llm.sh` (macOS/Linux) — which installs Ollama and pulls the default model (`qwen3:8b`; pass a smaller one like `qwen3:4b` as an argument for lighter machines). Details and alternatives (LM Studio, llama.cpp, vLLM) are in **[docs/LLM-SETUP.md](docs/LLM-SETUP.md)**. Two backends are supported, switchable in-game:
 
 | Backend | Runs on | Good for |
 |---|---|---|
@@ -71,6 +75,7 @@ Turn on **God mode** (Menu → Help) to inspect any villager's private state and
 index.html            the entire game (simulation, renderer, UI)
 serve.js              zero-dependency dev server (desktop + LAN/phone)
 run.bat               Windows one-click launcher
+setup-llm.bat/.sh     one-command Ollama install + model pull
 manifest.webmanifest  PWA manifest (install on phone)
 docs/DESIGN.md        design vision and simulation architecture
 docs/LLM-SETUP.md     running local models on your GPU/CPU
