@@ -268,7 +268,9 @@ const NAME_BANK={
 };
 const HOUSEHOLD_NAMES=["Ashbrook","Vale","Thorne","Miller","Fenwick","Rowan","Marsh","Bell","Cairn","Wren","Hearth","Dale"];
 const TIME_ENDOWMENT=16;
-const DAY_SECONDS=42;
+const DAY_SECONDS=300;
+const SKILL_INDEX={fishing:0,forestry:1,mining:2,hunting:3};
+const GATHER_ACTIVITY={fishing:"fishing at the pond",forestry:"felling trees at the grove",mining:"working the quarry",hunting:"hunting in the wild range"};
 const TILE=16,MW=72,MH=48,VW=640,VH=400;
 const TOWN_W=16,TOWN_H=12;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -279,7 +281,7 @@ const goodIndex=g=>GOODS.indexOf(g);
 
 let seed=1,rand=Math.random,tiles=[],solid=new Set(),worldCanvas=null;
 let towns=[],agents=[],caravans=[],worldEnemies=[],dungeonEnemies=[],particles=[],bolts=[],valleyRoad=[],roadPaths=new Map(),resourceLandmarks=[];
-let resourceState=new Map(),gatherLockKey=null;
+let resourceState=new Map(),gatherLockKey=null,resourceNodes={};
 let scene="world",returnPosition={x:0,y:0},dungeon={},dungeonCanvas=null;
 let currentShop=null,shopCanvas=null,shopCells=null;
 let dayNo=1,dayClock=0,roadSafety=62,kills=0,lastTime=performance.now();
@@ -293,9 +295,9 @@ let llmConfig={enabled:false,backend:"server",model:"",serverUrl:"http://localho
 const NEED_NAMES=["hunger","safety","belonging","comfort","status","purpose"];
 const PERSONAL_TRAITS=["generous","cautious","ambitious","stubborn","curious","dutiful","sociable","frugal","protective","independent"];
 const PLAN_ACTIONS=new Set(["assign_food_work","repair_home","save_coins","share_meal","seek_office","join_patrol","teach_child"]);
-const TOWN_ACTIONS=new Set(["food_reserve","road_patrol","apprenticeships","festival","housing_repair","market_fair"]);
+const TOWN_ACTIONS=new Set(["food_reserve","road_patrol","apprenticeships","festival","housing_repair","market_fair","build_walls"]);
 const PLAN_LABELS={secure_food:"Secure food",improve_shelter:"Repair the home",build_savings:"Build savings",strengthen_bonds:"Strengthen family bonds",seek_status:"Seek influence",support_guard:"Support the guard",educate_children:"Educate the children"};
-const POLICY_LABELS={food_reserve:"Fill the public reserve",road_patrol:"Fund road patrols",apprenticeships:"Expand apprenticeships",festival:"Hold a town festival",housing_repair:"Repair village homes",market_fair:"Sponsor a market fair"};
+const POLICY_LABELS={food_reserve:"Fill the public reserve",road_patrol:"Fund road patrols",apprenticeships:"Expand apprenticeships",festival:"Hold a town festival",housing_repair:"Repair village homes",market_fair:"Sponsor a market fair",build_walls:"Raise a palisade wall"};
 
 function seeded(seedValue){
   let s=(seedValue>>>0)||1;
@@ -378,6 +380,7 @@ class Market{
     this.lastUtility=this.avgUtility;
     const residents=town.agents;
     const production=[0,0,0,0],outputs=new Map(),demands=[0,0,0,0];
+    const materialFactor=GOODS.map((g,i)=>.55+.45*clamp(town.materialStock[i]/10,0,1));
     for(const a of residents){
       if(a.isGuard){
         const guardPay=Math.min(2.2,this.treasury);
@@ -387,7 +390,7 @@ class Market{
       practiceAgentSkills(a);
       const idx=goodIndex(a.produces);
       const hours=TIME_ENDOWMENT-a.leisure;
-      const q=hours*a.productivity*townAdvantage(town,a.produces)*.28*(a.isGuard?.15:1)*(a.ageGroup==="child"?.22:1);
+      const q=hours*a.productivity*townAdvantage(town,a.produces)*.28*materialFactor[idx]*(a.isGuard?.15:1)*(a.ageGroup==="child"?.22:1);
       a.dailyOutput=q;production[idx]+=q;outputs.set(a.id,q);
       const budget=clamp(a.wealth*.20+1.1,1.3,6.5);
       const goodsWeight=1-a.alphas[4];
@@ -424,6 +427,7 @@ class Market{
       for(const a of producerList)a.wealth+=producerPool*(outputs.get(a.id)||0)/Math.max(.001,production[i]);
       this.treasury+=spentByGood[i]-producerPool;
       this.inventory[i]=Math.max(0,available[i]-sold[i]);
+      town.materialStock[i]=Math.max(0,town.materialStock[i]-production[i]*.05);
       if(i===0){
         const decay=townHasFacility(town,"granary")?.015:.07;
         this.inventory[i]*=1-decay;
@@ -531,7 +535,8 @@ function townCandidates(town){
     {id:"apprenticeships",action:"apprenticeships",score:children*8+(townHasFacility(town,"academy")?18:0),rationale:"Young villagers need mentors and a route into useful work."},
     {id:"festival",action:"festival",score:belonging+(town.market.treasury>30?12:-12),rationale:"A shared celebration could restore trust and belonging."},
     {id:"housing_repair",action:"housing_repair",score:weakHomes,rationale:"Several homes need communal repair before conditions worsen."},
-    {id:"market_fair",action:"market_fair",score:town.market.inventory.reduce((s,v)=>s+v,0)/4+(town.market.treasury<20?18:0),rationale:"A fair can attract caravans, exchange surplus, and replenish the treasury."}
+    {id:"market_fair",action:"market_fair",score:town.market.inventory.reduce((s,v)=>s+v,0)/4+(town.market.treasury<20?18:0),rationale:"A fair can attract caravans, exchange surplus, and replenish the treasury."},
+    {id:"build_walls",action:"build_walls",score:town.walls&&town.walls.complete?-999:(100-roadSafety)*.9+worldEnemies.filter(e=>!e.dead&&Math.hypot(e.x-town.cx,e.y-town.cy)<300).length*8+(town.materialStock[1]>5?12:-12)+(town.walls&&town.walls.placed>0?20:0),rationale:town.walls&&town.walls.placed>0?"The half-built palisade should be finished before raiders test it.":"A palisade with a gate would keep raiders off the streets for good."}
   ].filter(c=>TOWN_ACTIONS.has(c.action)).sort((a,b)=>b.score-a.score);
 }
 function setTownPolicy(town,candidate,source="utility",rationale=null){
@@ -548,6 +553,20 @@ function applyTownPolicy(town){
   if(p.action==="festival"){for(const a of town.agents)a.needs.belonging=clamp(a.needs.belonging-7,0,100);town.market.treasury=Math.max(0,town.market.treasury-.4)}
   if(p.action==="housing_repair"){for(const h of town.houses)h.stock.shelter=clamp(h.stock.shelter+1.8,0,100);town.materialStock[1]=Math.max(0,town.materialStock[1]-.25)}
   if(p.action==="market_fair"){town.market.treasury+=.6;if(dayNo%3===0&&caravans.length<3)scheduleCaravan(false)}
+  if(p.action==="build_walls"){
+    const cells=wallPlan(town);town.walls=town.walls||{placed:0,complete:false};
+    const builders=town.agents.filter(a=>a.cls==="builder"&&a.ageGroup!=="child").length;
+    let budget=4+builders*2,built=false;
+    while(budget>0&&town.walls.placed<cells.length&&town.materialStock[1]>=.4){
+      const c=cells[town.walls.placed++];town.materialStock[1]-=.4;
+      if(!c.gate){tiles[c.y][c.x]=8;solid.add(keyOf(c.x,c.y))}
+      budget--;built=true;
+    }
+    p.progress=clamp(100*town.walls.placed/Math.max(1,cells.length),0,100);
+    if(built)paintWorld();
+    if(town.walls.placed>=cells.length&&!town.walls.complete){town.walls.complete=true;p.completed=true;recordVillageEvent(town,"PROJECT",townTitle(town.name)+" completes its palisade and hangs the town gate.",{salience:9})}
+    else if(!built&&town.walls.placed<cells.length&&dayNo%4===0)recordVillageEvent(town,"SHORTAGE","Wall construction in "+townTitle(town.name)+" stalls for lack of timber.",{salience:6});
+  }
   if(p.progress>=100&&!p.completed){p.completed=true;recordVillageEvent(town,"PROJECT",town.name+" completes its effort to "+p.label.toLowerCase()+".",{salience:7})}
 }
 function applyInstitutionsDaily(town){
@@ -571,13 +590,18 @@ function updateHouseholdDay(town,house){
   for(let i=0;i<members.length;i++)for(let j=i+1;j<members.length;j++){const delta=plan.action==="share_meal"?{affection:2.5,trust:1.5,resentment:-1}:{affection:.2,trust:.1};changeRelationship(members[i],members[j],delta)}
   if(house.stock.food===0&&(!house.lastHungerEvent||dayNo-house.lastHungerEvent>=4)){house.lastHungerEvent=dayNo;recordVillageEvent(town,"SHORTAGE",house.familyName+" household runs out of food.",{actorId:members[0].id,emotion:"fear",salience:8})}
 }
+function gatherFocus(a){return Object.keys(SKILL_INDEX).find(k=>a.equipment&&a.equipment[k])||null}
 function buildDailySchedule(a){
   const h=householdFor(a),plan=h&&h.plan,policy=a.town.institutions&&a.town.institutions.currentPolicy,child=a.ageGroup==="child";
-  a.schedule=[{until:.18,activity:"family breakfast",place:"home"},{until:.60,activity:child?"apprenticeship":a.isGuard?"guard patrol":plan&&plan.action==="assign_food_work"?"helping secure food":"working as "+a.profession.toLowerCase(),place:child?"school":a.isGuard?"patrol":plan&&plan.action==="assign_food_work"?"food":"work"},{until:.78,activity:policy&&policy.action==="festival"?"town festival":plan&&plan.action==="share_meal"?"family supper":a.town.institutions.councilIds.includes(a.id)&&dayNo%7===0?"council meeting":"market and neighbors",place:policy&&policy.action==="festival"?"market":plan&&plan.action==="share_meal"?"home":a.town.institutions.councilIds.includes(a.id)&&dayNo%7===0?"council":"social"},{until:1,activity:"resting at home",place:"home"}];
+  const focus=gatherFocus(a),node=focus&&resourceNodes[focus];
+  const gathering=!child&&!a.isGuard&&focus&&node&&a.town.materialStock[SKILL_INDEX[focus]]<20&&(a.id+dayNo)%4<3&&!(plan&&plan.action==="assign_food_work"&&focus!=="fishing");
+  const workEntry=child?{activity:"apprenticeship",place:"school"}:a.isGuard?{activity:"guard patrol",place:"patrol"}:gathering?{activity:GATHER_ACTIVITY[focus],place:"gather",skill:focus}:plan&&plan.action==="assign_food_work"?{activity:"helping secure food",place:"food"}:{activity:"working as "+a.profession.toLowerCase(),place:"work"};
+  a.schedule=[{until:.18,activity:"family breakfast",place:"home"},Object.assign({until:.60},workEntry),{until:.78,activity:policy&&policy.action==="festival"?"town festival":plan&&plan.action==="share_meal"?"family supper":a.town.institutions.councilIds.includes(a.id)&&dayNo%7===0?"council meeting":"market and neighbors",place:policy&&policy.action==="festival"?"market":plan&&plan.action==="share_meal"?"home":a.town.institutions.councilIds.includes(a.id)&&dayNo%7===0?"council":"social"},{until:1,activity:"resting at home",place:"home"}];
 }
 function scheduleTarget(a){
-  const phase=dayClock/DAY_SECONDS,entry=(a.schedule||[]).find(s=>phase<s.until)||(a.schedule||[]).slice(-1)[0];if(!entry)return a.home;a.currentActivity=entry.activity;
+  const phase=dayClock/DAY_SECONDS,entry=(a.schedule||[]).find(s=>phase<s.until)||(a.schedule||[]).slice(-1)[0];if(!entry)return a.home;a.currentActivity=entry.activity;a.currentPlace=entry.place;a.gatherSkill=entry.skill||null;
   if(entry.place==="home")return a.home;if(entry.place==="patrol"){const angle=a.id*1.9+phase*Math.PI*2,radius=58+(a.id%3)*13;return {x:a.town.cx+Math.cos(angle)*radius,y:a.town.cy+Math.sin(angle)*radius*.65}}
+  if(entry.place==="gather"){const node=resourceNodes[entry.skill];if(node)return {x:node.x+(a.id%5-2)*7,y:node.y+(Math.floor(a.id/5)%3-1)*8}}
   if(entry.place==="school")return a.town.sites.training;if(entry.place==="food")return a.town.sites.food;if(entry.place==="work")return a.town.sites[a.produces];if(entry.place==="council"||entry.place==="market")return a.town.marketPoint;
   if(entry.place==="social"){const rel=Object.entries(a.relationships||{}).sort((x,y)=>(y[1].affection-y[1].resentment)-(x[1].affection-x[1].resentment))[0],friend=rel&&agents.find(x=>x.id===+rel[0]&&x.town===a.town);return friend&&friend.home||a.town.marketPoint}
   return a.home;
@@ -749,7 +773,7 @@ function generateWorld(newSeed){
     else{const pool=shuffled(["watchpost","academy","court","granary","workshop"]),count=Math.floor(rand()*3);facilities=pool.slice(0,count)}
     const population=isCapital?20:5+Math.floor(rand()*8),houseCount=Math.ceil(population/4);
     const town={id:index,name,rx,ry,cx:(rx+8)*TILE,cy:(ry+6)*TILE,isCapital,populationTarget:population,agents:[],market:new Market(initial),sites:{},homePoints:[],houses:[],
-      building:null,facilities,advantages,dominantGood:GOODS[dominant],theme:isCapital?"the old capital, where three martial traditions meet a crowded regional market":TOWN_THEMES[Math.floor(rand()*TOWN_THEMES.length)],materialStock:[0,0,0,0]};
+      building:null,facilities,advantages,dominantGood:GOODS[dominant],theme:isCapital?"the old capital, where three martial traditions meet a crowded regional market":TOWN_THEMES[Math.floor(rand()*TOWN_THEMES.length)],materialStock:[8,10,6,4],walls:{placed:0,complete:false}};
     makeTownLayout(town,houseCount);
     for(const b of town.layout.buildings)for(let yy=0;yy<b.h;yy++)for(let xx=0;xx<b.w;xx++)solid.add(keyOf(rx+b.dx+xx,ry+b.dy+yy));
     for(const h of town.houses)for(let yy=0;yy<2;yy++)for(let xx=0;xx<2;xx++)solid.add(keyOf(rx+h.dx+xx,ry+h.dy+yy));
@@ -793,6 +817,12 @@ function generateWorld(newSeed){
     for(const p of pattern){const gx=site.x+p[0],gy=site.y+p[1];tiles[gy][gx]=site.tile;solid.add(keyOf(gx,gy))}
   }
   dungeon.entrance={x:caveTile.x*TILE,y:caveTile.y*TILE};
+  resourceNodes={
+    fishing:{index:0,x:25*TILE+8,y:5*TILE+8,label:"the fishing pond",stock:60,max:60,regen:9},
+    forestry:{index:1,x:28*TILE+8,y:30*TILE+8,label:"the timber grove",stock:80,max:80,regen:7},
+    mining:{index:2,x:45*TILE+8,y:43*TILE+8,label:"the mountain quarry",stock:90,max:90,regen:5},
+    hunting:{index:3,x:dungeon.entrance.x+8,y:dungeon.entrance.y+44,label:"the wild range",stock:45,max:45,regen:6}
+  };
   agents=[];let id=0;
   for(const town of towns){
     const roster=town.isCapital?shuffled(Array.from({length:20},(_,i)=>["warrior","mage","noble","builder"][i%4])):
@@ -819,6 +849,7 @@ function paintWorld(){
     else if(t===5){w.fillStyle="#9c7d50";w.fillRect(px,py,TILE,TILE);w.fillStyle="#81623e";w.fillRect(px+3,py+3,2,2);w.fillRect(px+11,py+10,2,2)}
     else if(t===6){w.fillStyle="#21425e";w.fillRect(px,py,TILE,TILE);w.fillStyle="#8b6a41";w.fillRect(px,py+2,TILE,12);w.fillStyle="#634b30";for(let i=0;i<4;i++)w.fillRect(px+i*4+1,py+2,1,12)}
     else if(t===7){w.fillStyle=(x+y)%2?"#8d7a56":"#96825c";w.fillRect(px,py,TILE,TILE)}
+    else if(t===8){w.fillStyle="#5c452b";w.fillRect(px,py,TILE,TILE);w.fillStyle="#6f5636";for(let i=0;i<4;i++)w.fillRect(px+i*4+1,py,2,TILE);w.fillStyle="#83683f";w.fillRect(px,py,TILE,2);w.fillStyle="#3d2d1b";w.fillRect(px,py+TILE-3,TILE,3)}
     else{w.fillStyle=(x+y)%2?"#315039":"#2d4934";w.fillRect(px,py,TILE,TILE);if((x*11+y*17)%9===0){w.fillStyle="#25402c";w.fillRect(px+6,py+9,2,2)}if(t===1){w.fillStyle="#4a3524";w.fillRect(px+6,py+8,4,8);w.fillStyle="#213a27";w.fillRect(px+2,py,12,10);w.fillStyle="#2b5135";w.fillRect(px+4,py+2,8,6)}}
   }
   for(const town of towns){
@@ -1310,6 +1341,8 @@ function gatherNearby(){
   let gained=0;while(gained<amount&&canAddMaterial(target.def.index,gained+1))gained++;
   if(gained<=0){toast("Your backpack cannot fit the gathered stack.");return true}
   player.materials[target.def.index]+=gained;target.state.hits=0;target.state.readyDay=dayNo+Math.max(1,target.def.cooldown-(rank>=3?1:0));gatherLockKey=null;
+  const depletedNode=Object.values(resourceNodes).find(n=>n.index===target.def.index&&Math.hypot(n.x-cx,n.y-cy)<90);
+  if(depletedNode)depletedNode.stock=Math.max(0,depletedNode.stock-gained);
   resourceState.set(target.key,target.state);quest.gathered=true;
   gainPlayerXP(2+gained,"gathering");
   toast("Gathered "+gained+" "+target.def.name+". This source recovers on day "+target.state.readyDay+".");
@@ -1723,6 +1756,7 @@ function newDay(){
     town.market.tick(town);
     town.materialStock=town.materialStock.map((v,i)=>Math.max(0,v-(i===0?1.2:.45)));
   }
+  for(const key of Object.keys(resourceNodes)){const n=resourceNodes[key];n.stock=Math.min(n.max,n.stock+n.regen)}
   runLivingDay();
   considerMigration();
   const watchposts=towns.filter(t=>townHasFacility(t,"watchpost")).length;
@@ -1733,8 +1767,45 @@ function newDay(){
   worldEnemies=worldEnemies.filter(e=>e.type!=="rat"||towns.every(t=>Math.hypot(e.x-t.cx,e.y-t.cy)>80));
   saveGame(true);renderLedger();updateUI();
 }
+function wallPlan(town){
+  if(town.wallCells)return town.wallCells;
+  const x0=town.rx-1,y0=town.ry-1,x1=town.rx+TOWN_W,y1=town.ry+TOWN_H,per=[];
+  for(let x=x0;x<=x1;x++)per.push([x,y0]);
+  for(let y=y0+1;y<=y1;y++)per.push([x1,y]);
+  for(let x=x1-1;x>=x0;x--)per.push([x,y1]);
+  for(let y=y1-1;y>y0;y--)per.push([x0,y]);
+  town.wallCells=per.filter(([x,y])=>x>=1&&y>=1&&x<MW-1&&y<MH-1&&!solid.has(keyOf(x,y))).map(([x,y])=>({x,y,gate:tiles[y][x]===5||tiles[y][x]===6}));
+  if(!town.wallCells.some(c=>c.gate)){const south=town.wallCells.find(c=>c.y===y1&&Math.abs(c.x-(town.rx+8))<3);if(south)south.gate=true}
+  return town.wallCells;
+}
+function insideTownWalls(town,x,y){return x>=(town.rx-1)*TILE&&x<(town.rx+TOWN_W+1)*TILE&&y>=(town.ry-1)*TILE&&y<(town.ry+TOWN_H+1)*TILE}
+function nearestGate(town,x,y){
+  const gates=wallPlan(town).filter(c=>c.gate);if(!gates.length)return null;
+  let best=null,bestD=Infinity;
+  for(const c of gates){const d=Math.hypot(c.x*TILE+8-x,c.y*TILE+8-y);if(d<bestD){best=c;bestD=d}}
+  return {x:best.x*TILE,y:best.y*TILE};
+}
 function agentTarget(a){
-  return scheduleTarget(a);
+  const target=scheduleTarget(a),t=a.town;
+  if(t.walls&&t.walls.placed>0){
+    const inA=insideTownWalls(t,a.x,a.y),inT=insideTownWalls(t,target.x,target.y);
+    if(inA!==inT){const gate=nearestGate(t,a.x,a.y);if(gate&&Math.hypot(a.x-gate.x,a.y-gate.y)>14)return gate}
+  }
+  return target;
+}
+function agentGatherTick(a,dt){
+  const skill=a.gatherSkill,node=skill&&resourceNodes[skill];if(!node)return;
+  a.gatherTick=(a.gatherTick||0)+dt;if(a.gatherTick<4)return;
+  a.gatherTick=0;
+  const idx=node.index;
+  if(node.stock<=.1){
+    a.currentActivity="finding "+node.label+" picked bare";
+    if(node.exhaustedDay!==dayNo){node.exhaustedDay=dayNo;recordVillageEvent(a.town,"SHORTAGE","Gatherers report "+node.label+" is nearly exhausted; it needs time to recover.",{actorId:a.id,salience:7})}
+    return;
+  }
+  const take=Math.min(node.stock,.12+lifeRank(a,skill)*.04);
+  node.stock-=take;a.town.materialStock[idx]+=take;gainAgentXP(a,.4);
+  particles.push({scene:"world",x:node.x+(rand()-.5)*16,y:node.y+(rand()-.5)*12,vx:(rand()-.5)*30,vy:-12-rand()*14,life:.3,color:["#83b9d7","#8e6842","#b8b7b1","#c98f6a"][idx]});
 }
 function stepAgents(dt){
   if(scene!=="world")return;
@@ -1759,6 +1830,7 @@ function stepAgents(dt){
     const target=enemy&&enemyDistance>=19?enemy:agentTarget(a),jx=a.isGuard?0:Math.sin(a.bob*2.8)*5,jy=a.isGuard?0:Math.cos(a.bob*2.2)*4;
     const dx=target.x+jx-a.x,dy=target.y+jy-a.y,d=Math.hypot(dx,dy);
     if(d>2&&a.guardStun<=0){const speed=(a.isGuard?43*agentCombatMods(a).speed:30)*dt;a.x+=dx/d*speed;a.y+=dy/d*speed;a.bob+=dt*6}else a.bob+=dt;
+    if(!a.isGuard&&a.currentPlace==="gather"&&d<=26)agentGatherTick(a,dt);
   }
 }
 
@@ -2208,7 +2280,7 @@ function snapshot(){
       influenceDay:player.influenceDay,tradeOrigins:player.tradeOrigins,level:player.level,xp:player.xp,specialtyPoints:player.specialtyPoints,
       skillPoints:player.skillPoints,lifeSkills:player.lifeSkills,equipment:player.equipment,homeTownName:player.homeTownName,backpackCols:player.backpackCols,backpackRows:player.backpackRows,
       gearInventory:player.gearInventory,equippedSlots:player.equippedSlots,nextItemUid:player.nextItemUid},
-    towns:towns.map(t=>({name:t.name,building:t.building,materialStock:t.materialStock,chronicle:t.chronicle,institutions:t.institutions,houses:t.houses.map(h=>({id:h.id,familyName:h.familyName,stock:h.stock,plan:h.plan,planHistory:h.planHistory,lastCouncilDay:h.lastCouncilDay,lastHungerEvent:h.lastHungerEvent})),
+    towns:towns.map(t=>({name:t.name,building:t.building,materialStock:t.materialStock,walls:t.walls,chronicle:t.chronicle,institutions:t.institutions,houses:t.houses.map(h=>({id:h.id,familyName:h.familyName,stock:h.stock,plan:h.plan,planHistory:h.planHistory,lastCouncilDay:h.lastCouncilDay,lastHungerEvent:h.lastHungerEvent})),
       market:{prices:t.market.prices,lastPrices:t.market.lastPrices,inventory:t.market.inventory,treasury:t.market.treasury,avgUtility:t.market.avgUtility,lastUtility:t.market.lastUtility,shortage:t.market.shortage}})),
     agents:agents.map(a=>({id:a.id,cls:a.cls,town:a.town.name,name:a.name,alphas:a.alphas,productivity:a.productivity,wealth:a.wealth,
       utility:a.utility,lastUtility:a.lastUtility,trend:a.trend,leisure:a.leisure,plan:a.plan,memory:a.memory,
@@ -2217,7 +2289,8 @@ function snapshot(){
       firstName:a.firstName,ageGroup:a.ageGroup,gender:a.gender,age:a.age,familyName:a.familyName,spouseId:a.spouseId,parentIds:a.parentIds,childrenIds:a.childrenIds,
       traits:a.traits,needs:a.needs,relationships:a.relationships,eventMemory:a.eventMemory,rumors:a.rumors,rumorNotes:a.rumorNotes,schedule:a.schedule,currentActivity:a.currentActivity,publicRationale:a.publicRationale})),
     dungeon:{chestOpened:dungeon.chestOpened,wardenDead:dungeon.wardenDead,cleared:dungeon.cleared},
-    resourceState:[...resourceState.entries()]
+    resourceState:[...resourceState.entries()],
+    resourceNodes:Object.fromEntries(Object.entries(resourceNodes).map(([k,n])=>[k,{stock:n.stock}]))
   };
 }
 function saveGame(silent=false){
@@ -2239,6 +2312,7 @@ function applySave(data){
   for(const savedTown of data.towns||[]){
     const town=towns.find(t=>t.name===savedTown.name);if(!town)continue;
     town.building=savedTown.building||null;town.materialStock=(savedTown.materialStock||[0,0,0,0]).slice();Object.assign(town.market,savedTown.market||{});
+    if(savedTown.walls){town.walls=Object.assign({placed:0,complete:false},savedTown.walls);const wallCells=wallPlan(town);for(let i=0;i<Math.min(town.walls.placed,wallCells.length);i++){const c=wallCells[i];if(!c.gate){tiles[c.y][c.x]=8;solid.add(keyOf(c.x,c.y))}}}
     if(savedTown.chronicle)town.chronicle=savedTown.chronicle.slice();if(savedTown.institutions)town.institutions=Object.assign(town.institutions||{},savedTown.institutions);
     for(const savedHouse of savedTown.houses||[]){const house=town.houses.find(h=>h.id===savedHouse.id);if(house)Object.assign(house,savedHouse)}
     const specialty=Object.keys(SPECIALTY_BUILDING).find(cls=>SPECIALTY_BUILDING[cls]===town.building);
@@ -2267,6 +2341,7 @@ function applySave(data){
     if(dungeon.cleared)dungeonEnemies=[];
   }
   resourceState=new Map(data.resourceState||[]);
+  if(data.resourceNodes)for(const k of Object.keys(resourceNodes))if(data.resourceNodes[k])resourceNodes[k].stock=clamp(data.resourceNodes[k].stock,0,resourceNodes[k].max);
   if(data.living){villageEvents=(data.living.villageEvents||[]).slice();nextEventId=data.living.nextEventId||((villageEvents.length?villageEvents[villageEvents.length-1].id:0)+1);godMode=!!data.living.godMode;llmConfig=Object.assign(llmConfig,data.living.llmConfig||{},{enabled:false})}
   updateGodModeVisibility();
   scene="world";currentShop=null;shopCanvas=null;shopCells=null;player.maxHp=mods().maxHp;player.hp=clamp(player.hp,1,player.maxHp);player.stamina=clamp(player.stamina||100,0,mods().maxStamina);
@@ -2569,7 +2644,7 @@ function frame(now){
   const dt=Math.min(.05,(now-lastTime)/1000);lastTime=now;
   if(selectedClass&&!activePanel){
     dayClock+=dt;if(dayClock>=DAY_SECONDS){dayClock-=DAY_SECONDS;newDay()}
-    if(scene==="world"&&isNight()&&rand()<dt*.62)spawnRoadRat();
+    if(scene==="world"&&isNight()&&rand()<dt*.12)spawnRoadRat();
     stepAgents(dt);stepCaravans(dt);stepPlayer(dt);stepBolts(dt);stepEnemies(dt);stepParticles(dt);
     screenShake=Math.max(0,screenShake-dt*28);
     if(toastTimer>0)toastTimer-=dt;

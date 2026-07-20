@@ -65,7 +65,8 @@ On a phone in landscape, the touch HUD provides all of the above.
 - **Memory & rumor**: villagers remember events they witnessed and *distort* the ones they only heard about, filtered through their traits.
 - **Relationships**: affection, trust, respect, obligation, resentment, mentorship — per pair, asymmetric.
 - **Households**: shared stocks, family plans chosen from scored candidates ("secure food", "seek office", …).
-- **Institutions**: town councils, taxes, policies, public chronicles, festivals.
+- **Scarcity**: the fishing pond, timber grove, quarry, and wild range hold finite stock that regenerates slowly; villagers make visible gathering trips when their town runs low, production requires materials, and exhausted grounds ripple into shortages and prices.
+- **Institutions**: town councils, taxes, policies, public chronicles, festivals — including raising a palisade wall with a gate that physically keeps raiders out.
 
 Turn on **God mode** (Menu → Help) to inspect any villager's private state and watch the planner think.
 
