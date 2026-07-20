@@ -143,6 +143,7 @@ function newDay(){
   }
   for(const key of Object.keys(resourceNodes)){const n=resourceNodes[key];n.stock=Math.min(n.max,n.stock+n.regen)}
   runLivingDay();
+  applyGovernmentDailyEffects();
   considerMigration();
   const watchposts=towns.filter(t=>townHasFacility(t,"watchpost")).length;
   roadSafety=clamp(roadSafety-Math.max(1,7-watchposts*4),0,100);
@@ -221,10 +222,11 @@ function stepAgentCore(a,dt,tier){
 function stepAgents(dt){
   if(scene!=="world")return;npcUpdateMetrics.seconds+=dt;
   for(const a of agents){
-    if(a.paused)continue;const tier=agentUpdateTier(a),interval=tier==="visible"?0:tier==="near"?NPC_UPDATE_REGIME.nearInterval:NPC_UPDATE_REGIME.farInterval;
+    if(a.paused||a.raidState)continue;const tier=agentUpdateTier(a),interval=tier==="visible"?0:tier==="near"?NPC_UPDATE_REGIME.nearInterval:NPC_UPDATE_REGIME.farInterval;
     if(!interval){a.updateAccumulator=0;stepAgentCore(a,dt,tier);npcUpdateMetrics.visible++;continue}
     a.updateAccumulator=(a.updateAccumulator||0)+dt;if(a.updateAccumulator<interval){npcUpdateMetrics.skipped++;continue}
     const elapsed=Math.min(NPC_UPDATE_REGIME.maxStep,a.updateAccumulator);a.updateAccumulator=0;stepAgentCore(a,elapsed,tier);npcUpdateMetrics[tier]++;
   }
   if(npcUpdateMetrics.seconds>=1){npcUpdateMetrics.last={visible:npcUpdateMetrics.visible,near:npcUpdateMetrics.near,far:npcUpdateMetrics.far,skipped:npcUpdateMetrics.skipped};npcUpdateMetrics.visible=0;npcUpdateMetrics.near=0;npcUpdateMetrics.far=0;npcUpdateMetrics.skipped=0;npcUpdateMetrics.seconds%=1}
+  stepGovernmentRaids(dt);separateCitizens();
 }

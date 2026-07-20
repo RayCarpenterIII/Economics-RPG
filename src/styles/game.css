@@ -50,7 +50,7 @@
   #menuPanel{justify-content:flex-start;overflow:hidden;padding:0;text-align:left}
   #menuShell{width:100%;height:100%;display:flex;flex-direction:column;min-height:0}
   #menuHeader{flex:0 0 auto;background:rgba(15,18,24,.98);border-bottom:1px solid var(--line);padding:10px 12px 8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  #menuTabs{display:grid;grid-template-columns:repeat(4,minmax(105px,1fr));gap:7px;width:min(720px,100%)}.menuTabBtn{min-height:42px;padding:9px 12px;font-size:10px}.menuTabBtn.active{border-color:var(--gold);color:var(--gold);background:var(--panel2)}
+  #menuTabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:3px;width:100%}.menuTabBtn{min-height:42px;min-width:0;padding:8px 2px;font-size:clamp(6.5px,1.6vw,9.5px);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.menuTabBtn.active{border-color:var(--gold);color:var(--gold);background:var(--panel2)}
   #menuBody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 70px}
   .menuTab{display:none;width:100%;max-width:900px;margin:0 auto}.menuTab.active{display:block}
   .menuTab>h2{text-align:center;margin-bottom:9px}.menuLead{text-align:center;margin:0 auto 12px}
@@ -108,4 +108,76 @@
     #mobileMenu{right:max(62px,calc(env(safe-area-inset-right) + 50px))}
     .overlay{position:fixed;inset:0;z-index:60;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
   }
-  @media(max-width:650px){h1{font-size:12px}#ledger{gap:8px}.card{width:145px}.overlay{justify-content:flex-start}.overlay h2{margin-top:8px}#menuHeader{align-items:stretch}#menuTabs{grid-template-columns:repeat(2,minmax(115px,1fr));width:100%}#lifeSkillTrees,#inventoryContent,#homeTownContent,#craftingContent,#godContent,#settingsContent{grid-template-columns:1fr}.residentList{grid-template-columns:1fr}.skillSection{justify-content:flex-start}.menuTabBtn{min-height:46px;padding:9px;font-size:10px}.chronicleEntry{grid-template-columns:55px 1fr}.chronicleEntry>span:last-child{grid-column:1/-1}}
+  @media(max-width:650px){h1{font-size:12px}#ledger{gap:8px}.card{width:145px}.overlay{justify-content:flex-start}.overlay h2{margin-top:8px}#menuHeader{align-items:stretch}#menuTabs{grid-template-columns:repeat(3,minmax(0,1fr));width:100%}#lifeSkillTrees,#inventoryContent,#homeTownContent,#craftingContent,#godContent,#settingsContent{grid-template-columns:1fr}.residentList{grid-template-columns:1fr}.skillSection{justify-content:flex-start}.menuTabBtn{min-height:46px;padding:9px 2px;font-size:8px}.chronicleEntry{grid-template-columns:55px 1fr}.chronicleEntry>span:last-child{grid-column:1/-1}}
+
+  /* Government */
+  .governmentColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;text-align:left}
+  .governmentSummary{display:grid;gap:6px;margin-bottom:12px}.governmentSummary span{color:var(--dim);font-size:10px}
+  .governmentActions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .dangerBtn{border-color:var(--bad)!important;color:#ffd1ca!important}
+  .governmentNotice{margin-top:10px;padding:10px;border:1px solid var(--line);background:#121722;font-size:9px;line-height:1.5}
+  .governmentNotice.danger{border-color:var(--bad)}
+  .governmentRelation{display:grid;grid-template-columns:110px 1fr 38px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .governmentRelation small{display:block;color:var(--dim);font-size:9px}
+  .governmentRelation b{text-align:right}
+  .relationMeter{height:8px;background:#090c12;border:1px solid var(--line);overflow:hidden}
+  .relationMeter span{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--gold),var(--good))}
+  #townGovernmentBlock{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+  #governmentEntryPanel{z-index:30;background:rgba(11,14,20,.985)}
+  .governmentEntryStep{color:var(--gold);font-size:10px;letter-spacing:2px}
+  .governmentEntryChoices{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px;width:min(720px,96%)}
+  .governmentEntryChoice{background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:14px;text-align:left;cursor:pointer;min-height:145px;display:flex;flex-direction:column;gap:7px;font:inherit}
+  .governmentEntryChoice:hover,.governmentEntryChoice:focus-visible{border-color:var(--gold);outline:none}
+  .governmentEntryChoice strong{color:var(--gold);font-size:12px;letter-spacing:2px}
+  .governmentEntryChoice small{color:var(--dim);line-height:1.45}
+  .governmentEntryChoice .govEffect{display:block;color:var(--ink);font-size:9px;line-height:1.5;border-top:1px solid var(--line);padding-top:7px;margin-top:auto}
+
+  /* Player relationships */
+  #relationshipsContent{text-align:left}
+  .playerRelationshipList{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:7px;margin-top:10px}
+  .playerRelationshipCard{border:1px solid var(--line);background:var(--panel);padding:8px;font-size:9px;line-height:1.5}
+  .playerRelationshipCard.family{border-color:var(--gold)}
+  .playerRelationshipCard.friend{border-color:var(--good)}
+  .playerRelationshipCard.enemy{border-color:var(--bad)}
+  .playerRelationshipCard.heard{opacity:.72}
+  .relationshipStatus{display:inline-block;margin-top:4px;padding:2px 5px;border:1px solid currentColor}
+  .speciesBadge{display:inline-block;border:1px solid var(--line);padding:2px 5px;color:var(--gold);font-size:9px}
+
+  /* Character stats page */
+  #statsContent{text-align:left}
+  .statsHero{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;margin-bottom:12px}
+  .statsPortrait{font-size:38px;text-align:center;border:1px solid var(--line);background:var(--panel2);padding:8px 0}
+  .statsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}
+  .statsColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  .statsColumns .menuCard{margin-bottom:12px}
+  .statsAbility{border:1px solid var(--line);padding:8px;margin:7px 0;font-size:9px;line-height:1.5}
+  .statsAbility.ready{border-color:var(--good)}
+  .statsAbility.cooling{border-color:var(--gold)}
+  .statsAbility.spent{border-color:var(--bad);opacity:.8}
+  .statsAbility strong{color:var(--gold)}
+
+  /* Active ability dock */
+  #skillBubbleDock{position:absolute;right:max(8px,env(safe-area-inset-right));top:31%;z-index:26;display:none;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:none}
+  .abilityBubble{pointer-events:auto;width:60px;height:60px;border-radius:50%;border:2px solid var(--line);background:rgba(20,25,34,.97);color:var(--ink);font:8px "Courier New",monospace;display:grid;grid-template-rows:14px 1fr 13px;place-items:center;padding:4px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+  .abilityBubble.ready{border-color:var(--good)}
+  .abilityBubble.cooling{border-color:var(--gold)}
+  .abilityBubble.spent{border-color:var(--bad);opacity:.72}
+  .abilityBubble:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .abilityBubble .abilityKey{color:var(--gold);letter-spacing:1px}
+  .abilityBubble .abilityIcon{font-size:17px}
+  .abilityBubble .abilityStatus{color:var(--dim)}
+
+  /* Camera zoom and fog */
+  .zoomReadout{color:var(--gold);font-weight:bold}
+  .zoomSlider{width:100%}
+  .fogLegend{color:var(--dim)}
+  @media(max-width:760px){
+    .governmentColumns,.statsColumns{grid-template-columns:1fr}
+    .governmentEntryChoices{grid-template-columns:1fr}
+    .governmentEntryChoice{min-height:0}
+    .playerRelationshipList{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .governmentRelation{grid-template-columns:95px 1fr 34px}
+    #skillBubbleDock{gap:6px}
+    .abilityBubble{width:48px;height:48px;grid-template-rows:11px 1fr 11px;font-size:7px}
+    .abilityBubble .abilityIcon{font-size:13px}
+  }

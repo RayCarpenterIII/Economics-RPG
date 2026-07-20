@@ -101,20 +101,27 @@ async function llmDialogueResponse(a,line){
   a.dialogueHistory.push({role:"user",content:line},{role:"assistant",content:reply});if(a.dialogueHistory.length>16)a.dialogueHistory.splice(0,a.dialogueHistory.length-16);
   return reply;
 }
+let thinkingSfxTimer=null;
+function startThinkingSfx(){stopThinkingSfx();playSfx("think");thinkingSfxTimer=setInterval(()=>playSfx("think"),1500)}
+function stopThinkingSfx(){if(thinkingSfxTimer){clearInterval(thinkingSfxTimer);thinkingSfxTimer=null}}
 async function sendDialogue(){
   if(!dialogueAgent||dialogueBusy)return;
   const input=document.getElementById("dialogueInput"),line=input.value.trim();
   if(!line)return;
   const a=dialogueAgent,output=document.getElementById("dialogueText"),button=document.getElementById("dialogueSend");input.value="";
   rememberImportantPlayerFact(a,line);
+  deepenPlayerRelationship(a,true);
   dialogueBusy=true;input.disabled=true;button.disabled=true;
   try{
-    if(llmConfig.backend==="browser-lite"&&!llmEngine){output.textContent="Loading the tiny villager mind for your first conversation…";await initializeLocalLLM()}
-    if(!llmConfig.enabled||!llmEngine){output.textContent=npcResponse(a,line);return}
+    if(llmConfig.backend==="browser-lite"&&!llmEngine){output.textContent="Loading the tiny villager mind for your first conversation…";startThinkingSfx();await initializeLocalLLM()}
+    if(!llmConfig.enabled||!llmEngine){output.textContent=npcResponse(a,line);playSfx("talk");return}
     output.textContent=a.firstName+" considers your words…";
+    startThinkingSfx();
     const reply=await llmDialogueResponse(a,line);
-    if(dialogueAgent===a)output.textContent=reply;
+    stopThinkingSfx();
+    if(dialogueAgent===a){output.textContent=reply;playSfx("talk")}
   }catch(error){
-    if(dialogueAgent===a)output.textContent=npcResponse(a,line)+"\n\n[Local mind unavailable for this reply: "+String(error.message||error).slice(0,100)+"]";
-  }finally{dialogueBusy=false;input.disabled=false;button.disabled=false;if(dialogueAgent===a)input.focus()}
+    stopThinkingSfx();
+    if(dialogueAgent===a){output.textContent=npcResponse(a,line)+"\n\n[Local mind unavailable for this reply: "+String(error.message||error).slice(0,100)+"]";playSfx("talk")}
+  }finally{stopThinkingSfx();dialogueBusy=false;input.disabled=false;button.disabled=false;if(dialogueAgent===a)input.focus()}
 }

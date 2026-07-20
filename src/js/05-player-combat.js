@@ -60,6 +60,7 @@ const GEAR_DEFS={
   iron_sword:{name:"Ember Greatsword",icon:"⚔",slot:"weapon",w:2,h:3,desc:"A Watchpost-forged blade built for Warriors.",stats:{power:2,special:1}},
   runed_staff:{name:"Runed Staff",icon:"⚕",slot:"weapon",w:1,h:4,desc:"An Academy focus that amplifies spellwork.",stats:{power:1,special:2}},
   court_rapier:{name:"Court Rapier",icon:"⌁",slot:"weapon",w:1,h:3,desc:"A Civic Court dueling weapon of exacting balance.",stats:{power:2,speed:5}},
+  apprentice_wand:{name:"Apprentice Wand",icon:"✧",slot:"weapon",w:1,h:2,desc:"A simple arcane focus for a beginning Mage.",stats:{power:1,special:1}},
   work_gloves:{name:"Work Gloves",icon:"∪",slot:"gauntlets",w:2,h:1,desc:"Reinforced gloves for tools and fighting.",stats:{stamina:8}},
   iron_gauntlets:{name:"Iron Gauntlets",icon:"▰",slot:"gauntlets",w:2,h:1,desc:"Heavy gauntlets from the Warrior forge.",stats:{power:1,defense:1}},
   trail_pants:{name:"Trail Trousers",icon:"Ⅱ",slot:"pants",w:2,h:2,desc:"Weatherproof trousers with deep pockets.",stats:{speed:4}},
@@ -126,15 +127,53 @@ function canAddMaterial(index,amount=1){const s=inventoryState();s.materials[ind
 function canAcquireTool(key){const s=inventoryState();s.equipment[key]=true;return packBackpack(s).overflow.length===0}
 function backpackUsed(){const packed=packBackpack();return packed.used}
 function findGear(uid){return player.gearInventory.find(item=>item.uid===uid)}
+const CLASS_STARTER_LOADOUT={
+  warrior:{weapon:"simple_sword",shield:"wood_shield"},
+  mage:{weapon:"apprentice_wand"},
+  noble:{weapon:"court_rapier"}
+};
+function nextGearUid(){
+  player.gearInventory=Array.isArray(player.gearInventory)?player.gearInventory:[];
+  let n=Number.isFinite(player.nextItemUid)?Math.max(1,Math.floor(player.nextItemUid)):1;
+  const used=new Set(player.gearInventory.map(g=>String(g&&g.uid)));
+  while(used.has("gear_"+n))n++;
+  player.nextItemUid=n+1;
+  return "gear_"+n;
+}
+function grantStarterEquipment(force=false){
+  const loadout=selectedClass&&CLASS_STARTER_LOADOUT[selectedClass];if(!loadout)return false;
+  player.gearInventory=Array.isArray(player.gearInventory)?player.gearInventory:[];
+  player.equippedSlots=Object.assign({helmet:null,shield:null,weapon:null,gauntlets:null,pants:null,amulet:null,ring:null},player.equippedSlots||{});
+  let changed=false;
+  const seen=new Set();
+  for(const g of player.gearInventory){if(!g.uid||seen.has(String(g.uid))){g.uid=nextGearUid();changed=true}seen.add(String(g.uid))}
+  for(const [slot,key] of Object.entries(loadout)){
+    const current=findGear(player.equippedSlots[slot]);
+    if(current&&(!force||current.key===key))continue;
+    let item=player.gearInventory.find(g=>g&&g.key===key);
+    if(!item){item={uid:nextGearUid(),key,craftedDay:dayNo,starter:true};player.gearInventory.push(item);changed=true}
+    if(player.equippedSlots[slot]!==item.uid){player.equippedSlots[slot]=item.uid;changed=true}
+  }
+  player.starterLoadoutVersion=1;
+  player.maxHp=mods().maxHp;
+  player.hp=clamp(Number.isFinite(player.hp)?player.hp:player.maxHp,1,player.maxHp);
+  if(changed){updateUI();saveGame(true)}
+  return changed;
+}
+function playerHasShield(){const uid=player.equippedSlots&&player.equippedSlots.shield;return !!(uid&&findGear(uid))}
 function equipGear(uid){
   const item=findGear(uid);if(!item)return;const def=GEAR_DEFS[item.key],next=Object.assign({},player.equippedSlots,{[def.slot]:uid}),s=inventoryState({equippedSlots:next});
   if(packBackpack(s).overflow.length){toast("The item currently in that slot will not fit back into your backpack.");return}
-  const oldMax=player.maxHp;player.equippedSlots=next;player.maxHp=mods().maxHp;player.hp=Math.min(player.maxHp,player.hp+Math.max(0,player.maxHp-oldMax));renderInventory();updateUI();
+  const oldMax=player.maxHp,previous=findGear(player.equippedSlots[def.slot]);
+  player.equippedSlots=next;player.maxHp=mods().maxHp;player.hp=Math.min(player.maxHp,player.hp+Math.max(0,player.maxHp-oldMax));renderInventory();updateUI();
+  toast("Equipped "+def.name+(previous?"; "+GEAR_DEFS[previous.key].name+" moved to your backpack.":"."));saveGame(true);
 }
 function unequipGear(slot){
-  if(!player.equippedSlots[slot])return;const next=Object.assign({},player.equippedSlots,{[slot]:null}),s=inventoryState({equippedSlots:next});
+  const uid=player.equippedSlots[slot];if(!uid)return;const next=Object.assign({},player.equippedSlots,{[slot]:null}),s=inventoryState({equippedSlots:next});
   if(packBackpack(s).overflow.length){toast("Your backpack has no room for that "+slot+".");return}
+  const item=findGear(uid);
   player.equippedSlots=next;player.maxHp=mods().maxHp;player.hp=Math.min(player.hp,player.maxHp);renderInventory();updateUI();
+  toast((item?GEAR_DEFS[item.key].name:"Item")+" moved to your backpack.");saveGame(true);
 }
 function recipeShopOpen(recipe){return !recipe.shop||(selectedClass===recipe.shop&&scene==="shop"&&currentShop&&currentShop.specialty===recipe.shop)}
 function recipeAffordable(recipe){return player.coins>=recipe.coins&&recipe.materials.every((q,i)=>player.materials[i]>=q)}
@@ -351,12 +390,16 @@ function gatherNearby(){
   updateUI();return true;
 }
 function wantsBlock(){return !!selectedClass&&(keys.c||blockHeld)&&!activePanel&&player.jumpZ<3}
-function blocking(){return wantsBlock()&&player.stamina>0&&player.guardBroken<=0}
-function startBlock(){if(selectedClass&&!activePanel)player.blockFresh=.18}
+function blocking(){return wantsBlock()&&playerHasShield()&&player.stamina>0&&player.guardBroken<=0}
+function startBlock(){
+  if(!selectedClass||activePanel)return;
+  if(!playerHasShield()){toast("You need a shield equipped to block. Craft a Wood Shield or equip one from your backpack.");return}
+  player.blockFresh=.18;
+}
 function stopBlock(){blockHeld=false}
 function updatePointerAim(){
   if(!player.pointerAim)return;
-  const dx=camera.x+player.pointerX-(player.x+5),dy=camera.y+player.pointerY-(player.y+8),d=Math.hypot(dx,dy);
+  const dx=camera.x+player.pointerX/worldZoom-(player.x+5),dy=camera.y+player.pointerY/worldZoom-(player.y+8),d=Math.hypot(dx,dy);
   if(d>3)player.face={x:dx/d,y:dy/d};
 }
 function enemyInBlockArc(e){

@@ -63,7 +63,7 @@
   #menuPanel{justify-content:flex-start;overflow:hidden;padding:0;text-align:left}
   #menuShell{width:100%;height:100%;display:flex;flex-direction:column;min-height:0}
   #menuHeader{flex:0 0 auto;background:rgba(15,18,24,.98);border-bottom:1px solid var(--line);padding:10px 12px 8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  #menuTabs{display:grid;grid-template-columns:repeat(4,minmax(105px,1fr));gap:7px;width:min(720px,100%)}.menuTabBtn{min-height:42px;padding:9px 12px;font-size:10px}.menuTabBtn.active{border-color:var(--gold);color:var(--gold);background:var(--panel2)}
+  #menuTabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:3px;width:100%}.menuTabBtn{min-height:42px;min-width:0;padding:8px 2px;font-size:clamp(6.5px,1.6vw,9.5px);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.menuTabBtn.active{border-color:var(--gold);color:var(--gold);background:var(--panel2)}
   #menuBody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 16px 70px}
   .menuTab{display:none;width:100%;max-width:900px;margin:0 auto}.menuTab.active{display:block}
   .menuTab>h2{text-align:center;margin-bottom:9px}.menuLead{text-align:center;margin:0 auto 12px}
@@ -121,7 +121,79 @@
     #mobileMenu{right:max(62px,calc(env(safe-area-inset-right) + 50px))}
     .overlay{position:fixed;inset:0;z-index:60;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
   }
-  @media(max-width:650px){h1{font-size:12px}#ledger{gap:8px}.card{width:145px}.overlay{justify-content:flex-start}.overlay h2{margin-top:8px}#menuHeader{align-items:stretch}#menuTabs{grid-template-columns:repeat(2,minmax(115px,1fr));width:100%}#lifeSkillTrees,#inventoryContent,#homeTownContent,#craftingContent,#godContent,#settingsContent{grid-template-columns:1fr}.residentList{grid-template-columns:1fr}.skillSection{justify-content:flex-start}.menuTabBtn{min-height:46px;padding:9px;font-size:10px}.chronicleEntry{grid-template-columns:55px 1fr}.chronicleEntry>span:last-child{grid-column:1/-1}}
+  @media(max-width:650px){h1{font-size:12px}#ledger{gap:8px}.card{width:145px}.overlay{justify-content:flex-start}.overlay h2{margin-top:8px}#menuHeader{align-items:stretch}#menuTabs{grid-template-columns:repeat(3,minmax(0,1fr));width:100%}#lifeSkillTrees,#inventoryContent,#homeTownContent,#craftingContent,#godContent,#settingsContent{grid-template-columns:1fr}.residentList{grid-template-columns:1fr}.skillSection{justify-content:flex-start}.menuTabBtn{min-height:46px;padding:9px 2px;font-size:8px}.chronicleEntry{grid-template-columns:55px 1fr}.chronicleEntry>span:last-child{grid-column:1/-1}}
+
+  /* Government */
+  .governmentColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;text-align:left}
+  .governmentSummary{display:grid;gap:6px;margin-bottom:12px}.governmentSummary span{color:var(--dim);font-size:10px}
+  .governmentActions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .dangerBtn{border-color:var(--bad)!important;color:#ffd1ca!important}
+  .governmentNotice{margin-top:10px;padding:10px;border:1px solid var(--line);background:#121722;font-size:9px;line-height:1.5}
+  .governmentNotice.danger{border-color:var(--bad)}
+  .governmentRelation{display:grid;grid-template-columns:110px 1fr 38px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .governmentRelation small{display:block;color:var(--dim);font-size:9px}
+  .governmentRelation b{text-align:right}
+  .relationMeter{height:8px;background:#090c12;border:1px solid var(--line);overflow:hidden}
+  .relationMeter span{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--gold),var(--good))}
+  #townGovernmentBlock{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+  #governmentEntryPanel{z-index:30;background:rgba(11,14,20,.985)}
+  .governmentEntryStep{color:var(--gold);font-size:10px;letter-spacing:2px}
+  .governmentEntryChoices{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px;width:min(720px,96%)}
+  .governmentEntryChoice{background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:14px;text-align:left;cursor:pointer;min-height:145px;display:flex;flex-direction:column;gap:7px;font:inherit}
+  .governmentEntryChoice:hover,.governmentEntryChoice:focus-visible{border-color:var(--gold);outline:none}
+  .governmentEntryChoice strong{color:var(--gold);font-size:12px;letter-spacing:2px}
+  .governmentEntryChoice small{color:var(--dim);line-height:1.45}
+  .governmentEntryChoice .govEffect{display:block;color:var(--ink);font-size:9px;line-height:1.5;border-top:1px solid var(--line);padding-top:7px;margin-top:auto}
+
+  /* Player relationships */
+  #relationshipsContent{text-align:left}
+  .playerRelationshipList{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:7px;margin-top:10px}
+  .playerRelationshipCard{border:1px solid var(--line);background:var(--panel);padding:8px;font-size:9px;line-height:1.5}
+  .playerRelationshipCard.family{border-color:var(--gold)}
+  .playerRelationshipCard.friend{border-color:var(--good)}
+  .playerRelationshipCard.enemy{border-color:var(--bad)}
+  .playerRelationshipCard.heard{opacity:.72}
+  .relationshipStatus{display:inline-block;margin-top:4px;padding:2px 5px;border:1px solid currentColor}
+  .speciesBadge{display:inline-block;border:1px solid var(--line);padding:2px 5px;color:var(--gold);font-size:9px}
+
+  /* Character stats page */
+  #statsContent{text-align:left}
+  .statsHero{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;margin-bottom:12px}
+  .statsPortrait{font-size:38px;text-align:center;border:1px solid var(--line);background:var(--panel2);padding:8px 0}
+  .statsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}
+  .statsColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  .statsColumns .menuCard{margin-bottom:12px}
+  .statsAbility{border:1px solid var(--line);padding:8px;margin:7px 0;font-size:9px;line-height:1.5}
+  .statsAbility.ready{border-color:var(--good)}
+  .statsAbility.cooling{border-color:var(--gold)}
+  .statsAbility.spent{border-color:var(--bad);opacity:.8}
+  .statsAbility strong{color:var(--gold)}
+
+  /* Active ability dock */
+  #skillBubbleDock{position:absolute;right:max(8px,env(safe-area-inset-right));top:31%;z-index:26;display:none;flex-direction:column;gap:9px;align-items:flex-end;pointer-events:none}
+  .abilityBubble{pointer-events:auto;width:60px;height:60px;border-radius:50%;border:2px solid var(--line);background:rgba(20,25,34,.97);color:var(--ink);font:8px "Courier New",monospace;display:grid;grid-template-rows:14px 1fr 13px;place-items:center;padding:4px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+  .abilityBubble.ready{border-color:var(--good)}
+  .abilityBubble.cooling{border-color:var(--gold)}
+  .abilityBubble.spent{border-color:var(--bad);opacity:.72}
+  .abilityBubble:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .abilityBubble .abilityKey{color:var(--gold);letter-spacing:1px}
+  .abilityBubble .abilityIcon{font-size:17px}
+  .abilityBubble .abilityStatus{color:var(--dim)}
+
+  /* Camera zoom and fog */
+  .zoomReadout{color:var(--gold);font-weight:bold}
+  .zoomSlider{width:100%}
+  .fogLegend{color:var(--dim)}
+  @media(max-width:760px){
+    .governmentColumns,.statsColumns{grid-template-columns:1fr}
+    .governmentEntryChoices{grid-template-columns:1fr}
+    .governmentEntryChoice{min-height:0}
+    .playerRelationshipList{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .governmentRelation{grid-template-columns:95px 1fr 34px}
+    #skillBubbleDock{gap:6px}
+    .abilityBubble{width:48px;height:48px;grid-template-rows:11px 1fr 11px;font-size:7px}
+    .abilityBubble .abilityIcon{font-size:13px}
+  }
 </style>
 </head>
 <body>
@@ -160,10 +232,12 @@
   <section id="menuPanel" class="overlay" role="dialog" aria-label="Game menu">
     <div id="menuShell">
       <div id="menuHeader"><h2>Game menu</h2><div id="menuTabs">
-        <button class="uibtn menuTabBtn active" data-menu-tab="inventory">Bag</button><button class="uibtn menuTabBtn" data-menu-tab="map">Map</button><button class="uibtn menuTabBtn" data-menu-tab="skills">Skills</button><button class="uibtn menuTabBtn" data-menu-tab="crafting">Craft</button><button class="uibtn menuTabBtn" data-menu-tab="chronicle">Journal</button><button class="uibtn menuTabBtn" data-menu-tab="home">Town</button><button class="uibtn menuTabBtn" data-menu-tab="settings">Settings</button><button class="uibtn menuTabBtn" data-menu-tab="help">Help</button><button class="uibtn menuTabBtn godOnly" id="godTabBtn" data-menu-tab="god">God mode</button>
+        <button class="uibtn menuTabBtn active" data-menu-tab="stats">Stats</button><button class="uibtn menuTabBtn" data-menu-tab="inventory">Bag</button><button class="uibtn menuTabBtn" data-menu-tab="map">Map</button><button class="uibtn menuTabBtn" data-menu-tab="skills">Skills</button><button class="uibtn menuTabBtn" data-menu-tab="crafting">Craft</button><button class="uibtn menuTabBtn" data-menu-tab="relationships">Relations</button><button class="uibtn menuTabBtn" data-menu-tab="chronicle">Journal</button><button class="uibtn menuTabBtn" data-menu-tab="home">Town</button><button class="uibtn menuTabBtn" data-menu-tab="settings">Settings</button><button class="uibtn menuTabBtn" data-menu-tab="help">Help</button><button class="uibtn menuTabBtn godOnly" id="godTabBtn" data-menu-tab="god">God mode</button>
       </div></div>
       <div id="menuBody">
-        <section class="menuTab active" id="inventoryTab"><h2>Inventory</h2><div class="sub menuLead">Your carried goods, gathered resources, equipment, and progression at a glance.</div><div id="inventoryContent"></div></section>
+        <section class="menuTab active" id="statsTab"><h2>Character</h2><div class="sub menuLead">Your character, combat statistics, active abilities, equipment, and progression.</div><div id="statsContent"></div></section>
+        <section class="menuTab" id="relationshipsTab"><h2>Relationships</h2><div class="sub menuLead">Your family, friends, acquaintances, and the people you have merely heard of.</div><div id="relationshipsContent"></div></section>
+        <section class="menuTab" id="inventoryTab"><h2>Inventory</h2><div class="sub menuLead">Your carried goods, gathered resources, equipment, and progression at a glance.</div><div id="inventoryContent"></div></section>
         <section class="menuTab" id="mapTab"><h2>Valley map</h2><div class="sub menuLead">Three settlements, their roads, gathering grounds, and your present position.</div><canvas id="menuMap" width="720" height="480"></canvas><div id="mapLegend"></div></section>
         <section class="menuTab" id="skillsTab"><div id="skillScroll">
           <div class="skillSection" id="specialtySection"><h2>Specialty · <span id="skillPts">0</span> points</h2><div class="sub" id="specialtySummary"></div><div id="skillCols"></div><div class="sub">Scroll down for gathering Skills ↓</div></div>
@@ -183,16 +257,19 @@
           <span class="key">F / Q</span><span>Use your combat Specialty or daily economic influence.</span>
           <span class="key">X</span><span>Jump. Press X again in the air to double-jump over low attacks.</span>
           <span class="key">Shift</span><span>Dash. Dashing during a jump keeps your aerial momentum.</span>
-          <span class="key">C / right-click</span><span>Block toward your aim. A last-moment block parries and bounces the attacker back.</span>
-          <span class="key">M / Menu</span><span>Open Inventory first, then switch among Map, Skills, Crafting, Chronicle, Help, and Home Town.</span>
+          <span class="key">C / right-click</span><span>Block toward your aim with a shield equipped. A last-moment block parries and bounces the attacker back.</span>
+          <span class="key">M / Menu</span><span>Open your character page first, then switch among Bag, Map, Skills, Crafting, Relations, Journal, Town, and more.</span>
+          <span class="key">Government</span><span>Chosen at character creation and managed inside the Town tab: rule type, town focus, relations, and raids.</span>
+          <span class="key">Fog of war</span><span>Unexplored land is dark in the world and on the map. It clears permanently as you explore, and saves remember it.</span>
           <span class="key">K</span><span>Open the Menu directly to Skills.</span>
           <span class="key">Phone landscape</span><span>Left pad moves; double-tap a direction to dash. Attack strikes, Block guards and can parry, Skill uses your Specialty (hold for influence), and Jump can be pressed twice.</span>
           <span class="key">⛶</span><span>On a phone, request browser fullscreen while keeping the landscape HUD.</span>
           <span class="key">Goal</span><span>Trade among three towns, keep a caravan alive, recover the Heartstone, and construct a civic building.</span>
         </div></section>
-        <section class="menuTab" id="homeTab"><h2 id="homeTownTitle">Home town</h2><div class="sub menuLead" id="homeTownLead"></div><div id="homeTownContent"></div></section>
+        <section class="menuTab" id="homeTab"><h2 id="homeTownTitle">Home town</h2><div class="sub menuLead" id="homeTownLead"></div><div id="homeTownContent"></div><div id="townGovernmentBlock"><h2>Government</h2><div class="sub menuLead">Rule, town focus, relations, and raids.</div><div id="governmentContent"></div></div></section>
         <section class="menuTab" id="settingsTab"><h2>Settings</h2><div class="sub menuLead">Choose how villagers think and adjust developer access.</div><div id="settingsContent">
-          <div class="menuCard"><h3>Villager LLM</h3><div class="settingField"><label for="settingsLLMBackend">Runs on</label><select id="settingsLLMBackend"><option value="browser-lite">Lightweight browser CPU (recommended)</option><option value="server">Local server (Ollama / LM Studio)</option><option value="webllm">WebGPU (larger, experimental)</option></select></div><div class="settingField"><label for="settingsLLMModel">Model</label><input id="settingsLLMModel" list="settingsModelChoices"><datalist id="settingsModelChoices"><option value="onnx-community/SmolLM2-135M-Instruct-ONNX-MHA"><option value="Llama-3.2-1B-Instruct-q4f16_1-MLC"><option value="qwen3:4b"><option value="qwen3:8b"></datalist></div><div class="settingField" id="settingsServerField"><label for="settingsLLMUrl">Server address</label><input id="settingsLLMUrl" placeholder="http://localhost:11434/v1"></div><label><input type="checkbox" id="settingsLLMToggle"> Use this model for villager conversations</label><div class="sub" id="settingsLLMNote" style="margin-top:8px"></div><div class="aiStatus" id="settingsLLMStatus"></div><div class="settingActions"><button class="uibtn" id="settingsLLMInit">Load / connect</button><button class="uibtn" id="settingsRunPlanners">Refresh village plans</button></div></div>
+          <div class="menuCard"><h3>Villager LLM</h3><div class="settingField"><label for="settingsLLMBackend">Runs on</label><select id="settingsLLMBackend"><option value="browser-lite">Lightweight browser CPU (recommended)</option><option value="server">Local server (Ollama / LM Studio)</option><option value="webllm">WebGPU (larger, experimental)</option></select></div><div class="settingField"><label for="settingsLLMModel">Model</label><input id="settingsLLMModel" list="settingsModelChoices"><datalist id="settingsModelChoices"><option value="onnx-community/SmolLM2-135M-Instruct-ONNX-MHA"><option value="Llama-3.2-1B-Instruct-q4f16_1-MLC"><option value="qwen2.5:7b"><option value="llama3.2:3b"></datalist></div><div class="settingField" id="settingsServerField"><label for="settingsLLMUrl">Server address</label><input id="settingsLLMUrl" placeholder="http://localhost:11434/v1"></div><label><input type="checkbox" id="settingsLLMToggle"> Use this model for villager conversations</label><div class="sub" id="settingsLLMNote" style="margin-top:8px"></div><div class="aiStatus" id="settingsLLMStatus"></div><div class="settingActions"><button class="uibtn" id="settingsLLMInit">Load / connect</button><button class="uibtn" id="settingsRunPlanners">Refresh village plans</button></div></div>
+          <div class="menuCard"><h3>Camera zoom</h3><div class="sub">Raise this to see your character at a larger scale. The lowest setting shows as much of the valley as fits the game area.</div><div class="settingField"><label for="worldZoom">World zoom · <span class="zoomReadout" id="zoomValue">2.25×</span></label><input class="zoomSlider" id="worldZoom" type="range" min="1" max="2.25" step="0.05" value="2.25"></div><button class="uibtn mini" id="zoomReset">Reset zoom</button></div>
           <div class="menuCard"><h3>Sound and developer options</h3><label><input type="checkbox" id="musicToggle" checked> 16-bit adventure music</label><br><label><input type="checkbox" id="sfxToggle" checked> Combat and world sounds</label><div class="settingActions"><button class="uibtn" id="audioPreview">Preview sound</button></div><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><label><input type="checkbox" id="godModeToggle"> God mode</label><div class="sub" style="margin-top:8px">Reveals private needs, relationships, memories, household plans, and council scores in a separate inspector tab.</div></div>
         </div></section>
         <section class="menuTab" id="godTab"><h2>God mode · Village Inspector</h2><div class="sub menuLead">Inspect the simulation's private state. The LLM may choose only from validated plans; the deterministic simulation remains authoritative.</div><div id="godControls"><label>Town <select id="godTown"></select></label><label>Villager <select id="godAgent"></select></label><button class="uibtn mini" id="godRefresh">Refresh</button></div><div id="godContent"></div></section>
@@ -200,6 +277,10 @@
     </div>
     <div id="menuFooter"><button class="uibtn" id="menuSave">Save</button><button class="uibtn" id="menuLoad">Load</button><button class="uibtn" data-close="menuPanel">Close [M]</button></div>
   </section>
+
+  <section id="governmentEntryPanel" class="overlay" role="dialog" aria-label="Choose your government"></section>
+
+  <div id="skillBubbleDock"></div>
 
   <section id="dialogue" class="overlay" role="dialog" aria-label="Conversation">
     <div id="dialogueBox">
@@ -323,7 +404,7 @@ function ensureAudio(){
 }
 function playSfx(name){
   if(!audioConfig.sfx)return;ensureAudio();const now=performance.now();if(now-(lastSfx[name]||0)<45)return;lastSfx[name]=now;
-  const sounds={swing:[[190,.05,"square",.045,0],[120,.06,"sawtooth",.025,.035]],cast:[[392,.045,"triangle",.032,0],[587,.07,"square",.025,.035]],arcane:[[740,.04,"square",.04,0],[370,.11,"triangle",.03,.025]],jump:[[260,.06,"square",.035,0],[390,.08,"square",.028,.045]],land:[[95,.08,"triangle",.05,0]],dash:[[150,.05,"sawtooth",.035,0],[260,.05,"square",.025,.035]],hit:[[90,.05,"square",.065,0],[65,.08,"sawtooth",.035,.025]],chop:[[118,.055,"square",.05,0],[82,.08,"triangle",.035,.035]],mine:[[410,.035,"square",.045,0],[205,.10,"triangle",.04,.025]],harvest:[[523,.055,"square",.03,0],[659,.09,"triangle",.03,.05]],block:[[310,.06,"square",.055,0],[465,.09,"triangle",.04,.04]],parry:[[520,.06,"square",.055,0],[780,.12,"triangle",.035,.045]],hurt:[[72,.12,"sawtooth",.055,0]],defeat:[[220,.07,"square",.045,0],[165,.07,"square",.04,.07],[110,.14,"triangle",.045,.14]],coin:[[660,.06,"square",.035,0],[880,.09,"square",.03,.06]],skill:[[330,.07,"square",.035,0],[495,.07,"square",.035,.055],[660,.13,"triangle",.035,.11]],menu:[[440,.04,"square",.025,0]],day:[[392,.09,"square",.03,0],[523,.09,"square",.03,.08],[659,.16,"triangle",.035,.16]],mind:[[330,.08,"triangle",.03,0],[440,.08,"triangle",.03,.07],[554,.14,"triangle",.03,.14]]};
+  const sounds={swing:[[190,.05,"square",.045,0],[120,.06,"sawtooth",.025,.035]],cast:[[392,.045,"triangle",.032,0],[587,.07,"square",.025,.035]],arcane:[[740,.04,"square",.04,0],[370,.11,"triangle",.03,.025]],jump:[[260,.06,"square",.035,0],[390,.08,"square",.028,.045]],land:[[95,.08,"triangle",.05,0]],dash:[[150,.05,"sawtooth",.035,0],[260,.05,"square",.025,.035]],hit:[[90,.05,"square",.065,0],[65,.08,"sawtooth",.035,.025]],chop:[[118,.055,"square",.05,0],[82,.08,"triangle",.035,.035]],mine:[[410,.035,"square",.045,0],[205,.10,"triangle",.04,.025]],harvest:[[523,.055,"square",.03,0],[659,.09,"triangle",.03,.05]],block:[[310,.06,"square",.055,0],[465,.09,"triangle",.04,.04]],parry:[[520,.06,"square",.055,0],[780,.12,"triangle",.035,.045]],hurt:[[72,.12,"sawtooth",.055,0]],defeat:[[220,.07,"square",.045,0],[165,.07,"square",.04,.07],[110,.14,"triangle",.045,.14]],coin:[[660,.06,"square",.035,0],[880,.09,"square",.03,.06]],skill:[[330,.07,"square",.035,0],[495,.07,"square",.035,.055],[660,.13,"triangle",.035,.11]],menu:[[440,.04,"square",.025,0]],day:[[392,.09,"square",.03,0],[523,.09,"square",.03,.08],[659,.16,"triangle",.035,.16]],mind:[[330,.08,"triangle",.03,0],[440,.08,"triangle",.03,.07],[554,.14,"triangle",.03,.14]],think:[[262,.10,"triangle",.022,0],[311,.10,"triangle",.020,.14],[392,.16,"triangle",.017,.28]],talk:[[470,.03,"square",.030,0],[530,.03,"square",.027,.055],[455,.03,"square",.027,.11],[545,.03,"square",.025,.165],[495,.03,"square",.022,.22],[520,.04,"square",.020,.275]]};
   for(const spec of sounds[name]||[])synthTone(...spec);
 }
 function saveAudioPrefs(){try{localStorage.setItem(AUDIO_PREF_KEY,JSON.stringify(audioConfig))}catch(error){}}
@@ -356,7 +437,8 @@ function buildingBonus(town,good){
   return 1;
 }
 function townAdvantage(town,good){
-  return (town.advantages&&town.advantages[good]||1)*buildingBonus(town,good);
+  const focus=town.government&&GOVERNMENT_FOCI[town.government.focus];
+  return (town.advantages&&town.advantages[good]||1)*buildingBonus(town,good)*(focus&&focus.good===good?1.22:1);
 }
 
 class Agent{
@@ -488,8 +570,12 @@ function relationRecord(a,targetId){
 }
 function changeRelationship(a,b,changes){
   if(!a||!b||a===b)return;
+  const compatibility=.72+opennessCompatibility(a,b)*.42;
   const forward=relationRecord(a,b.id),back=relationRecord(b,a.id);
-  for(const key of Object.keys(changes)){forward[key]=clamp((forward[key]||0)+changes[key],0,100);back[key]=clamp((back[key]||0)+changes[key]*.82,0,100)}
+  for(const key of Object.keys(changes)){
+    const delta=changes[key]*(key==="resentment"?1.08-.22*compatibility:compatibility);
+    forward[key]=clamp((forward[key]||0)+delta,0,100);back[key]=clamp((back[key]||0)+delta*.82,0,100);
+  }
 }
 function rememberEvent(a,event,heard=false){
   if(!a)return;a.eventMemory=a.eventMemory||[];a.rumors=a.rumors||[];a.rumorNotes=a.rumorNotes||{};
@@ -508,6 +594,7 @@ function recordVillageEvent(town,kind,text,options={}){
 function initializeAgentMind(a){
   if(!a.traits||!a.traits.length){const start=(a.id*3+(a.cls||"").length)%PERSONAL_TRAITS.length;a.traits=[PERSONAL_TRAITS[start],PERSONAL_TRAITS[(start+3+a.id)%PERSONAL_TRAITS.length]]}
   a.needs=Object.assign({hunger:20,safety:30,belonging:20,comfort:25,status:35,purpose:20},a.needs||{});
+  initializeSocialIdentity(a);
   a.relationships=a.relationships||{};a.eventMemory=a.eventMemory||[];a.rumors=a.rumors||[];a.rumorNotes=a.rumorNotes||{};a.dialogueHistory=(a.dialogueHistory||[]).slice(-16);a.playerMemories=(a.playerMemories||[]).slice(-8);a.face=a.face||{x:0,y:1};a.moveBlend=Number.isFinite(a.moveBlend)?a.moveBlend:0;a.updateAccumulator=Number.isFinite(a.updateAccumulator)?a.updateAccumulator:(a.id%7)*.011;a.targetRefresh=0;a.cachedTarget=null;a.combatRefresh=0;a.cachedEnemy=null;a.schedule=a.schedule||[];a.currentActivity=a.currentActivity||"settling in";a.publicRationale=a.publicRationale||"I am balancing work with the needs of my household.";
 }
 function initializeRelationships(town){
@@ -1150,6 +1237,7 @@ const GEAR_DEFS={
   iron_sword:{name:"Ember Greatsword",icon:"⚔",slot:"weapon",w:2,h:3,desc:"A Watchpost-forged blade built for Warriors.",stats:{power:2,special:1}},
   runed_staff:{name:"Runed Staff",icon:"⚕",slot:"weapon",w:1,h:4,desc:"An Academy focus that amplifies spellwork.",stats:{power:1,special:2}},
   court_rapier:{name:"Court Rapier",icon:"⌁",slot:"weapon",w:1,h:3,desc:"A Civic Court dueling weapon of exacting balance.",stats:{power:2,speed:5}},
+  apprentice_wand:{name:"Apprentice Wand",icon:"✧",slot:"weapon",w:1,h:2,desc:"A simple arcane focus for a beginning Mage.",stats:{power:1,special:1}},
   work_gloves:{name:"Work Gloves",icon:"∪",slot:"gauntlets",w:2,h:1,desc:"Reinforced gloves for tools and fighting.",stats:{stamina:8}},
   iron_gauntlets:{name:"Iron Gauntlets",icon:"▰",slot:"gauntlets",w:2,h:1,desc:"Heavy gauntlets from the Warrior forge.",stats:{power:1,defense:1}},
   trail_pants:{name:"Trail Trousers",icon:"Ⅱ",slot:"pants",w:2,h:2,desc:"Weatherproof trousers with deep pockets.",stats:{speed:4}},
@@ -1216,15 +1304,53 @@ function canAddMaterial(index,amount=1){const s=inventoryState();s.materials[ind
 function canAcquireTool(key){const s=inventoryState();s.equipment[key]=true;return packBackpack(s).overflow.length===0}
 function backpackUsed(){const packed=packBackpack();return packed.used}
 function findGear(uid){return player.gearInventory.find(item=>item.uid===uid)}
+const CLASS_STARTER_LOADOUT={
+  warrior:{weapon:"simple_sword",shield:"wood_shield"},
+  mage:{weapon:"apprentice_wand"},
+  noble:{weapon:"court_rapier"}
+};
+function nextGearUid(){
+  player.gearInventory=Array.isArray(player.gearInventory)?player.gearInventory:[];
+  let n=Number.isFinite(player.nextItemUid)?Math.max(1,Math.floor(player.nextItemUid)):1;
+  const used=new Set(player.gearInventory.map(g=>String(g&&g.uid)));
+  while(used.has("gear_"+n))n++;
+  player.nextItemUid=n+1;
+  return "gear_"+n;
+}
+function grantStarterEquipment(force=false){
+  const loadout=selectedClass&&CLASS_STARTER_LOADOUT[selectedClass];if(!loadout)return false;
+  player.gearInventory=Array.isArray(player.gearInventory)?player.gearInventory:[];
+  player.equippedSlots=Object.assign({helmet:null,shield:null,weapon:null,gauntlets:null,pants:null,amulet:null,ring:null},player.equippedSlots||{});
+  let changed=false;
+  const seen=new Set();
+  for(const g of player.gearInventory){if(!g.uid||seen.has(String(g.uid))){g.uid=nextGearUid();changed=true}seen.add(String(g.uid))}
+  for(const [slot,key] of Object.entries(loadout)){
+    const current=findGear(player.equippedSlots[slot]);
+    if(current&&(!force||current.key===key))continue;
+    let item=player.gearInventory.find(g=>g&&g.key===key);
+    if(!item){item={uid:nextGearUid(),key,craftedDay:dayNo,starter:true};player.gearInventory.push(item);changed=true}
+    if(player.equippedSlots[slot]!==item.uid){player.equippedSlots[slot]=item.uid;changed=true}
+  }
+  player.starterLoadoutVersion=1;
+  player.maxHp=mods().maxHp;
+  player.hp=clamp(Number.isFinite(player.hp)?player.hp:player.maxHp,1,player.maxHp);
+  if(changed){updateUI();saveGame(true)}
+  return changed;
+}
+function playerHasShield(){const uid=player.equippedSlots&&player.equippedSlots.shield;return !!(uid&&findGear(uid))}
 function equipGear(uid){
   const item=findGear(uid);if(!item)return;const def=GEAR_DEFS[item.key],next=Object.assign({},player.equippedSlots,{[def.slot]:uid}),s=inventoryState({equippedSlots:next});
   if(packBackpack(s).overflow.length){toast("The item currently in that slot will not fit back into your backpack.");return}
-  const oldMax=player.maxHp;player.equippedSlots=next;player.maxHp=mods().maxHp;player.hp=Math.min(player.maxHp,player.hp+Math.max(0,player.maxHp-oldMax));renderInventory();updateUI();
+  const oldMax=player.maxHp,previous=findGear(player.equippedSlots[def.slot]);
+  player.equippedSlots=next;player.maxHp=mods().maxHp;player.hp=Math.min(player.maxHp,player.hp+Math.max(0,player.maxHp-oldMax));renderInventory();updateUI();
+  toast("Equipped "+def.name+(previous?"; "+GEAR_DEFS[previous.key].name+" moved to your backpack.":"."));saveGame(true);
 }
 function unequipGear(slot){
-  if(!player.equippedSlots[slot])return;const next=Object.assign({},player.equippedSlots,{[slot]:null}),s=inventoryState({equippedSlots:next});
+  const uid=player.equippedSlots[slot];if(!uid)return;const next=Object.assign({},player.equippedSlots,{[slot]:null}),s=inventoryState({equippedSlots:next});
   if(packBackpack(s).overflow.length){toast("Your backpack has no room for that "+slot+".");return}
+  const item=findGear(uid);
   player.equippedSlots=next;player.maxHp=mods().maxHp;player.hp=Math.min(player.hp,player.maxHp);renderInventory();updateUI();
+  toast((item?GEAR_DEFS[item.key].name:"Item")+" moved to your backpack.");saveGame(true);
 }
 function recipeShopOpen(recipe){return !recipe.shop||(selectedClass===recipe.shop&&scene==="shop"&&currentShop&&currentShop.specialty===recipe.shop)}
 function recipeAffordable(recipe){return player.coins>=recipe.coins&&recipe.materials.every((q,i)=>player.materials[i]>=q)}
@@ -1441,12 +1567,16 @@ function gatherNearby(){
   updateUI();return true;
 }
 function wantsBlock(){return !!selectedClass&&(keys.c||blockHeld)&&!activePanel&&player.jumpZ<3}
-function blocking(){return wantsBlock()&&player.stamina>0&&player.guardBroken<=0}
-function startBlock(){if(selectedClass&&!activePanel)player.blockFresh=.18}
+function blocking(){return wantsBlock()&&playerHasShield()&&player.stamina>0&&player.guardBroken<=0}
+function startBlock(){
+  if(!selectedClass||activePanel)return;
+  if(!playerHasShield()){toast("You need a shield equipped to block. Craft a Wood Shield or equip one from your backpack.");return}
+  player.blockFresh=.18;
+}
 function stopBlock(){blockHeld=false}
 function updatePointerAim(){
   if(!player.pointerAim)return;
-  const dx=camera.x+player.pointerX-(player.x+5),dy=camera.y+player.pointerY-(player.y+8),d=Math.hypot(dx,dy);
+  const dx=camera.x+player.pointerX/worldZoom-(player.x+5),dy=camera.y+player.pointerY/worldZoom-(player.y+8),d=Math.hypot(dx,dy);
   if(d>3)player.face={x:dx/d,y:dy/d};
 }
 function enemyInBlockArc(e){
@@ -1907,6 +2037,7 @@ function newDay(){
   }
   for(const key of Object.keys(resourceNodes)){const n=resourceNodes[key];n.stock=Math.min(n.max,n.stock+n.regen)}
   runLivingDay();
+  applyGovernmentDailyEffects();
   considerMigration();
   const watchposts=towns.filter(t=>townHasFacility(t,"watchpost")).length;
   roadSafety=clamp(roadSafety-Math.max(1,7-watchposts*4),0,100);
@@ -1985,12 +2116,13 @@ function stepAgentCore(a,dt,tier){
 function stepAgents(dt){
   if(scene!=="world")return;npcUpdateMetrics.seconds+=dt;
   for(const a of agents){
-    if(a.paused)continue;const tier=agentUpdateTier(a),interval=tier==="visible"?0:tier==="near"?NPC_UPDATE_REGIME.nearInterval:NPC_UPDATE_REGIME.farInterval;
+    if(a.paused||a.raidState)continue;const tier=agentUpdateTier(a),interval=tier==="visible"?0:tier==="near"?NPC_UPDATE_REGIME.nearInterval:NPC_UPDATE_REGIME.farInterval;
     if(!interval){a.updateAccumulator=0;stepAgentCore(a,dt,tier);npcUpdateMetrics.visible++;continue}
     a.updateAccumulator=(a.updateAccumulator||0)+dt;if(a.updateAccumulator<interval){npcUpdateMetrics.skipped++;continue}
     const elapsed=Math.min(NPC_UPDATE_REGIME.maxStep,a.updateAccumulator);a.updateAccumulator=0;stepAgentCore(a,elapsed,tier);npcUpdateMetrics[tier]++;
   }
   if(npcUpdateMetrics.seconds>=1){npcUpdateMetrics.last={visible:npcUpdateMetrics.visible,near:npcUpdateMetrics.near,far:npcUpdateMetrics.far,skipped:npcUpdateMetrics.skipped};npcUpdateMetrics.visible=0;npcUpdateMetrics.near=0;npcUpdateMetrics.far=0;npcUpdateMetrics.skipped=0;npcUpdateMetrics.seconds%=1}
+  stepGovernmentRaids(dt);separateCitizens();
 }
 
 /* ============================================================
@@ -2164,6 +2296,358 @@ function interact(){
 }
 
 /* ============================================================
+   GOVERNMENT, VOTING, RELATIONS, AND NPC RAIDS
+   ============================================================ */
+const GOVERNMENT_TYPES={
+  council:{label:"Council",description:"A small civic council chooses policy. Stable, but only council members vote.",happiness:0},
+  empire:{label:"Empire",description:"You rule directly. Decisions pass immediately, but residents are less happy.",happiness:-8},
+  democracy:{label:"Democracy",description:"Every adult votes on major actions. Decisions are slower, but residents are generally happier.",happiness:7}
+};
+const GOVERNMENT_FOCI={
+  balanced:{label:"Balanced growth",good:null,skill:null,description:"No single trade dominates public policy."},
+  food:{label:"Food and fishing",good:"food",skill:"fishing",description:"Boost food production and encourage fishing skill."},
+  shelter:{label:"Construction and forestry",good:"shelter",skill:"forestry",description:"Boost shelter production and encourage forestry skill."},
+  status:{label:"Commerce and diplomacy",good:"status",skill:"hunting",description:"Boost status production and civic ambition."},
+  training:{label:"Research and mining",good:"training",skill:"mining",description:"Boost training production and encourage mining skill."}
+};
+let governmentRaidId=1;
+function governmentFor(town){
+  if(!town.government)town.government={type:"council",focus:"balanced",relations:{},raid:null,lastDecision:null,raidHistory:[]};
+  town.government.relations=town.government.relations||{};
+  town.government.raidHistory=town.government.raidHistory||[];
+  if(!GOVERNMENT_TYPES[town.government.type])town.government.type="council";
+  if(!GOVERNMENT_FOCI[town.government.focus])town.government.focus="balanced";
+  for(const other of towns){
+    if(other===town)continue;
+    if(!town.government.relations[other.name])town.government.relations[other.name]={score:25,status:"neutral",lastConflictDay:null};
+  }
+  return town.government;
+}
+function homeGovernmentTown(){return towns.find(t=>t.name===(player.homeTownName||towns[0]?.name))||towns[0]}
+function adultCitizens(town){return town.agents.filter(a=>a.ageGroup!=="child"&&!a.eliminated)}
+function adultMen(town){return adultCitizens(town).filter(a=>a.gender==="man"||a.gender==="male"||a.gender==="adult")}
+function averageTownNeed(town,key){const people=adultCitizens(town);return people.reduce((sum,a)=>sum+(a.needs&&a.needs[key]||0),0)/Math.max(1,people.length)}
+function relationStatus(score){return score<=-50?"war":score<=-15?"hostile":score<20?"neutral":score<55?"friendly":"allied"}
+function adjustGovernmentRelation(from,to,delta){
+  const relation=governmentFor(from).relations[to.name];
+  relation.score=clamp(relation.score+delta,-100,100);relation.status=relationStatus(relation.score);
+  const reverse=governmentFor(to).relations[from.name];
+  reverse.score=clamp(reverse.score+delta*.8,-100,100);reverse.status=relationStatus(reverse.score);
+}
+function governmentHappiness(town){
+  const govt=governmentFor(town),base=GOVERNMENT_TYPES[govt.type].happiness||0;
+  return base-averageTownNeed(town,"hunger")*.08-averageTownNeed(town,"safety")*.05-averageTownNeed(town,"belonging")*.04;
+}
+function citizenVoteScore(agent,town,decision){
+  const traits=agent.traits||[],needs=agent.needs||{},focus=GOVERNMENT_FOCI[decision.focus];
+  let score=(agent.utility>=town.market.avgUtility?4:-4)+(traits.includes("dutiful")?5:0)+(traits.includes("stubborn")?-4:0);
+  if(decision.kind==="focus"&&focus){
+    if(focus.good===agent.produces)score+=22;
+    if(focus.skill&&agent.lifeSkills&&agent.lifeSkills[focus.skill]>0)score+=12;
+    if(decision.focus==="balanced")score+=traits.includes("cautious")?10:2;
+  }
+  if(decision.kind==="raid"){
+    score+=(traits.includes("protective")?16:0)+(traits.includes("ambitious")?10:0)-(traits.includes("cautious")?18:0);
+    score+=(needs.safety>55?-18:4)+(roadSafety<45?8:0);
+    if(decision.targetType==="town")score-=10;
+  }
+  return score+(rand()-.5)*18;
+}
+function resolveGovernmentDecision(town,decision){
+  const govt=governmentFor(town),type=govt.type;
+  let voters=[],yes=0,no=0,passed=false;
+  if(type==="empire"){passed=true;yes=1}
+  else{
+    voters=type==="democracy"?adultCitizens(town):adultCitizens(town).filter(a=>town.institutions&&town.institutions.councilIds&&town.institutions.councilIds.includes(a.id));
+    if(!voters.length)voters=adultCitizens(town);
+    for(const voter of voters){if(citizenVoteScore(voter,town,decision)>=0)yes++;else no++}
+    passed=yes>no;
+  }
+  govt.lastDecision={day:dayNo,decision,passed,yes,no,type};
+  recordVillageEvent(town,"GOVERNMENT",GOVERNMENT_TYPES[type].label+" decision: "+decision.label+" — "+(passed?"approved":"rejected")+(type==="empire"?" by decree.":" "+yes+"–"+no+"."),{salience:8});
+  if(type==="democracy")for(const a of adultCitizens(town))a.needs.belonging=clamp(a.needs.belonging-(passed?3:1),0,100);
+  if(type==="empire")for(const a of adultCitizens(town)){a.needs.belonging=clamp(a.needs.belonging+4,0,100);a.needs.status=clamp(a.needs.status+2,0,100)}
+  return passed;
+}
+function setGovernmentType(town,type){
+  if(!GOVERNMENT_TYPES[type])return;
+  const govt=governmentFor(town),old=govt.type;if(old===type)return;
+  govt.type=type;
+  recordVillageEvent(town,"REGIME",town.name+" changes from "+GOVERNMENT_TYPES[old].label+" to "+GOVERNMENT_TYPES[type].label+".",{salience:10});
+  for(const a of adultCitizens(town))a.needs.belonging=clamp(a.needs.belonging+(type==="empire"?8:type==="democracy"?-6:0),0,100);
+  toast(town.name+" is now a "+GOVERNMENT_TYPES[type].label+".");
+  renderGovernment();saveGame(true);
+}
+function requestTownFocus(town,focusKey){
+  const focus=GOVERNMENT_FOCI[focusKey];if(!focus)return;
+  const decision={kind:"focus",focus:focusKey,label:"Adopt "+focus.label+" as the town focus"};
+  if(!resolveGovernmentDecision(town,decision)){toast("The government rejected the new focus.");renderGovernment();return}
+  governmentFor(town).focus=focusKey;
+  for(const a of adultCitizens(town)){
+    if(focus.skill&&a.lifeSkills){a.lifeSkills[focus.skill]=a.lifeSkills[focus.skill]||0;if(rand()<.22)a.currentActivity="considering work in "+focus.label.toLowerCase()}
+    a.needs.purpose=clamp(a.needs.purpose-(focus.good===a.produces?5:1),0,100);
+  }
+  toast(town.name+" now focuses on "+focus.label+".");renderGovernment();saveGame(true);
+}
+function closestOtherTown(town){return towns.filter(t=>t!==town).sort((a,b)=>Math.hypot(a.cx-town.cx,a.cy-town.cy)-Math.hypot(b.cx-town.cx,b.cy-town.cy))[0]}
+function moveAgentToward(a,target,speed,dt){
+  const dx=target.x-a.x,dy=target.y-a.y,d=Math.hypot(dx,dy);if(d<2)return true;
+  const nx=a.x+dx/d*speed*dt,ny=a.y+dy/d*speed*dt;
+  const open=(x,y)=>!solid.has(keyOf(Math.floor(x/TILE),Math.floor(y/TILE)));
+  if(open(nx,ny)){a.x=nx;a.y=ny}
+  else if(open(nx,a.y))a.x=nx;
+  else if(open(a.x,ny))a.y=ny;
+  a.face={x:dx/d,y:dy/d};
+  return d<8;
+}
+function eliminateCitizen(agent,killerTown=null){
+  if(!agent||agent.eliminated)return;
+  agent.eliminated=true;agent.raidState=null;
+  const town=agent.town;
+  try{releaseHouse(agent)}catch(error){}
+  town.agents=town.agents.filter(a=>a!==agent);agents=agents.filter(a=>a!==agent);
+  for(const survivor of agents){
+    if(survivor.spouseId===agent.id)survivor.spouseId=null;
+    survivor.parentIds=(survivor.parentIds||[]).filter(id=>id!==agent.id);
+    survivor.childrenIds=(survivor.childrenIds||[]).filter(id=>id!==agent.id);
+  }
+  recordVillageEvent(town,"DEATH",agent.firstName+" is killed in a clash"+(killerTown?" with "+killerTown.name:"")+".",{emotion:"grief",salience:10});
+  for(const relative of town.agents.filter(a=>a.spouseId===agent.id||(a.parentIds||[]).includes(agent.id)||(a.childrenIds||[]).includes(agent.id))){
+    relative.needs.belonging=clamp(relative.needs.belonging+24,0,100);relative.needs.safety=clamp(relative.needs.safety+18,0,100);
+  }
+}
+function beginRaid(town,targetType){
+  const men=adultMen(town);
+  if(!men.length){toast("There are no adults available to form the raid.");return}
+  if(governmentFor(town).raid){toast("A raid is already underway.");return}
+  const targetTown=targetType==="town"?closestOtherTown(town):null;
+  const label=targetType==="town"?"Raid "+targetTown.name:"Raid the old mine";
+  if(!resolveGovernmentDecision(town,{kind:"raid",targetType,label})){toast("The raid proposal was rejected.");renderGovernment();return}
+  const rally={x:town.marketPoint.x+24,y:town.marketPoint.y+18};
+  const raid={id:governmentRaidId++,phase:"gathering",targetType,targetTownName:targetTown?targetTown.name:null,countdown:30,rally,memberIds:men.map(a=>a.id),casualties:0,startedDay:dayNo};
+  governmentFor(town).raid=raid;
+  for(const a of men){a.raidState={raidId:raid.id,phase:"gathering",hp:Math.max(3,a.level+2),attackCd:0};a.currentActivity="rallying for a raid"}
+  recordVillageEvent(town,"RAID",men.length+" citizens begin gathering for "+label.toLowerCase()+".",{salience:10});
+  toast("Raid called. The party will rally for 30 seconds.");renderGovernment();
+}
+function raidCombat(attacker,target,dt){
+  attacker.raidState.attackCd=Math.max(0,attacker.raidState.attackCd-dt);
+  target.worldHp=Number.isFinite(target.worldHp)?target.worldHp:Math.max(3,target.level+2);
+  if(Math.hypot(attacker.x-target.x,attacker.y-target.y)>18){moveAgentToward(attacker,target,34*speciesSpeed(attacker),dt);return}
+  if(attacker.raidState.attackCd<=0){
+    const physical=(1+Math.floor(attacker.level/4))*speciesStrength(attacker);
+    const arcane=attacker.combatClass==="mage"?.55*speciesMagic(attacker):0;
+    target.worldHp-=Math.max(1,Math.round(physical+arcane));
+    attacker.raidState.attackCd=(.75+rand()*.45)/speciesSpeed(attacker);
+    changeRelationship(attacker,target,{resentment:14,trust:-10});
+    if(target.worldHp<=0)eliminateCitizen(target,attacker.town);
+  }
+}
+function finishRaid(town,success){
+  const govt=governmentFor(town),raid=govt.raid;if(!raid)return;
+  const survivors=raid.memberIds.map(id=>agents.find(a=>a.id===id)).filter(Boolean);
+  for(const a of survivors){a.raidState=null;a.currentActivity="returning from the raid";a.needs.safety=clamp(a.needs.safety+(success?-5:12),0,100)}
+  const target=raid.targetTownName&&towns.find(t=>t.name===raid.targetTownName);
+  if(target){
+    adjustGovernmentRelation(town,target,-55);
+    governmentFor(town).relations[target.name].lastConflictDay=dayNo;
+    governmentFor(target).relations[town.name].lastConflictDay=dayNo;
+    initializeInstitutions(target);
+  }
+  initializeInstitutions(town);
+  govt.raidHistory.unshift({day:dayNo,target:target?target.name:"Old Mine",success,casualties:raid.casualties});
+  govt.raidHistory=govt.raidHistory.slice(0,8);
+  recordVillageEvent(town,"RAID",town.name+"'s raid on "+(target?target.name:"the old mine")+" "+(success?"returns with plunder":"breaks apart")+".",{salience:10});
+  govt.raid=null;
+  toast(success?"The raid returns successfully.":"The raid has failed.");
+  renderGovernment();saveGame(true);
+}
+function stepGovernmentRaids(dt){
+  if(scene!=="world")return;
+  for(const town of towns){
+    const raid=governmentFor(town).raid;if(!raid)continue;
+    raid.elapsed=(raid.elapsed||0)+dt;
+    if(raid.elapsed>240){finishRaid(town,false);continue}
+    const members=raid.memberIds.map(id=>agents.find(a=>a.id===id)).filter(a=>a&&!a.eliminated);
+    raid.casualties=raid.memberIds.length-members.length;
+    if(!members.length){finishRaid(town,false);continue}
+    if(raid.phase==="gathering"){
+      raid.countdown=Math.max(0,raid.countdown-dt);
+      for(const a of members)moveAgentToward(a,raid.rally,30*speciesSpeed(a),dt);
+      if(raid.countdown<=0){
+        raid.phase="marching";
+        for(const a of members){a.raidState.phase="marching";a.currentActivity="marching on a raid"}
+        recordVillageEvent(town,"RAID","The raiding party marches from "+town.name+".",{salience:9});
+      }
+      continue;
+    }
+    if(raid.targetType==="dungeon"){
+      const target=dungeon.entrance||{x:(MW-8)*TILE,y:(MH-8)*TILE};let arrived=0;
+      for(const a of members){moveAgentToward(a,target,36*speciesSpeed(a),dt);if(Math.hypot(a.x-target.x,a.y-target.y)<30)arrived++}
+      if(arrived>=Math.ceil(members.length*.7)){
+        town.market.treasury+=10+members.length*2;
+        town.materialStock[3]+=3+members.length*.5;
+        finishRaid(town,true);
+      }
+      continue;
+    }
+    const targetTown=towns.find(t=>t.name===raid.targetTownName);if(!targetTown){finishRaid(town,false);continue}
+    const defenders=targetTown.agents.filter(a=>!a.eliminated&&a.ageGroup!=="child");
+    for(const a of members){
+      const target=defenders.filter(d=>!d.eliminated).sort((x,y)=>Math.hypot(x.x-a.x,x.y-a.y)-Math.hypot(y.x-a.x,y.y-a.y))[0];
+      if(target)raidCombat(a,target,dt);else moveAgentToward(a,targetTown.marketPoint,36*speciesSpeed(a),dt);
+    }
+    for(const defender of defenders.filter(d=>!d.eliminated)){
+      defender.worldAttackCd=Math.max(0,(defender.worldAttackCd||0)-dt);
+      const target=members.filter(a=>!a.eliminated).sort((x,y)=>Math.hypot(x.x-defender.x,x.y-defender.y)-Math.hypot(y.x-defender.x,y.y-defender.y))[0];
+      if(!target)continue;
+      if(Math.hypot(defender.x-target.x,defender.y-target.y)>18){moveAgentToward(defender,target,32*speciesSpeed(defender),dt);continue}
+      if(defender.worldAttackCd<=0){
+        target.raidState.hp-=1+(defender.isGuard?1:0);
+        defender.worldAttackCd=.9+rand()*.5;
+        if(target.raidState.hp<=0)eliminateCitizen(target,targetTown);
+      }
+    }
+    if(!targetTown.agents.some(a=>a.ageGroup!=="child"&&!a.eliminated)){
+      town.market.treasury+=Math.min(35,targetTown.market.treasury*.35);
+      targetTown.market.treasury*=.65;
+      finishRaid(town,true);
+    }else if(raid.casualties>=Math.ceil(raid.memberIds.length*.55))finishRaid(town,false);
+  }
+}
+function separateCitizens(){
+  if(scene!=="world")return;
+  for(let i=0;i<agents.length;i++)for(let j=i+1;j<agents.length;j++){
+    const a=agents[i],b=agents[j];if(a.raidState||b.raidState)continue;
+    const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
+    if(d>0&&d<9){const push=(9-d)*.18;a.x-=dx/d*push;a.y-=dy/d*push;b.x+=dx/d*push;b.y+=dy/d*push}
+  }
+}
+function applyGovernmentDailyEffects(){
+  for(const town of towns){
+    const govt=governmentFor(town);
+    for(const a of adultCitizens(town)){
+      if(govt.type==="empire")a.needs.belonging=clamp(a.needs.belonging+1.2,0,100);
+      if(govt.type==="democracy")a.needs.belonging=clamp(a.needs.belonging-.8,0,100);
+    }
+    const focus=GOVERNMENT_FOCI[govt.focus];
+    if(focus&&focus.skill)for(const a of adultCitizens(town))if(a.lifeSkills&&a.lifeSkills[focus.skill]!=null&&rand()<.08)a.lifeSkills[focus.skill]=Math.min(3,a.lifeSkills[focus.skill]+1);
+  }
+}
+function renderGovernment(){
+  const wrap=document.getElementById("governmentContent");if(!wrap||!towns.length)return;
+  const town=homeGovernmentTown(),govt=governmentFor(town),type=GOVERNMENT_TYPES[govt.type],raid=govt.raid;
+  const relationRows=towns.filter(t=>t!==town).map(other=>{
+    const relation=govt.relations[other.name];
+    return '<div class="governmentRelation"><div><strong>'+escapeHTML(other.name)+'</strong><small>'+escapeHTML(relation.status.toUpperCase())+'</small></div><div class="relationMeter"><span style="width:'+((relation.score+100)/2)+'%"></span></div><b>'+Math.round(relation.score)+'</b></div>';
+  }).join("");
+  const last=govt.lastDecision?'<div class="governmentNotice">Last decision: '+escapeHTML(govt.lastDecision.decision.label)+' — '+(govt.lastDecision.passed?'passed':'failed')+(govt.lastDecision.type==='empire'?' by decree':' '+govt.lastDecision.yes+'–'+govt.lastDecision.no)+'.</div>':'';
+  const raidStatus=raid?'<div class="governmentNotice danger"><strong>Raid '+escapeHTML(raid.phase)+'</strong><br>'+(raid.phase==='gathering'?Math.ceil(raid.countdown)+' seconds until march':escapeHTML(raid.targetTownName||'Old Mine'))+' · '+raid.memberIds.length+' called · '+raid.casualties+' lost</div>':'<div class="sub">No active raid.</div>';
+  const happiness=governmentHappiness(town);
+  wrap.innerHTML='<div class="governmentColumns"><div><div class="menuCard"><h3>Government actions</h3><div class="governmentSummary"><strong>'+escapeHTML(town.name)+' · '+type.label+'</strong><span>'+escapeHTML(type.description)+'</span><span>Estimated civic happiness effect: '+(happiness>=0?'+':'')+happiness.toFixed(1)+'</span></div><label class="settingField"><span>Government type</span><select id="governmentType">'+Object.entries(GOVERNMENT_TYPES).map(([key,value])=>'<option value="'+key+'" '+(govt.type===key?'selected':'')+'>'+value.label+'</option>').join('')+'</select></label><label class="settingField"><span>Town focus</span><select id="governmentFocus">'+Object.entries(GOVERNMENT_FOCI).map(([key,value])=>'<option value="'+key+'" '+(govt.focus===key?'selected':'')+'>'+value.label+'</option>').join('')+'</select></label><button class="uibtn" id="governmentFocusApply">Propose focus change</button>'+last+'</div><div class="menuCard"><h3>Raid</h3><div class="sub">Adults rally for 30 seconds, then march. Town raids permanently damage relations, and citizens can wound or eliminate one another.</div><div class="governmentActions"><button class="uibtn" id="raidDungeon" '+(raid?'disabled':'')+'>Raid dungeon</button><button class="uibtn dangerBtn" id="raidTown" '+(raid?'disabled':'')+'>Raid closest town</button></div>'+raidStatus+'</div></div><div><div class="menuCard"><h3>Relations</h3>'+relationRows+'</div><div class="menuCard"><h3>Recent campaigns</h3>'+(govt.raidHistory.length?govt.raidHistory.map(r=>'<div class="townStat"><span>Day '+r.day+' · '+escapeHTML(r.target)+'</span><span>'+(r.success?'Victory':'Defeat')+' · '+r.casualties+' lost</span></div>').join(''):'<div class="sub">No campaigns recorded.</div>')+'</div></div></div>';
+  const typeSelect=document.getElementById("governmentType");if(typeSelect)typeSelect.addEventListener("change",e=>setGovernmentType(town,e.target.value));
+  const focusBtn=document.getElementById("governmentFocusApply");if(focusBtn)focusBtn.addEventListener("click",()=>{const sel=document.getElementById("governmentFocus");requestTownFocus(town,sel?sel.value:"balanced")});
+  const dungeonBtn=document.getElementById("raidDungeon");if(dungeonBtn)dungeonBtn.addEventListener("click",()=>beginRaid(town,"dungeon"));
+  const townBtn=document.getElementById("raidTown");if(townBtn)townBtn.addEventListener("click",()=>beginRaid(town,"town"));
+}
+function governmentEffectSummary(key){
+  if(key==="council")return "Councilors vote on policy. Moderate stability, slower decisions, no broad happiness modifier.";
+  if(key==="empire")return "You issue decrees immediately. Policy is fast, but belonging and civic happiness are reduced.";
+  return "Every adult votes on major policy. Decisions take consensus, while belonging and civic happiness improve.";
+}
+function renderGovernmentEntryPanel(){
+  const panel=document.getElementById("governmentEntryPanel");if(!panel)return;
+  panel.innerHTML='<div class="governmentEntryStep">CHARACTER CREATION · STEP 2 OF 2</div><h2>Choose your government</h2><div class="sub">Your class is set. Now choose how your home settlement begins. This can be changed later from the Town tab.</div><div class="governmentEntryChoices">'+Object.entries(GOVERNMENT_TYPES).map(([key,g])=>'<button class="governmentEntryChoice" data-entry-government="'+key+'"><strong>'+g.label+'</strong><small>'+escapeHTML(g.description)+'</small><span class="govEffect">'+escapeHTML(governmentEffectSummary(key))+'</span></button>').join('')+'</div>';
+  panel.querySelectorAll("[data-entry-government]").forEach(btn=>btn.addEventListener("click",()=>{
+    const town=homeGovernmentTown();
+    setGovernmentType(town,btn.dataset.entryGovernment);
+    player.governmentChosen=true;
+    panel.classList.remove("open");activePanel=null;saveGame(true);
+    toast(town.name+" begins as a "+GOVERNMENT_TYPES[btn.dataset.entryGovernment].label+".");
+  }));
+}
+function promptGovernmentOnEntry(){
+  if(!selectedClass||player.governmentChosen)return;
+  const panel=document.getElementById("governmentEntryPanel");if(!panel)return;
+  renderGovernmentEntryPanel();
+  closePanels();
+  activePanel="governmentEntryPanel";panel.classList.add("open");
+}
+
+/* ============================================================
+   SPECIES, OPENNESS, AND PLAYER RELATIONSHIPS
+   ============================================================ */
+const SPECIES={
+  human:{label:"Human",icon:"◆",description:"Strong and physically forceful.",strength:1.24,speed:1,magic:1},
+  grung:{label:"Grung",icon:"●",description:"Small amphibious people with exceptional speed.",strength:.92,speed:1.28,magic:1},
+  cat:{label:"Cat",icon:"♠",description:"Upright talking cats with humanlike hands and natural magic.",strength:.88,speed:1.08,magic:1.34}
+};
+function deterministic01(value){let x=((value+1)*2654435761)>>>0;x^=x>>>15;x=Math.imul(x,2246822519)>>>0;x^=x>>>13;x>>>=0;return (x%10000)/10000}
+function initializeSocialIdentity(a){
+  if(!a)return;
+  if(!SPECIES[a.species]){const roll=deterministic01(a.id*17+(a.firstName||"").length*13);a.species=roll<.58?"human":roll<.79?"grung":"cat"}
+  if(!Number.isFinite(a.opennessBias))a.opennessBias=Math.round((.18+deterministic01(a.id*31+7)*.72)*100)/100;
+}
+function speciesDef(a){initializeSocialIdentity(a);return SPECIES[a.species]}
+function speciesStrength(a){return speciesDef(a).strength}
+function speciesSpeed(a){return speciesDef(a).speed}
+function speciesMagic(a){return speciesDef(a).magic}
+function opennessCompatibility(a,b){initializeSocialIdentity(a);initializeSocialIdentity(b);return 1-Math.abs(a.opennessBias-b.opennessBias)}
+const PLAYER_RELATION_DEFAULT={familiarity:0,affection:0,trust:0,respect:0,resentment:0,kind:"heard"};
+function playerRelationshipStore(){player.relationships=player.relationships||{};return player.relationships}
+function playerFamilyIds(){
+  player.familyAgentIds=Array.isArray(player.familyAgentIds)?player.familyAgentIds:[];
+  const home=homeGovernmentTown();
+  if(!player.familyAgentIds.length&&home){
+    const firstHouse=home.houses&&home.houses[0];
+    player.familyAgentIds=((firstHouse&&firstHouse.residentIds&&firstHouse.residentIds.length?firstHouse.residentIds:home.agents.slice(0,2).map(a=>a.id))||[]).slice();
+  }
+  return player.familyAgentIds;
+}
+function ensurePlayerRelationships(){
+  const home=homeGovernmentTown();if(!home)return;
+  const store=playerRelationshipStore(),family=new Set(playerFamilyIds());
+  for(const a of home.agents){
+    const key=String(a.id),existing=store[key];
+    if(!existing){
+      store[key]=family.has(a.id)?{familiarity:90,affection:68,trust:62,respect:52,resentment:0,kind:"family"}:{familiarity:10,affection:2,trust:0,respect:1,resentment:0,kind:"heard"};
+    }else if(family.has(a.id)){existing.kind="family";existing.familiarity=Math.max(existing.familiarity||0,80)}
+  }
+}
+function playerRelation(a){ensurePlayerRelationships();return playerRelationshipStore()[String(a.id)]||Object.assign({},PLAYER_RELATION_DEFAULT)}
+function playerRelationScore(r){return (r.affection||0)*.38+(r.trust||0)*.32+(r.respect||0)*.20+(r.familiarity||0)*.10-(r.resentment||0)*.62}
+function playerRelationLabel(r){
+  if(r.kind==="family")return "Family";
+  if((r.familiarity||0)<20)return "Heard of";
+  const score=playerRelationScore(r);
+  return score>=46?"Close friend":score>=23?"Friend":score>=7?"Acquaintance":score>-9?"Known":score>-28?"Rival":"Enemy";
+}
+function deepenPlayerRelationship(a,positive=true){
+  if(!a)return;
+  ensurePlayerRelationships();
+  const store=playerRelationshipStore(),key=String(a.id);
+  const r=store[key]||(store[key]=Object.assign({},PLAYER_RELATION_DEFAULT));
+  r.familiarity=clamp((r.familiarity||0)+14,0,100);
+  if(positive){r.affection=clamp((r.affection||0)+3,0,100);r.trust=clamp((r.trust||0)+2,0,100)}
+  else r.resentment=clamp((r.resentment||0)+5,0,100);
+  if(r.kind==="heard"&&r.familiarity>=20)r.kind="known";
+}
+function renderPlayerRelationships(){
+  const wrap=document.getElementById("relationshipsContent");if(!wrap||!towns.length)return;
+  ensurePlayerRelationships();
+  const town=homeGovernmentTown(),family=new Set(playerFamilyIds());
+  const people=town.agents.map(a=>{initializeSocialIdentity(a);return {a,r:playerRelation(a)}});
+  people.sort((x,y)=>{const order={family:0,known:1,heard:2};return (order[x.r.kind]??1)-(order[y.r.kind]??1)||playerRelationScore(y.r)-playerRelationScore(x.r)});
+  const cards=people.map(({a,r})=>{
+    const label=playerRelationLabel(r),score=playerRelationScore(r);
+    const cls=r.kind==="family"?"family":score>=23?"friend":score<=-28?"enemy":label==="Heard of"?"heard":"";
+    return '<div class="playerRelationshipCard '+cls+'"><strong>'+SPECIES[a.species].icon+' '+escapeHTML(a.firstName)+'</strong><br>'+escapeHTML(SPECIES[a.species].label)+' · openness '+Math.round(a.opennessBias*100)+'%<br><span class="relationshipStatus">'+label+'</span><br><small>Familiarity '+Math.round(r.familiarity||0)+' · affection '+Math.round(r.affection||0)+' · trust '+Math.round(r.trust||0)+(r.resentment?' · resentment '+Math.round(r.resentment):'')+'</small></div>';
+  }).join('');
+  const familyNames=town.agents.filter(a=>family.has(a.id)).map(a=>a.firstName).join(", ")||"None";
+  wrap.innerHTML='<div class="menuCard"><h3>Your relationship tree</h3><div class="townStat"><span>Home village</span><span>'+escapeHTML(town.name)+'</span></div><div class="townStat"><span>Family</span><span>'+escapeHTML(familyNames)+'</span></div><div class="townStat"><span>Known people</span><span>'+people.filter(x=>(x.r.familiarity||0)>=20).length+' / '+people.length+'</span></div><div class="sub" style="margin-top:8px">Family begins with established bonds. Everyone else in your village begins as <b>Heard of</b> until you speak with them.</div></div><div class="playerRelationshipList">'+cards+'</div>';
+}
+
+/* ============================================================
    LOCAL STATE-AWARE DIALOGUE
    ============================================================ */
 function richestFact(a){
@@ -2266,22 +2750,29 @@ async function llmDialogueResponse(a,line){
   a.dialogueHistory.push({role:"user",content:line},{role:"assistant",content:reply});if(a.dialogueHistory.length>16)a.dialogueHistory.splice(0,a.dialogueHistory.length-16);
   return reply;
 }
+let thinkingSfxTimer=null;
+function startThinkingSfx(){stopThinkingSfx();playSfx("think");thinkingSfxTimer=setInterval(()=>playSfx("think"),1500)}
+function stopThinkingSfx(){if(thinkingSfxTimer){clearInterval(thinkingSfxTimer);thinkingSfxTimer=null}}
 async function sendDialogue(){
   if(!dialogueAgent||dialogueBusy)return;
   const input=document.getElementById("dialogueInput"),line=input.value.trim();
   if(!line)return;
   const a=dialogueAgent,output=document.getElementById("dialogueText"),button=document.getElementById("dialogueSend");input.value="";
   rememberImportantPlayerFact(a,line);
+  deepenPlayerRelationship(a,true);
   dialogueBusy=true;input.disabled=true;button.disabled=true;
   try{
-    if(llmConfig.backend==="browser-lite"&&!llmEngine){output.textContent="Loading the tiny villager mind for your first conversation…";await initializeLocalLLM()}
-    if(!llmConfig.enabled||!llmEngine){output.textContent=npcResponse(a,line);return}
+    if(llmConfig.backend==="browser-lite"&&!llmEngine){output.textContent="Loading the tiny villager mind for your first conversation…";startThinkingSfx();await initializeLocalLLM()}
+    if(!llmConfig.enabled||!llmEngine){output.textContent=npcResponse(a,line);playSfx("talk");return}
     output.textContent=a.firstName+" considers your words…";
+    startThinkingSfx();
     const reply=await llmDialogueResponse(a,line);
-    if(dialogueAgent===a)output.textContent=reply;
+    stopThinkingSfx();
+    if(dialogueAgent===a){output.textContent=reply;playSfx("talk")}
   }catch(error){
-    if(dialogueAgent===a)output.textContent=npcResponse(a,line)+"\n\n[Local mind unavailable for this reply: "+String(error.message||error).slice(0,100)+"]";
-  }finally{dialogueBusy=false;input.disabled=false;button.disabled=false;if(dialogueAgent===a)input.focus()}
+    stopThinkingSfx();
+    if(dialogueAgent===a){output.textContent=npcResponse(a,line)+"\n\n[Local mind unavailable for this reply: "+String(error.message||error).slice(0,100)+"]";playSfx("talk")}
+  }finally{stopThinkingSfx();dialogueBusy=false;input.disabled=false;button.disabled=false;if(dialogueAgent===a)input.focus()}
 }
 
 /* ============================================================
@@ -2354,6 +2845,67 @@ function renderInventory(){
   }
   const overflow=document.getElementById("overflowItems");for(const item of packed.overflow){const box=document.createElement("div");box.className="bagItem overflow";box.innerHTML='<strong>'+item.icon+' '+item.name+'</strong>Needs '+item.w+'×'+item.h+' contiguous slots';overflow.appendChild(box)}
 }
+function abilityState(kind){
+  if(!selectedClass)return {ready:false,spent:false,remaining:0,total:1};
+  const m=mods();
+  if(kind==="specialty"){const total=SPECIALTY[selectedClass].cooldown*m.specialCd;return {ready:player.specialCd<=0,spent:false,remaining:player.specialCd,total}}
+  if(kind==="dash"){const total=1.45*m.dashCd;return {ready:player.dashCd<=0&&player.dashTime<=0,spent:false,remaining:player.dashCd,total}}
+  const spent=player.influenceDay>=dayNo;
+  return {ready:!spent,spent,remaining:0,total:1};
+}
+function installAbilityBubbles(){
+  const dock=document.getElementById("skillBubbleDock");
+  if(!dock||dock.children.length)return;
+  const bubbles=[
+    {id:"abilitySpecialty",kind:"specialty",key:"F",icon:"✦",action:()=>specialty()},
+    {id:"abilityInfluence",kind:"influence",key:"Q",icon:"♛",action:()=>classInfluence()},
+    {id:"abilityDash",kind:"dash",key:"SHIFT",icon:"➤",action:()=>dash()}
+  ];
+  for(const spec of bubbles){
+    const b=document.createElement("button");
+    b.className="abilityBubble";b.id=spec.id;b.type="button";b.dataset.kind=spec.kind;
+    b.innerHTML='<span class="abilityKey">'+spec.key+'</span><span class="abilityIcon">'+spec.icon+'</span><span class="abilityStatus">Ready</span>';
+    b.addEventListener("click",()=>{if(selectedClass&&!activePanel)spec.action()});
+    dock.appendChild(b);
+  }
+}
+function refreshAbilityBubbles(){
+  const dock=document.getElementById("skillBubbleDock");if(!dock)return;
+  installAbilityBubbles();
+  dock.style.display=selectedClass?"flex":"none";
+  if(!selectedClass)return;
+  const names={specialty:SPECIALTY[selectedClass].name,influence:CLASS_POWER[selectedClass].name,dash:selectedClass==="mage"?"Blink":"Dash"};
+  for(const b of Array.from(dock.children)){
+    const kind=b.dataset.kind,state=abilityState(kind);
+    const status=state.ready?"Ready":state.spent?"Tomorrow":state.remaining.toFixed(1)+"s";
+    const cls="abilityBubble "+(state.ready?"ready":state.spent?"spent":"cooling");
+    if(b.className!==cls)b.className=cls;
+    const label=b.querySelector(".abilityStatus");
+    if(label&&label.textContent!==status)label.textContent=status;
+    const title=names[kind]+" · "+status;
+    if(b.title!==title){b.title=title;b.setAttribute("aria-label",title)}
+  }
+}
+function statLine(name,value){return '<div class="townStat"><span>'+name+'</span><span>'+value+'</span></div>'}
+function equippedSlotName(slot){const uid=player.equippedSlots&&player.equippedSlots[slot],item=uid&&findGear(uid),def=item&&GEAR_DEFS[item.key];return def?def.icon+" "+escapeHTML(def.name):"Empty"}
+function renderPlayerStats(){
+  const wrap=document.getElementById("statsContent");if(!wrap)return;
+  if(!selectedClass){wrap.innerHTML='<div class="emptyState">Choose a Specialty to begin your story.</div>';return}
+  const m=mods(),g=gearBonuses(),packed=packBackpack(),town=homeGovernmentTown(),gov=town?governmentFor(town):null;
+  const specialtyState=abilityState("specialty"),dashState=abilityState("dash"),influenceState=abilityState("influence");
+  const phaseEl=document.getElementById("phaseText"),phase=phaseEl?phaseEl.textContent:"";
+  const gearLines=GEAR_SLOTS.map(slot=>statLine(slot.charAt(0).toUpperCase()+slot.slice(1),equippedSlotName(slot))).join("");
+  const lifeLines=Object.keys(LIFE_SKILLS).map(key=>statLine(LIFE_SKILLS[key].icon+" "+LIFE_SKILLS[key].name,(player.lifeSkills[key]||0)+"/3")).join("");
+  const cargoLines=GOODS.map((good,i)=>statLine(GOOD_ICON[i]+" "+good,Math.floor(player.cargo[i]||0))).join("");
+  const materialLines=MATERIALS.map((mat,i)=>statLine(MATERIAL_ICON[i]+" "+mat,Math.floor(player.materials[i]||0))).join("");
+  const abilityCard=(name,key,state,description)=>{
+    const cls=state.ready?"ready":state.spent?"spent":"cooling";
+    const status=state.ready?"Ready":state.spent?"Available tomorrow":state.remaining.toFixed(1)+" seconds";
+    return '<div class="statsAbility '+cls+'"><strong>'+key+' · '+escapeHTML(name)+'</strong><div class="townStat"><span>Status</span><span>'+status+'</span></div><small>'+escapeHTML(description)+'</small></div>';
+  };
+  wrap.innerHTML='<div class="menuCard statsHero"><div class="statsPortrait">'+CLASS_ICON[selectedClass]+'</div><div><h3>'+selectedClass.toUpperCase()+' · LEVEL '+player.level+'</h3><div class="statsGrid">'+statLine("Experience",player.xp+" / "+xpNeeded(player.level))+statLine("Home",town?escapeHTML(town.name):"Unknown")+statLine("Government",gov?GOVERNMENT_TYPES[gov.type].label:"Council")+statLine("Time","Day "+dayNo+" · "+escapeHTML(phase))+statLine("Coins",player.coins.toFixed(1))+statLine("Heartstones",player.relics)+'</div></div></div>'+
+  '<div class="statsColumns"><div><div class="menuCard"><h3>Combat statistics</h3>'+statLine("Health",player.hp+" / "+player.maxHp)+statLine("Attack bonus","+"+g.power)+statLine("Specialty bonus","+"+g.special)+statLine("Defense","+"+g.defense)+statLine("Maximum stamina",m.maxStamina)+statLine("Movement speed",Math.round(m.speed*100)+"%")+statLine("Block power","+"+g.block)+statLine("Shield",playerHasShield()?"Equipped":"None — blocking unavailable")+statLine("Kills",kills)+'</div><div class="menuCard"><h3>Active abilities</h3>'+abilityCard(SPECIALTY[selectedClass].name,"F",specialtyState,SPECIALTY[selectedClass].desc)+abilityCard(CLASS_POWER[selectedClass].name,"Q",influenceState,CLASS_POWER[selectedClass].desc)+abilityCard(selectedClass==="mage"?"Blink":"Dash","SHIFT",dashState,"Rapid movement with a short recharge.")+'</div></div><div><div class="menuCard"><h3>Equipment</h3>'+gearLines+'</div><div class="menuCard"><h3>Progression</h3>'+statLine("Specialty points",player.specialtyPoints||0)+statLine("Skills points",player.skillPoints||0)+statLine("Specialty perks",purchased.size)+lifeLines+'</div><div class="menuCard"><h3>Economy and backpack</h3>'+statLine("Backpack",packed.used+" / "+packed.capacity+" slots")+statLine("Road safety",Math.round(roadSafety)+"%")+cargoLines+materialLines+'</div></div></div>';
+}
 function renderMenuMap(){
   const map=document.getElementById("menuMap"),m=map.getContext("2d"),sx=map.width/(MW*TILE),sy=map.height/(MH*TILE);
   m.clearRect(0,0,map.width,map.height);m.drawImage(worldCanvas,0,0,map.width,map.height);
@@ -2364,9 +2916,12 @@ function renderMenuMap(){
     for(const shop of town.shops){m.fillStyle=CLASS_COLOR[shop.specialty];m.fillRect(shop.x*sx-2,shop.y*sy-2,5,5)}
   }
   for(const site of resourceLandmarks){m.fillStyle="#79c56b";m.font="13px monospace";m.fillText(MATERIAL_ICON[[2,1,4].indexOf(site.tile)],(site.x*TILE+8)*sx,(site.y*TILE+8)*sy)}
+  const cw=map.width/MW,ch=map.height/MH;
+  m.fillStyle="rgba(5,7,10,.93)";
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)if(!exploredWorldCells.has(keyOf(x,y)))m.fillRect(Math.floor(x*cw),Math.floor(y*ch),Math.ceil(cw)+1,Math.ceil(ch)+1);
   const mapPos=scene==="world"?player:scene==="shop"?returnPosition:dungeon.entrance,px=mapPos.x*sx,py=mapPos.y*sy;
   m.fillStyle="#ffef79";m.beginPath();m.arc(px,py,4,0,Math.PI*2);m.fill();m.strokeStyle="#14161c";m.stroke();
-  document.getElementById("mapLegend").innerHTML='<span style="color:#ffef79">● You</span><span style="color:#e2ad45">● Home</span><span>○ Town</span><span style="color:#cf6547">■ Specialty shops</span><span style="color:#79c56b">≈ ♠ ◆ Resources</span><span>▣ Old Mine</span>';
+  document.getElementById("mapLegend").innerHTML='<span style="color:#ffef79">● You</span><span style="color:#e2ad45">● Home</span><span>○ Town</span><span style="color:#cf6547">■ Specialty shops</span><span style="color:#79c56b">≈ ♠ ◆ Resources</span><span>▣ Old Mine</span><span class="fogLegend">Fog clears permanently as you explore</span>';
 }
 function renderHomeTown(){
   const home=towns.find(t=>t.name===(player.homeTownName||towns[0].name))||towns[0];player.homeTownName=home.name;
@@ -2384,6 +2939,7 @@ function renderHomeTown(){
   const policy=home.institutions?.currentPolicy;
   document.getElementById("homeTownContent").innerHTML='<div><div class="menuCard"><h3>Town</h3><div class="townStat"><span>Population</span><span>'+home.agents.length+'</span></div><div class="townStat"><span>Adults / children</span><span>'+home.agents.filter(a=>a.ageGroup!=="child").length+' / '+home.agents.filter(a=>a.ageGroup==="child").length+'</span></div><div class="townStat"><span>Houses</span><span>'+home.houses.length+'</span></div><div class="townStat"><span>Residents per house</span><span>Maximum 4</span></div><div class="townStat"><span>Buildings</span><span>'+facilities+'</span></div><div class="townStat"><span>Guards</span><span>'+guardCount(home)+'</span></div><div class="townStat"><span>Council policy</span><span>'+(policy?escapeHTML(policy.label):"Uncommitted")+'</span></div></div><div class="menuCard"><h3>Households and public plans</h3>'+houseLines+'</div><div class="menuCard"><h3>Professions</h3>'+profLines+'</div><div class="menuCard"><h3>Local trades</h3>'+tradeLines+'</div><div class="menuCard"><h3>Specialties</h3>'+specialtyLines+'</div></div><div class="menuCard"><h3>Residents and families</h3><div class="residentList">'+people+'</div></div>';
   if(godMode)document.querySelectorAll("#homeTownContent [data-agent-id]").forEach(el=>{el.style.cursor="pointer";el.title="Inspect in God mode";el.addEventListener("click",()=>{document.getElementById("godTown").value=String(home.id);renderGodMode(+el.dataset.agentId);selectMenuTab("god")})});
+  renderGovernment();
 }
 function renderChronicle(){
   const select=document.getElementById("chronicleTown"),previous=select.value||"ALL";select.innerHTML='<option value="ALL">All settlements</option>'+towns.map(t=>'<option value="'+t.name+'">'+escapeHTML(t.name)+'</option>').join("");select.value=["ALL",...towns.map(t=>t.name)].includes(previous)?previous:"ALL";
@@ -2410,6 +2966,21 @@ function syncSettingsLLMConfig(){
   if(model){if(llmConfig.backend==="server")llmConfig.serverModel=model.value.trim();else llmConfig.model=model.value.trim()||(llmConfig.backend==="browser-lite"?LITE_LLM_MODEL:llmConfig.model)}
   if(url)llmConfig.serverUrl=url.value.trim()||"http://localhost:11434/v1";
 }
+let serverModelFetchToken=0;
+function refreshServerModelChoices(){
+  if(llmConfig.backend!=="server")return;
+  const list=document.getElementById("settingsModelChoices");if(!list)return;
+  const root=(llmConfig.serverUrl||"").trim().replace(/\/+$/,"");if(!root)return;
+  const token=++serverModelFetchToken;
+  fetch(root+"/models").then(res=>res.ok?res.json():null).then(data=>{
+    if(!data||token!==serverModelFetchToken)return;
+    const ids=(data.data||[]).map(m=>m.id).filter(Boolean);
+    if(!ids.length)return;
+    list.innerHTML=ids.map(id=>'<option value="'+escapeHTML(id)+'">').join("");
+    const status=document.getElementById("settingsLLMStatus");
+    if(status&&!llmConfig.enabled)status.textContent="Server reachable. Models available: "+ids.join(", ")+". Leave the model box blank to use the first one.";
+  }).catch(()=>{});
+}
 function renderSettings(){
   const backend=document.getElementById("settingsLLMBackend");if(!backend)return;
   backend.value=llmConfig.backend;document.getElementById("settingsLLMModel").value=llmConfig.backend==="server"?llmConfig.serverModel:llmConfig.model;
@@ -2417,20 +2988,21 @@ function renderSettings(){
   document.getElementById("settingsLLMToggle").checked=!!llmConfig.enabled;document.getElementById("settingsLLMStatus").textContent=llmConfig.status+(llmConfig.model?"\nSelected: "+llmConfig.model:"");
   document.getElementById("settingsLLMNote").textContent=llmConfig.backend==="browser-lite"?"Tiny 135M 4-bit model on CPU/WASM. It loads on the first conversation and handles speech; reliable deterministic rules handle village plans.":llmConfig.backend==="server"?"Best conversation quality. Connect to an OpenAI-compatible Ollama, LM Studio, llama.cpp, or vLLM server.":"Larger experimental browser model. Requires working WebGPU and a much bigger download.";
   document.getElementById("musicToggle").checked=audioConfig.music;document.getElementById("sfxToggle").checked=audioConfig.sfx;
+  refreshServerModelChoices();
 }
 function selectMenuTab(tab){
   if(tab==="god"&&!godMode)tab="help";
   document.querySelectorAll(".menuTabBtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.menuTab===tab));
   document.querySelectorAll("#menuBody>.menuTab").forEach(panel=>panel.classList.toggle("active",panel.id===tab+"Tab"));
-  if(tab==="inventory")renderInventory();else if(tab==="map")renderMenuMap();else if(tab==="skills")renderSkills();else if(tab==="crafting")renderCrafting();else if(tab==="chronicle")renderChronicle();else if(tab==="home")renderHomeTown();else if(tab==="settings")renderSettings();else if(tab==="god")renderGodMode();
+  if(tab==="stats")renderPlayerStats();else if(tab==="relationships")renderPlayerRelationships();else if(tab==="inventory")renderInventory();else if(tab==="map")renderMenuMap();else if(tab==="skills")renderSkills();else if(tab==="crafting")renderCrafting();else if(tab==="chronicle")renderChronicle();else if(tab==="home")renderHomeTown();else if(tab==="settings")renderSettings();else if(tab==="god")renderGodMode();
   document.getElementById("menuBody").scrollTop=0;
 }
-function openMenu(tab="inventory"){
+function openMenu(tab="stats"){
   if(!selectedClass)return;
   if(activePanel&&activePanel!=="menuPanel")return;
   activePanel="menuPanel";document.getElementById("menuPanel").classList.add("open");playSfx("menu");selectMenuTab(tab);
 }
-function toggleMenu(){if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("inventory")}
+function toggleMenu(){if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("stats")}
 function toggleSkills(){
   if(!selectedClass)return;
   if(activePanel==="menuPanel"){if(document.getElementById("skillsTab").classList.contains("active"))closePanels();else selectMenuTab("skills");return}
@@ -2490,13 +3062,17 @@ function updatePhase(){
 const SAVE_KEY="egglands_v1";
 function snapshot(){
   return {
-    version:10,seed,dayNo,dayClock,roadSafety,kills,selectedClass,spentPoints,purchased:[...purchased],quest,
+    version:19,seed,dayNo,dayClock,roadSafety,kills,selectedClass,spentPoints,purchased:[...purchased],quest,
     living:{villageEvents,nextEventId,godMode,llmConfig:{enabled:false,backend:llmConfig.backend,serverUrl:llmConfig.serverUrl,serverModel:llmConfig.serverModel,model:llmConfig.model,status:"Lightweight villager mind ready to load on the first conversation.",lastDecision:llmConfig.lastDecision}},
     player:{x:player.x,y:player.y,hp:player.hp,maxHp:player.maxHp,coins:player.coins,relics:player.relics,cargo:player.cargo,capacity:player.capacity,
       materials:player.materials,materialCapacity:player.materialCapacity,stamina:player.stamina,guardBroken:player.guardBroken,
       influenceDay:player.influenceDay,tradeOrigins:player.tradeOrigins,level:player.level,xp:player.xp,specialtyPoints:player.specialtyPoints,
       skillPoints:player.skillPoints,lifeSkills:player.lifeSkills,equipment:player.equipment,homeTownName:player.homeTownName,backpackCols:player.backpackCols,backpackRows:player.backpackRows,
-      gearInventory:player.gearInventory,equippedSlots:player.equippedSlots,nextItemUid:player.nextItemUid},
+      gearInventory:player.gearInventory,equippedSlots:player.equippedSlots,nextItemUid:player.nextItemUid,
+      starterLoadoutVersion:player.starterLoadoutVersion||0,governmentChosen:!!player.governmentChosen,
+      relationships:player.relationships||{},familyAgentIds:player.familyAgentIds||[],
+      worldZoom:worldZoom,exploredWorldCells:[...exploredWorldCells]},
+    governments:towns.map(t=>({name:t.name,government:governmentFor(t)})),
     towns:towns.map(t=>({name:t.name,building:t.building,materialStock:t.materialStock,walls:t.walls,chronicle:t.chronicle,institutions:t.institutions,houses:t.houses.map(h=>({id:h.id,familyName:h.familyName,stock:h.stock,plan:h.plan,planHistory:h.planHistory,lastCouncilDay:h.lastCouncilDay,lastHungerEvent:h.lastHungerEvent})),
       market:{prices:t.market.prices,lastPrices:t.market.lastPrices,inventory:t.market.inventory,treasury:t.market.treasury,avgUtility:t.market.avgUtility,lastUtility:t.market.lastUtility,shortage:t.market.shortage}})),
     agents:agents.map(a=>({id:a.id,cls:a.cls,town:a.town.name,name:a.name,alphas:a.alphas,productivity:a.productivity,wealth:a.wealth,
@@ -2504,6 +3080,7 @@ function snapshot(){
       isGuard:a.isGuard,guardHp:a.guardHp,guardMaxHp:a.guardMaxHp,guardDays:a.guardDays,combatClass:a.combatClass,level:a.level,xp:a.xp,
       specialtyPoints:a.specialtyPoints,skillPoints:a.skillPoints,specialtyPurchased:[...a.specialtyPurchased],lifeSkills:a.lifeSkills,equipment:a.equipment,houseId:a.houseId,
       firstName:a.firstName,ageGroup:a.ageGroup,gender:a.gender,age:a.age,familyName:a.familyName,spouseId:a.spouseId,parentIds:a.parentIds,childrenIds:a.childrenIds,
+      species:a.species,opennessBias:a.opennessBias,
       traits:a.traits,needs:a.needs,relationships:a.relationships,eventMemory:a.eventMemory,rumors:a.rumors,rumorNotes:a.rumorNotes,dialogueHistory:(a.dialogueHistory||[]).slice(-16),playerMemories:(a.playerMemories||[]).slice(-8),schedule:a.schedule,currentActivity:a.currentActivity,publicRationale:a.publicRationale})),
     dungeon:{chestOpened:dungeon.chestOpened,wardenDead:dungeon.wardenDead,cleared:dungeon.cleared},
     resourceState:[...resourceState.entries()],
@@ -2525,6 +3102,12 @@ function applySave(data){
   player.equipment=Object.assign({fishing:false,forestry:false,mining:false,hunting:false},savedPlayer.equipment||{});
   player.backpackCols=savedPlayer.backpackCols||8;player.backpackRows=savedPlayer.backpackRows||5;player.gearInventory=(savedPlayer.gearInventory||[]).map(item=>Object.assign({},item));
   player.equippedSlots=Object.assign({helmet:null,shield:null,weapon:null,gauntlets:null,pants:null,amulet:null,ring:null},savedPlayer.equippedSlots||{});player.nextItemUid=savedPlayer.nextItemUid||1;
+  player.starterLoadoutVersion=player.gearInventory.length?(Number(savedPlayer.starterLoadoutVersion)||0):0;
+  player.governmentChosen=!!savedPlayer.governmentChosen;
+  player.relationships=savedPlayer.relationships&&typeof savedPlayer.relationships==="object"?savedPlayer.relationships:{};
+  player.familyAgentIds=Array.isArray(savedPlayer.familyAgentIds)?savedPlayer.familyAgentIds.slice():[];
+  worldZoom=clamp(Number(savedPlayer.worldZoom)||WORLD_ZOOM_MAX,WORLD_ZOOM_MIN,WORLD_ZOOM_MAX);
+  exploredWorldCells=new Set(Array.isArray(savedPlayer.exploredWorldCells)?savedPlayer.exploredWorldCells:[]);
   if(!Number.isFinite(savedPlayer.specialtyPoints))player.specialtyPoints=Math.max(0,Math.floor(kills/3)-spentPoints);
   for(const savedTown of data.towns||[]){
     const town=towns.find(t=>t.name===savedTown.name);if(!town)continue;
@@ -2567,7 +3150,14 @@ function applySave(data){
   scene="world";currentShop=null;shopCanvas=null;shopCells=null;player.maxHp=mods().maxHp;player.hp=clamp(player.hp,1,player.maxHp);player.stamina=clamp(player.stamina||100,0,mods().maxStamina);
   Object.assign(player,{jumpZ:0,jumpV:0,jumpsUsed:0,landingSquash:0,attackQueued:0,attackLunge:0,dashHitTargets:null,moveBlend:0,walkTime:0,moving:false,moveVX:0,moveVY:0,stepDust:0,harvestAnim:0,harvestKind:null});
   if((data.version||0)<7&&insideTownBounds(player.x,player.y,0))placePlayerAtWorldSpawn();
+  for(const saved of data.governments||[]){const town=towns.find(t=>t.name===saved.name);if(town&&saved.government){town.government=Object.assign(governmentFor(town),saved.government);town.government.raid=null}}
+  for(const town of towns)governmentFor(town);
+  for(const a of agents)initializeSocialIdentity(a);
+  ensurePlayerRelationships();
+  if(selectedClass)grantStarterEquipment(false);
+  applyWorldZoom();revealFogAroundPlayer();
   document.getElementById("classPanel").classList.remove("open");activePanel=null;
+  if(selectedClass&&!player.governmentChosen)promptGovernmentOnEntry();
   document.getElementById("dayNo").textContent=dayNo;paintWorld();renderLedger();updateUI();toast("Saved valley restored.");
 }
 function loadGame(){
@@ -2583,13 +3173,39 @@ function loadGame(){
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
 ctx.imageSmoothingEnabled=false;
 const camera={x:0,y:0};
+const WORLD_ZOOM_MIN=1,WORLD_ZOOM_MAX=2.25,FOG_REVEAL_RADIUS=5;
+let worldZoom=WORLD_ZOOM_MAX;
+let exploredWorldCells=new Set();
+function viewW(){return VW/worldZoom}
+function viewH(){return VH/worldZoom}
+function applyWorldZoom(){
+  worldZoom=clamp(Number(worldZoom)||WORLD_ZOOM_MAX,WORLD_ZOOM_MIN,WORLD_ZOOM_MAX);
+  const output=document.getElementById("zoomValue");if(output)output.textContent=worldZoom.toFixed(2)+"×";
+  const slider=document.getElementById("worldZoom");if(slider&&Number(slider.value)!==worldZoom)slider.value=worldZoom;
+}
+function revealFogAroundPlayer(){
+  if(scene!=="world"||!player)return;
+  const tx=Math.floor(player.x/TILE),ty=Math.floor(player.y/TILE);
+  for(let y=ty-FOG_REVEAL_RADIUS;y<=ty+FOG_REVEAL_RADIUS;y++)
+    for(let x=tx-FOG_REVEAL_RADIUS;x<=tx+FOG_REVEAL_RADIUS;x++)
+      if(x>=0&&y>=0&&x<MW&&y<MH&&Math.hypot(x-tx,y-ty)<=FOG_REVEAL_RADIUS+.35)exploredWorldCells.add(keyOf(x,y));
+}
+function drawWorldFog(){
+  if(scene!=="world")return;
+  ctx.fillStyle="rgba(5,7,10,.93)";
+  const x0=Math.max(0,Math.floor(camera.x/TILE)),y0=Math.max(0,Math.floor(camera.y/TILE));
+  const x1=Math.min(MW-1,Math.ceil((camera.x+viewW())/TILE)),y1=Math.min(MH-1,Math.ceil((camera.y+viewH())/TILE));
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+    if(!exploredWorldCells.has(keyOf(x,y)))ctx.fillRect(x*TILE-camera.x,y*TILE-camera.y,TILE,TILE);
+  }
+}
 function updateCamera(){
-  const width=(scene==="world"?MW:scene==="dungeon"?DW:SW)*TILE,height=(scene==="world"?MH:scene==="dungeon"?DH:SH)*TILE;
-  camera.x=clamp(player.x-VW/2,0,Math.max(0,width-VW));
-  camera.y=clamp(player.y-VH/2,0,Math.max(0,height-VH));
+  const width=(scene==="world"?MW:scene==="dungeon"?DW:SW)*TILE,height=(scene==="world"?MH:scene==="dungeon"?DH:SH)*TILE,vw=viewW(),vh=viewH();
+  camera.x=clamp(player.x-vw/2,0,Math.max(0,width-vw));
+  camera.y=clamp(player.y-vh/2,0,Math.max(0,height-vh));
   if(screenShake>0){
-    camera.x=clamp(camera.x+(rand()-.5)*screenShake,0,Math.max(0,width-VW));
-    camera.y=clamp(camera.y+(rand()-.5)*screenShake,0,Math.max(0,height-VH));
+    camera.x=clamp(camera.x+(rand()-.5)*screenShake,0,Math.max(0,width-vw));
+    camera.y=clamp(camera.y+(rand()-.5)*screenShake,0,Math.max(0,height-vh));
   }
 }
 function drawPerson(x,y,color,bob,outlined=false,guard=null,child=false,motion=null){
@@ -2696,8 +3312,8 @@ function drawCombatEffects(){
       const sweep=player.combo===2?2.55:1.95,angle=base-sweep/2+progress*sweep,length=(21+player.combo*3)*m.range;ctx.strokeStyle=player.combo===3?"#f0c969":"#e5e5ea";ctx.lineWidth=player.combo===3?4:3;ctx.beginPath();ctx.arc(x,y,length,angle-.28,angle+.12);ctx.stroke();ctx.lineWidth=1;
     }
   }
-  const aimX=player.pointerAim?player.pointerX:player.x+5-camera.x+player.face.x*34;
-  const aimY=player.pointerAim?player.pointerY:player.y+8-camera.y+player.face.y*34;
+  const aimX=player.pointerAim?player.pointerX/worldZoom:player.x+5-camera.x+player.face.x*34;
+  const aimY=player.pointerAim?player.pointerY/worldZoom:player.y+8-camera.y+player.face.y*34;
   if(selectedClass&&!activePanel){
     ctx.strokeStyle="rgba(234,223,199,.38)";ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(player.x+5-camera.x,player.y+8-camera.y);ctx.lineTo(aimX,aimY);ctx.stroke();ctx.setLineDash([]);
     ctx.strokeStyle="#eadfc7";ctx.beginPath();ctx.arc(aimX,aimY,5,0,Math.PI*2);
@@ -2736,12 +3352,14 @@ function drawHUD(){
 function render(){
   updateCamera();
   ctx.clearRect(0,0,VW,VH);
+  const vw=viewW(),vh=viewH();
+  ctx.save();ctx.scale(worldZoom,worldZoom);
   const base=scene==="world"?worldCanvas:scene==="dungeon"?dungeonCanvas:shopCanvas;
-  ctx.drawImage(base,camera.x,camera.y,VW,VH,0,0,VW,VH);
+  ctx.drawImage(base,camera.x,camera.y,vw,vh,0,0,vw,vh);
   if(scene==="world")drawGatherHighlight();
   const near=nearestAgent(),entities=[];
   if(scene==="world"){
-    for(const a of agents){if(a.x<camera.x-30||a.x>camera.x+VW+30||a.y<camera.y-35||a.y>camera.y+VH+30)continue;entities.push({y:a.y,draw:()=>{drawPerson(a.x-camera.x,a.y-camera.y,CLASS_COLOR[a.combatClass]||CLASS_COLOR.peasant,a.bob,a===near&&!activePanel,a.isGuard?a:null,a.ageGroup==="child",{move:a.moveBlend,walkTime:a.bob,face:a.face,attack:a.isGuard&&a.guardAttackCd>.42});if(godMode){const urgent=NEED_NAMES.slice().sort((x,y)=>a.needs[y]-a.needs[x])[0];ctx.fillStyle="rgba(15,18,24,.82)";ctx.fillRect(a.x-camera.x-8,a.y-camera.y-12,28,7);ctx.fillStyle=a.needs[urgent]>70?"#df6c5d":"#e2ad45";ctx.font="6px monospace";ctx.textAlign="center";ctx.fillText(urgent.toUpperCase(),a.x-camera.x+6,a.y-camera.y-7)}}})}
+    for(const a of agents){if(a.x<camera.x-30||a.x>camera.x+vw+30||a.y<camera.y-35||a.y>camera.y+vh+30)continue;entities.push({y:a.y,draw:()=>{drawPerson(a.x-camera.x,a.y-camera.y,CLASS_COLOR[a.combatClass]||CLASS_COLOR.peasant,a.bob,a===near&&!activePanel,a.isGuard?a:null,a.ageGroup==="child",{move:a.moveBlend,walkTime:a.bob,face:a.face,attack:a.isGuard&&a.guardAttackCd>.42});if(godMode){const urgent=NEED_NAMES.slice().sort((x,y)=>a.needs[y]-a.needs[x])[0];ctx.fillStyle="rgba(15,18,24,.82)";ctx.fillRect(a.x-camera.x-8,a.y-camera.y-12,28,7);ctx.fillStyle=a.needs[urgent]>70?"#df6c5d":"#e2ad45";ctx.font="6px monospace";ctx.textAlign="center";ctx.fillText(urgent.toUpperCase(),a.x-camera.x+6,a.y-camera.y-7)}}})}
     for(const c of caravans)entities.push({y:c.y,draw:()=>drawCaravan(c)});
   }
   for(const e of currentEnemies())entities.push({y:e.y,draw:()=>drawEnemy(e)});
@@ -2757,11 +3375,13 @@ function render(){
   }});
   entities.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   drawCombatEffects();
-  if(scene==="world"&&isNight()){ctx.fillStyle="rgba(10,14,48,.34)";ctx.fillRect(0,0,VW,VH)}
+  if(scene==="world"){revealFogAroundPlayer();drawWorldFog()}
+  if(scene==="world"&&isNight()){ctx.fillStyle="rgba(10,14,48,.34)";ctx.fillRect(0,0,vw,vh)}
   if(scene==="dungeon"){
     const gradient=ctx.createRadialGradient(player.x-camera.x,player.y-camera.y,45,player.x-camera.x,player.y-camera.y,220);
-    gradient.addColorStop(0,"rgba(0,0,0,0)");gradient.addColorStop(1,"rgba(0,0,0,.48)");ctx.fillStyle=gradient;ctx.fillRect(0,0,VW,VH);
+    gradient.addColorStop(0,"rgba(0,0,0,0)");gradient.addColorStop(1,"rgba(0,0,0,.48)");ctx.fillStyle=gradient;ctx.fillRect(0,0,vw,vh);
   }
+  ctx.restore();
   if(player.hurt>0){ctx.fillStyle="rgba(180,40,30,"+(player.hurt*.28)+")";ctx.fillRect(0,0,VW,VH)}
   drawHUD();
 }
@@ -2777,7 +3397,10 @@ function buildClassCards(){
     const choose=()=>{
       selectedClass=cls;player.maxHp=mods().maxHp;player.hp=player.maxHp;activePanel=null;
       document.getElementById("classPanel").classList.remove("open");scheduleCaravan(false);
-      toast("You choose the "+cls+" Specialty. Your first Specialty and Skills points are ready.");updateUI();saveGame(true);
+      grantStarterEquipment(true);
+      const weapon=GEAR_DEFS[CLASS_STARTER_LOADOUT[cls].weapon];
+      toast("You choose the "+cls+" Specialty. "+weapon.name+(cls==="warrior"?" and Wood Shield are":" is")+" equipped.");updateUI();saveGame(true);
+      promptGovernmentOnEntry();
     };
     card.addEventListener("click",choose);card.addEventListener("keydown",e=>{if(e.key==="Enter")choose()});wrap.appendChild(card);
   });
@@ -2796,8 +3419,12 @@ function setupGame(newSeed,loading=false){
     swing:0,swingHit:false,combo:0,comboWindow:0,attackQueued:0,attackLunge:0,specialCd:0,dashCd:0,dashTime:0,dashHitTargets:null,hurt:0,
     jumpZ:0,jumpV:0,jumpsUsed:0,landingSquash:0,moveBlend:0,walkTime:0,moving:false,moveVX:0,moveVY:0,stepDust:0,harvestAnim:0,harvestKind:null,
     stamina:100,guardBroken:0,blockFresh:0,knockTime:0,knockX:0,knockY:0,pointerAim:false,pointerX:VW/2,pointerY:VH/2,
-    influenceDay:0,tradeOrigins:[null,null,null,null],homeTownName:towns[0].name});
+    influenceDay:0,tradeOrigins:[null,null,null,null],homeTownName:towns[0].name,
+    starterLoadoutVersion:0,governmentChosen:false,relationships:{},familyAgentIds:[]});
   document.getElementById("dayNo").textContent="1";ledgerTown=null;
+  if(!loading){worldZoom=WORLD_ZOOM_MAX;exploredWorldCells=new Set()}
+  for(const town of towns)governmentFor(town);
+  applyWorldZoom();revealFogAroundPlayer();
   if(!loading){activePanel="classPanel";document.getElementById("classPanel").classList.add("open")}
   renderLedger();updateUI();updatePhase();
 }
@@ -2814,7 +3441,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Shift")dash();
   if((e.key==="m"||e.key==="M")&&!e.repeat)toggleMenu();
   if(e.key==="k"||e.key==="K")toggleSkills();
-  if(e.key==="Escape"&&activePanel&&activePanel!=="classPanel")closePanels();
+  if(e.key==="Escape"&&activePanel&&activePanel!=="classPanel"&&activePanel!=="governmentEntryPanel")closePanels();
 });
 document.addEventListener("keyup",e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});
 function setPointerPosition(e){
@@ -2852,8 +3479,10 @@ document.getElementById("musicToggle").addEventListener("change",e=>{audioConfig
 document.getElementById("sfxToggle").addEventListener("change",e=>{audioConfig.sfx=e.target.checked;ensureAudio();saveAudioPrefs()});
 document.getElementById("audioPreview").addEventListener("click",()=>{ensureAudio();playSfx("day")});
 document.getElementById("godTown").addEventListener("change",()=>renderGodMode());document.getElementById("godAgent").addEventListener("change",()=>renderGodMode());document.getElementById("godRefresh").addEventListener("click",()=>renderGodMode());
-document.getElementById("helpBtn").addEventListener("click",()=>{if(!activePanel)openMenu("inventory")});
-document.getElementById("mobileMenu").addEventListener("click",()=>{if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("inventory")});
+document.getElementById("helpBtn").addEventListener("click",()=>{if(!activePanel)openMenu("stats")});
+document.getElementById("mobileMenu").addEventListener("click",()=>{if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("stats")});
+document.getElementById("worldZoom").addEventListener("input",e=>{worldZoom=+e.target.value;applyWorldZoom()});
+document.getElementById("zoomReset").addEventListener("click",()=>{worldZoom=WORLD_ZOOM_MAX;applyWorldZoom()});
 document.getElementById("menuSave").addEventListener("click",()=>saveGame(false));
 document.getElementById("menuLoad").addEventListener("click",loadGame);
 document.getElementById("saveBtn").addEventListener("click",()=>saveGame(false));
@@ -2915,7 +3544,7 @@ function frame(now){
   }else{
     const town=nearestTown();if(town!==ledgerTown)renderLedger();
   }
-  updatePhase();render();requestAnimationFrame(frame);
+  updatePhase();refreshAbilityBubbles();render();requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 </script>

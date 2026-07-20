@@ -82,7 +82,7 @@ function ensureAudio(){
 }
 function playSfx(name){
   if(!audioConfig.sfx)return;ensureAudio();const now=performance.now();if(now-(lastSfx[name]||0)<45)return;lastSfx[name]=now;
-  const sounds={swing:[[190,.05,"square",.045,0],[120,.06,"sawtooth",.025,.035]],cast:[[392,.045,"triangle",.032,0],[587,.07,"square",.025,.035]],arcane:[[740,.04,"square",.04,0],[370,.11,"triangle",.03,.025]],jump:[[260,.06,"square",.035,0],[390,.08,"square",.028,.045]],land:[[95,.08,"triangle",.05,0]],dash:[[150,.05,"sawtooth",.035,0],[260,.05,"square",.025,.035]],hit:[[90,.05,"square",.065,0],[65,.08,"sawtooth",.035,.025]],chop:[[118,.055,"square",.05,0],[82,.08,"triangle",.035,.035]],mine:[[410,.035,"square",.045,0],[205,.10,"triangle",.04,.025]],harvest:[[523,.055,"square",.03,0],[659,.09,"triangle",.03,.05]],block:[[310,.06,"square",.055,0],[465,.09,"triangle",.04,.04]],parry:[[520,.06,"square",.055,0],[780,.12,"triangle",.035,.045]],hurt:[[72,.12,"sawtooth",.055,0]],defeat:[[220,.07,"square",.045,0],[165,.07,"square",.04,.07],[110,.14,"triangle",.045,.14]],coin:[[660,.06,"square",.035,0],[880,.09,"square",.03,.06]],skill:[[330,.07,"square",.035,0],[495,.07,"square",.035,.055],[660,.13,"triangle",.035,.11]],menu:[[440,.04,"square",.025,0]],day:[[392,.09,"square",.03,0],[523,.09,"square",.03,.08],[659,.16,"triangle",.035,.16]],mind:[[330,.08,"triangle",.03,0],[440,.08,"triangle",.03,.07],[554,.14,"triangle",.03,.14]]};
+  const sounds={swing:[[190,.05,"square",.045,0],[120,.06,"sawtooth",.025,.035]],cast:[[392,.045,"triangle",.032,0],[587,.07,"square",.025,.035]],arcane:[[740,.04,"square",.04,0],[370,.11,"triangle",.03,.025]],jump:[[260,.06,"square",.035,0],[390,.08,"square",.028,.045]],land:[[95,.08,"triangle",.05,0]],dash:[[150,.05,"sawtooth",.035,0],[260,.05,"square",.025,.035]],hit:[[90,.05,"square",.065,0],[65,.08,"sawtooth",.035,.025]],chop:[[118,.055,"square",.05,0],[82,.08,"triangle",.035,.035]],mine:[[410,.035,"square",.045,0],[205,.10,"triangle",.04,.025]],harvest:[[523,.055,"square",.03,0],[659,.09,"triangle",.03,.05]],block:[[310,.06,"square",.055,0],[465,.09,"triangle",.04,.04]],parry:[[520,.06,"square",.055,0],[780,.12,"triangle",.035,.045]],hurt:[[72,.12,"sawtooth",.055,0]],defeat:[[220,.07,"square",.045,0],[165,.07,"square",.04,.07],[110,.14,"triangle",.045,.14]],coin:[[660,.06,"square",.035,0],[880,.09,"square",.03,.06]],skill:[[330,.07,"square",.035,0],[495,.07,"square",.035,.055],[660,.13,"triangle",.035,.11]],menu:[[440,.04,"square",.025,0]],day:[[392,.09,"square",.03,0],[523,.09,"square",.03,.08],[659,.16,"triangle",.035,.16]],mind:[[330,.08,"triangle",.03,0],[440,.08,"triangle",.03,.07],[554,.14,"triangle",.03,.14]],think:[[262,.10,"triangle",.022,0],[311,.10,"triangle",.020,.14],[392,.16,"triangle",.017,.28]],talk:[[470,.03,"square",.030,0],[530,.03,"square",.027,.055],[455,.03,"square",.027,.11],[545,.03,"square",.025,.165],[495,.03,"square",.022,.22],[520,.04,"square",.020,.275]]};
   for(const spec of sounds[name]||[])synthTone(...spec);
 }
 function saveAudioPrefs(){try{localStorage.setItem(AUDIO_PREF_KEY,JSON.stringify(audioConfig))}catch(error){}}
@@ -115,7 +115,8 @@ function buildingBonus(town,good){
   return 1;
 }
 function townAdvantage(town,good){
-  return (town.advantages&&town.advantages[good]||1)*buildingBonus(town,good);
+  const focus=town.government&&GOVERNMENT_FOCI[town.government.focus];
+  return (town.advantages&&town.advantages[good]||1)*buildingBonus(town,good)*(focus&&focus.good===good?1.22:1);
 }
 
 class Agent{

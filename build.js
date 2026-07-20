@@ -18,6 +18,8 @@ const jsFiles = [
   "06-time-schedules.js",
   "07-markets-building.js",
   "08-interactions.js",
+  "08a-government.js",
+  "08b-social.js",
   "09-dialogue-llm.js",
   "10-ui-panels.js",
   "11-save-load.js",

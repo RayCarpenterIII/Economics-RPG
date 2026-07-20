@@ -4,13 +4,17 @@
 const SAVE_KEY="egglands_v1";
 function snapshot(){
   return {
-    version:10,seed,dayNo,dayClock,roadSafety,kills,selectedClass,spentPoints,purchased:[...purchased],quest,
+    version:19,seed,dayNo,dayClock,roadSafety,kills,selectedClass,spentPoints,purchased:[...purchased],quest,
     living:{villageEvents,nextEventId,godMode,llmConfig:{enabled:false,backend:llmConfig.backend,serverUrl:llmConfig.serverUrl,serverModel:llmConfig.serverModel,model:llmConfig.model,status:"Lightweight villager mind ready to load on the first conversation.",lastDecision:llmConfig.lastDecision}},
     player:{x:player.x,y:player.y,hp:player.hp,maxHp:player.maxHp,coins:player.coins,relics:player.relics,cargo:player.cargo,capacity:player.capacity,
       materials:player.materials,materialCapacity:player.materialCapacity,stamina:player.stamina,guardBroken:player.guardBroken,
       influenceDay:player.influenceDay,tradeOrigins:player.tradeOrigins,level:player.level,xp:player.xp,specialtyPoints:player.specialtyPoints,
       skillPoints:player.skillPoints,lifeSkills:player.lifeSkills,equipment:player.equipment,homeTownName:player.homeTownName,backpackCols:player.backpackCols,backpackRows:player.backpackRows,
-      gearInventory:player.gearInventory,equippedSlots:player.equippedSlots,nextItemUid:player.nextItemUid},
+      gearInventory:player.gearInventory,equippedSlots:player.equippedSlots,nextItemUid:player.nextItemUid,
+      starterLoadoutVersion:player.starterLoadoutVersion||0,governmentChosen:!!player.governmentChosen,
+      relationships:player.relationships||{},familyAgentIds:player.familyAgentIds||[],
+      worldZoom:worldZoom,exploredWorldCells:[...exploredWorldCells]},
+    governments:towns.map(t=>({name:t.name,government:governmentFor(t)})),
     towns:towns.map(t=>({name:t.name,building:t.building,materialStock:t.materialStock,walls:t.walls,chronicle:t.chronicle,institutions:t.institutions,houses:t.houses.map(h=>({id:h.id,familyName:h.familyName,stock:h.stock,plan:h.plan,planHistory:h.planHistory,lastCouncilDay:h.lastCouncilDay,lastHungerEvent:h.lastHungerEvent})),
       market:{prices:t.market.prices,lastPrices:t.market.lastPrices,inventory:t.market.inventory,treasury:t.market.treasury,avgUtility:t.market.avgUtility,lastUtility:t.market.lastUtility,shortage:t.market.shortage}})),
     agents:agents.map(a=>({id:a.id,cls:a.cls,town:a.town.name,name:a.name,alphas:a.alphas,productivity:a.productivity,wealth:a.wealth,
@@ -18,6 +22,7 @@ function snapshot(){
       isGuard:a.isGuard,guardHp:a.guardHp,guardMaxHp:a.guardMaxHp,guardDays:a.guardDays,combatClass:a.combatClass,level:a.level,xp:a.xp,
       specialtyPoints:a.specialtyPoints,skillPoints:a.skillPoints,specialtyPurchased:[...a.specialtyPurchased],lifeSkills:a.lifeSkills,equipment:a.equipment,houseId:a.houseId,
       firstName:a.firstName,ageGroup:a.ageGroup,gender:a.gender,age:a.age,familyName:a.familyName,spouseId:a.spouseId,parentIds:a.parentIds,childrenIds:a.childrenIds,
+      species:a.species,opennessBias:a.opennessBias,
       traits:a.traits,needs:a.needs,relationships:a.relationships,eventMemory:a.eventMemory,rumors:a.rumors,rumorNotes:a.rumorNotes,dialogueHistory:(a.dialogueHistory||[]).slice(-16),playerMemories:(a.playerMemories||[]).slice(-8),schedule:a.schedule,currentActivity:a.currentActivity,publicRationale:a.publicRationale})),
     dungeon:{chestOpened:dungeon.chestOpened,wardenDead:dungeon.wardenDead,cleared:dungeon.cleared},
     resourceState:[...resourceState.entries()],
@@ -39,6 +44,12 @@ function applySave(data){
   player.equipment=Object.assign({fishing:false,forestry:false,mining:false,hunting:false},savedPlayer.equipment||{});
   player.backpackCols=savedPlayer.backpackCols||8;player.backpackRows=savedPlayer.backpackRows||5;player.gearInventory=(savedPlayer.gearInventory||[]).map(item=>Object.assign({},item));
   player.equippedSlots=Object.assign({helmet:null,shield:null,weapon:null,gauntlets:null,pants:null,amulet:null,ring:null},savedPlayer.equippedSlots||{});player.nextItemUid=savedPlayer.nextItemUid||1;
+  player.starterLoadoutVersion=player.gearInventory.length?(Number(savedPlayer.starterLoadoutVersion)||0):0;
+  player.governmentChosen=!!savedPlayer.governmentChosen;
+  player.relationships=savedPlayer.relationships&&typeof savedPlayer.relationships==="object"?savedPlayer.relationships:{};
+  player.familyAgentIds=Array.isArray(savedPlayer.familyAgentIds)?savedPlayer.familyAgentIds.slice():[];
+  worldZoom=clamp(Number(savedPlayer.worldZoom)||WORLD_ZOOM_MAX,WORLD_ZOOM_MIN,WORLD_ZOOM_MAX);
+  exploredWorldCells=new Set(Array.isArray(savedPlayer.exploredWorldCells)?savedPlayer.exploredWorldCells:[]);
   if(!Number.isFinite(savedPlayer.specialtyPoints))player.specialtyPoints=Math.max(0,Math.floor(kills/3)-spentPoints);
   for(const savedTown of data.towns||[]){
     const town=towns.find(t=>t.name===savedTown.name);if(!town)continue;
@@ -81,7 +92,14 @@ function applySave(data){
   scene="world";currentShop=null;shopCanvas=null;shopCells=null;player.maxHp=mods().maxHp;player.hp=clamp(player.hp,1,player.maxHp);player.stamina=clamp(player.stamina||100,0,mods().maxStamina);
   Object.assign(player,{jumpZ:0,jumpV:0,jumpsUsed:0,landingSquash:0,attackQueued:0,attackLunge:0,dashHitTargets:null,moveBlend:0,walkTime:0,moving:false,moveVX:0,moveVY:0,stepDust:0,harvestAnim:0,harvestKind:null});
   if((data.version||0)<7&&insideTownBounds(player.x,player.y,0))placePlayerAtWorldSpawn();
+  for(const saved of data.governments||[]){const town=towns.find(t=>t.name===saved.name);if(town&&saved.government){town.government=Object.assign(governmentFor(town),saved.government);town.government.raid=null}}
+  for(const town of towns)governmentFor(town);
+  for(const a of agents)initializeSocialIdentity(a);
+  ensurePlayerRelationships();
+  if(selectedClass)grantStarterEquipment(false);
+  applyWorldZoom();revealFogAroundPlayer();
   document.getElementById("classPanel").classList.remove("open");activePanel=null;
+  if(selectedClass&&!player.governmentChosen)promptGovernmentOnEntry();
   document.getElementById("dayNo").textContent=dayNo;paintWorld();renderLedger();updateUI();toast("Saved valley restored.");
 }
 function loadGame(){

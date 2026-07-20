@@ -68,6 +68,67 @@ function renderInventory(){
   }
   const overflow=document.getElementById("overflowItems");for(const item of packed.overflow){const box=document.createElement("div");box.className="bagItem overflow";box.innerHTML='<strong>'+item.icon+' '+item.name+'</strong>Needs '+item.w+'×'+item.h+' contiguous slots';overflow.appendChild(box)}
 }
+function abilityState(kind){
+  if(!selectedClass)return {ready:false,spent:false,remaining:0,total:1};
+  const m=mods();
+  if(kind==="specialty"){const total=SPECIALTY[selectedClass].cooldown*m.specialCd;return {ready:player.specialCd<=0,spent:false,remaining:player.specialCd,total}}
+  if(kind==="dash"){const total=1.45*m.dashCd;return {ready:player.dashCd<=0&&player.dashTime<=0,spent:false,remaining:player.dashCd,total}}
+  const spent=player.influenceDay>=dayNo;
+  return {ready:!spent,spent,remaining:0,total:1};
+}
+function installAbilityBubbles(){
+  const dock=document.getElementById("skillBubbleDock");
+  if(!dock||dock.children.length)return;
+  const bubbles=[
+    {id:"abilitySpecialty",kind:"specialty",key:"F",icon:"✦",action:()=>specialty()},
+    {id:"abilityInfluence",kind:"influence",key:"Q",icon:"♛",action:()=>classInfluence()},
+    {id:"abilityDash",kind:"dash",key:"SHIFT",icon:"➤",action:()=>dash()}
+  ];
+  for(const spec of bubbles){
+    const b=document.createElement("button");
+    b.className="abilityBubble";b.id=spec.id;b.type="button";b.dataset.kind=spec.kind;
+    b.innerHTML='<span class="abilityKey">'+spec.key+'</span><span class="abilityIcon">'+spec.icon+'</span><span class="abilityStatus">Ready</span>';
+    b.addEventListener("click",()=>{if(selectedClass&&!activePanel)spec.action()});
+    dock.appendChild(b);
+  }
+}
+function refreshAbilityBubbles(){
+  const dock=document.getElementById("skillBubbleDock");if(!dock)return;
+  installAbilityBubbles();
+  dock.style.display=selectedClass?"flex":"none";
+  if(!selectedClass)return;
+  const names={specialty:SPECIALTY[selectedClass].name,influence:CLASS_POWER[selectedClass].name,dash:selectedClass==="mage"?"Blink":"Dash"};
+  for(const b of Array.from(dock.children)){
+    const kind=b.dataset.kind,state=abilityState(kind);
+    const status=state.ready?"Ready":state.spent?"Tomorrow":state.remaining.toFixed(1)+"s";
+    const cls="abilityBubble "+(state.ready?"ready":state.spent?"spent":"cooling");
+    if(b.className!==cls)b.className=cls;
+    const label=b.querySelector(".abilityStatus");
+    if(label&&label.textContent!==status)label.textContent=status;
+    const title=names[kind]+" · "+status;
+    if(b.title!==title){b.title=title;b.setAttribute("aria-label",title)}
+  }
+}
+function statLine(name,value){return '<div class="townStat"><span>'+name+'</span><span>'+value+'</span></div>'}
+function equippedSlotName(slot){const uid=player.equippedSlots&&player.equippedSlots[slot],item=uid&&findGear(uid),def=item&&GEAR_DEFS[item.key];return def?def.icon+" "+escapeHTML(def.name):"Empty"}
+function renderPlayerStats(){
+  const wrap=document.getElementById("statsContent");if(!wrap)return;
+  if(!selectedClass){wrap.innerHTML='<div class="emptyState">Choose a Specialty to begin your story.</div>';return}
+  const m=mods(),g=gearBonuses(),packed=packBackpack(),town=homeGovernmentTown(),gov=town?governmentFor(town):null;
+  const specialtyState=abilityState("specialty"),dashState=abilityState("dash"),influenceState=abilityState("influence");
+  const phaseEl=document.getElementById("phaseText"),phase=phaseEl?phaseEl.textContent:"";
+  const gearLines=GEAR_SLOTS.map(slot=>statLine(slot.charAt(0).toUpperCase()+slot.slice(1),equippedSlotName(slot))).join("");
+  const lifeLines=Object.keys(LIFE_SKILLS).map(key=>statLine(LIFE_SKILLS[key].icon+" "+LIFE_SKILLS[key].name,(player.lifeSkills[key]||0)+"/3")).join("");
+  const cargoLines=GOODS.map((good,i)=>statLine(GOOD_ICON[i]+" "+good,Math.floor(player.cargo[i]||0))).join("");
+  const materialLines=MATERIALS.map((mat,i)=>statLine(MATERIAL_ICON[i]+" "+mat,Math.floor(player.materials[i]||0))).join("");
+  const abilityCard=(name,key,state,description)=>{
+    const cls=state.ready?"ready":state.spent?"spent":"cooling";
+    const status=state.ready?"Ready":state.spent?"Available tomorrow":state.remaining.toFixed(1)+" seconds";
+    return '<div class="statsAbility '+cls+'"><strong>'+key+' · '+escapeHTML(name)+'</strong><div class="townStat"><span>Status</span><span>'+status+'</span></div><small>'+escapeHTML(description)+'</small></div>';
+  };
+  wrap.innerHTML='<div class="menuCard statsHero"><div class="statsPortrait">'+CLASS_ICON[selectedClass]+'</div><div><h3>'+selectedClass.toUpperCase()+' · LEVEL '+player.level+'</h3><div class="statsGrid">'+statLine("Experience",player.xp+" / "+xpNeeded(player.level))+statLine("Home",town?escapeHTML(town.name):"Unknown")+statLine("Government",gov?GOVERNMENT_TYPES[gov.type].label:"Council")+statLine("Time","Day "+dayNo+" · "+escapeHTML(phase))+statLine("Coins",player.coins.toFixed(1))+statLine("Heartstones",player.relics)+'</div></div></div>'+
+  '<div class="statsColumns"><div><div class="menuCard"><h3>Combat statistics</h3>'+statLine("Health",player.hp+" / "+player.maxHp)+statLine("Attack bonus","+"+g.power)+statLine("Specialty bonus","+"+g.special)+statLine("Defense","+"+g.defense)+statLine("Maximum stamina",m.maxStamina)+statLine("Movement speed",Math.round(m.speed*100)+"%")+statLine("Block power","+"+g.block)+statLine("Shield",playerHasShield()?"Equipped":"None — blocking unavailable")+statLine("Kills",kills)+'</div><div class="menuCard"><h3>Active abilities</h3>'+abilityCard(SPECIALTY[selectedClass].name,"F",specialtyState,SPECIALTY[selectedClass].desc)+abilityCard(CLASS_POWER[selectedClass].name,"Q",influenceState,CLASS_POWER[selectedClass].desc)+abilityCard(selectedClass==="mage"?"Blink":"Dash","SHIFT",dashState,"Rapid movement with a short recharge.")+'</div></div><div><div class="menuCard"><h3>Equipment</h3>'+gearLines+'</div><div class="menuCard"><h3>Progression</h3>'+statLine("Specialty points",player.specialtyPoints||0)+statLine("Skills points",player.skillPoints||0)+statLine("Specialty perks",purchased.size)+lifeLines+'</div><div class="menuCard"><h3>Economy and backpack</h3>'+statLine("Backpack",packed.used+" / "+packed.capacity+" slots")+statLine("Road safety",Math.round(roadSafety)+"%")+cargoLines+materialLines+'</div></div></div>';
+}
 function renderMenuMap(){
   const map=document.getElementById("menuMap"),m=map.getContext("2d"),sx=map.width/(MW*TILE),sy=map.height/(MH*TILE);
   m.clearRect(0,0,map.width,map.height);m.drawImage(worldCanvas,0,0,map.width,map.height);
@@ -78,9 +139,12 @@ function renderMenuMap(){
     for(const shop of town.shops){m.fillStyle=CLASS_COLOR[shop.specialty];m.fillRect(shop.x*sx-2,shop.y*sy-2,5,5)}
   }
   for(const site of resourceLandmarks){m.fillStyle="#79c56b";m.font="13px monospace";m.fillText(MATERIAL_ICON[[2,1,4].indexOf(site.tile)],(site.x*TILE+8)*sx,(site.y*TILE+8)*sy)}
+  const cw=map.width/MW,ch=map.height/MH;
+  m.fillStyle="rgba(5,7,10,.93)";
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)if(!exploredWorldCells.has(keyOf(x,y)))m.fillRect(Math.floor(x*cw),Math.floor(y*ch),Math.ceil(cw)+1,Math.ceil(ch)+1);
   const mapPos=scene==="world"?player:scene==="shop"?returnPosition:dungeon.entrance,px=mapPos.x*sx,py=mapPos.y*sy;
   m.fillStyle="#ffef79";m.beginPath();m.arc(px,py,4,0,Math.PI*2);m.fill();m.strokeStyle="#14161c";m.stroke();
-  document.getElementById("mapLegend").innerHTML='<span style="color:#ffef79">● You</span><span style="color:#e2ad45">● Home</span><span>○ Town</span><span style="color:#cf6547">■ Specialty shops</span><span style="color:#79c56b">≈ ♠ ◆ Resources</span><span>▣ Old Mine</span>';
+  document.getElementById("mapLegend").innerHTML='<span style="color:#ffef79">● You</span><span style="color:#e2ad45">● Home</span><span>○ Town</span><span style="color:#cf6547">■ Specialty shops</span><span style="color:#79c56b">≈ ♠ ◆ Resources</span><span>▣ Old Mine</span><span class="fogLegend">Fog clears permanently as you explore</span>';
 }
 function renderHomeTown(){
   const home=towns.find(t=>t.name===(player.homeTownName||towns[0].name))||towns[0];player.homeTownName=home.name;
@@ -98,6 +162,7 @@ function renderHomeTown(){
   const policy=home.institutions?.currentPolicy;
   document.getElementById("homeTownContent").innerHTML='<div><div class="menuCard"><h3>Town</h3><div class="townStat"><span>Population</span><span>'+home.agents.length+'</span></div><div class="townStat"><span>Adults / children</span><span>'+home.agents.filter(a=>a.ageGroup!=="child").length+' / '+home.agents.filter(a=>a.ageGroup==="child").length+'</span></div><div class="townStat"><span>Houses</span><span>'+home.houses.length+'</span></div><div class="townStat"><span>Residents per house</span><span>Maximum 4</span></div><div class="townStat"><span>Buildings</span><span>'+facilities+'</span></div><div class="townStat"><span>Guards</span><span>'+guardCount(home)+'</span></div><div class="townStat"><span>Council policy</span><span>'+(policy?escapeHTML(policy.label):"Uncommitted")+'</span></div></div><div class="menuCard"><h3>Households and public plans</h3>'+houseLines+'</div><div class="menuCard"><h3>Professions</h3>'+profLines+'</div><div class="menuCard"><h3>Local trades</h3>'+tradeLines+'</div><div class="menuCard"><h3>Specialties</h3>'+specialtyLines+'</div></div><div class="menuCard"><h3>Residents and families</h3><div class="residentList">'+people+'</div></div>';
   if(godMode)document.querySelectorAll("#homeTownContent [data-agent-id]").forEach(el=>{el.style.cursor="pointer";el.title="Inspect in God mode";el.addEventListener("click",()=>{document.getElementById("godTown").value=String(home.id);renderGodMode(+el.dataset.agentId);selectMenuTab("god")})});
+  renderGovernment();
 }
 function renderChronicle(){
   const select=document.getElementById("chronicleTown"),previous=select.value||"ALL";select.innerHTML='<option value="ALL">All settlements</option>'+towns.map(t=>'<option value="'+t.name+'">'+escapeHTML(t.name)+'</option>').join("");select.value=["ALL",...towns.map(t=>t.name)].includes(previous)?previous:"ALL";
@@ -124,6 +189,21 @@ function syncSettingsLLMConfig(){
   if(model){if(llmConfig.backend==="server")llmConfig.serverModel=model.value.trim();else llmConfig.model=model.value.trim()||(llmConfig.backend==="browser-lite"?LITE_LLM_MODEL:llmConfig.model)}
   if(url)llmConfig.serverUrl=url.value.trim()||"http://localhost:11434/v1";
 }
+let serverModelFetchToken=0;
+function refreshServerModelChoices(){
+  if(llmConfig.backend!=="server")return;
+  const list=document.getElementById("settingsModelChoices");if(!list)return;
+  const root=(llmConfig.serverUrl||"").trim().replace(/\/+$/,"");if(!root)return;
+  const token=++serverModelFetchToken;
+  fetch(root+"/models").then(res=>res.ok?res.json():null).then(data=>{
+    if(!data||token!==serverModelFetchToken)return;
+    const ids=(data.data||[]).map(m=>m.id).filter(Boolean);
+    if(!ids.length)return;
+    list.innerHTML=ids.map(id=>'<option value="'+escapeHTML(id)+'">').join("");
+    const status=document.getElementById("settingsLLMStatus");
+    if(status&&!llmConfig.enabled)status.textContent="Server reachable. Models available: "+ids.join(", ")+". Leave the model box blank to use the first one.";
+  }).catch(()=>{});
+}
 function renderSettings(){
   const backend=document.getElementById("settingsLLMBackend");if(!backend)return;
   backend.value=llmConfig.backend;document.getElementById("settingsLLMModel").value=llmConfig.backend==="server"?llmConfig.serverModel:llmConfig.model;
@@ -131,20 +211,21 @@ function renderSettings(){
   document.getElementById("settingsLLMToggle").checked=!!llmConfig.enabled;document.getElementById("settingsLLMStatus").textContent=llmConfig.status+(llmConfig.model?"\nSelected: "+llmConfig.model:"");
   document.getElementById("settingsLLMNote").textContent=llmConfig.backend==="browser-lite"?"Tiny 135M 4-bit model on CPU/WASM. It loads on the first conversation and handles speech; reliable deterministic rules handle village plans.":llmConfig.backend==="server"?"Best conversation quality. Connect to an OpenAI-compatible Ollama, LM Studio, llama.cpp, or vLLM server.":"Larger experimental browser model. Requires working WebGPU and a much bigger download.";
   document.getElementById("musicToggle").checked=audioConfig.music;document.getElementById("sfxToggle").checked=audioConfig.sfx;
+  refreshServerModelChoices();
 }
 function selectMenuTab(tab){
   if(tab==="god"&&!godMode)tab="help";
   document.querySelectorAll(".menuTabBtn").forEach(btn=>btn.classList.toggle("active",btn.dataset.menuTab===tab));
   document.querySelectorAll("#menuBody>.menuTab").forEach(panel=>panel.classList.toggle("active",panel.id===tab+"Tab"));
-  if(tab==="inventory")renderInventory();else if(tab==="map")renderMenuMap();else if(tab==="skills")renderSkills();else if(tab==="crafting")renderCrafting();else if(tab==="chronicle")renderChronicle();else if(tab==="home")renderHomeTown();else if(tab==="settings")renderSettings();else if(tab==="god")renderGodMode();
+  if(tab==="stats")renderPlayerStats();else if(tab==="relationships")renderPlayerRelationships();else if(tab==="inventory")renderInventory();else if(tab==="map")renderMenuMap();else if(tab==="skills")renderSkills();else if(tab==="crafting")renderCrafting();else if(tab==="chronicle")renderChronicle();else if(tab==="home")renderHomeTown();else if(tab==="settings")renderSettings();else if(tab==="god")renderGodMode();
   document.getElementById("menuBody").scrollTop=0;
 }
-function openMenu(tab="inventory"){
+function openMenu(tab="stats"){
   if(!selectedClass)return;
   if(activePanel&&activePanel!=="menuPanel")return;
   activePanel="menuPanel";document.getElementById("menuPanel").classList.add("open");playSfx("menu");selectMenuTab(tab);
 }
-function toggleMenu(){if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("inventory")}
+function toggleMenu(){if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("stats")}
 function toggleSkills(){
   if(!selectedClass)return;
   if(activePanel==="menuPanel"){if(document.getElementById("skillsTab").classList.contains("active"))closePanels();else selectMenuTab("skills");return}

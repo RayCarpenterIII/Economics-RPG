@@ -8,8 +8,12 @@ function relationRecord(a,targetId){
 }
 function changeRelationship(a,b,changes){
   if(!a||!b||a===b)return;
+  const compatibility=.72+opennessCompatibility(a,b)*.42;
   const forward=relationRecord(a,b.id),back=relationRecord(b,a.id);
-  for(const key of Object.keys(changes)){forward[key]=clamp((forward[key]||0)+changes[key],0,100);back[key]=clamp((back[key]||0)+changes[key]*.82,0,100)}
+  for(const key of Object.keys(changes)){
+    const delta=changes[key]*(key==="resentment"?1.08-.22*compatibility:compatibility);
+    forward[key]=clamp((forward[key]||0)+delta,0,100);back[key]=clamp((back[key]||0)+delta*.82,0,100);
+  }
 }
 function rememberEvent(a,event,heard=false){
   if(!a)return;a.eventMemory=a.eventMemory||[];a.rumors=a.rumors||[];a.rumorNotes=a.rumorNotes||{};
@@ -28,6 +32,7 @@ function recordVillageEvent(town,kind,text,options={}){
 function initializeAgentMind(a){
   if(!a.traits||!a.traits.length){const start=(a.id*3+(a.cls||"").length)%PERSONAL_TRAITS.length;a.traits=[PERSONAL_TRAITS[start],PERSONAL_TRAITS[(start+3+a.id)%PERSONAL_TRAITS.length]]}
   a.needs=Object.assign({hunger:20,safety:30,belonging:20,comfort:25,status:35,purpose:20},a.needs||{});
+  initializeSocialIdentity(a);
   a.relationships=a.relationships||{};a.eventMemory=a.eventMemory||[];a.rumors=a.rumors||[];a.rumorNotes=a.rumorNotes||{};a.dialogueHistory=(a.dialogueHistory||[]).slice(-16);a.playerMemories=(a.playerMemories||[]).slice(-8);a.face=a.face||{x:0,y:1};a.moveBlend=Number.isFinite(a.moveBlend)?a.moveBlend:0;a.updateAccumulator=Number.isFinite(a.updateAccumulator)?a.updateAccumulator:(a.id%7)*.011;a.targetRefresh=0;a.cachedTarget=null;a.combatRefresh=0;a.cachedEnemy=null;a.schedule=a.schedule||[];a.currentActivity=a.currentActivity||"settling in";a.publicRationale=a.publicRationale||"I am balancing work with the needs of my household.";
 }
 function initializeRelationships(town){

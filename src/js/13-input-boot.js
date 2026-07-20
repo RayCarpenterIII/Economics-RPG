@@ -9,7 +9,10 @@ function buildClassCards(){
     const choose=()=>{
       selectedClass=cls;player.maxHp=mods().maxHp;player.hp=player.maxHp;activePanel=null;
       document.getElementById("classPanel").classList.remove("open");scheduleCaravan(false);
-      toast("You choose the "+cls+" Specialty. Your first Specialty and Skills points are ready.");updateUI();saveGame(true);
+      grantStarterEquipment(true);
+      const weapon=GEAR_DEFS[CLASS_STARTER_LOADOUT[cls].weapon];
+      toast("You choose the "+cls+" Specialty. "+weapon.name+(cls==="warrior"?" and Wood Shield are":" is")+" equipped.");updateUI();saveGame(true);
+      promptGovernmentOnEntry();
     };
     card.addEventListener("click",choose);card.addEventListener("keydown",e=>{if(e.key==="Enter")choose()});wrap.appendChild(card);
   });
@@ -28,8 +31,12 @@ function setupGame(newSeed,loading=false){
     swing:0,swingHit:false,combo:0,comboWindow:0,attackQueued:0,attackLunge:0,specialCd:0,dashCd:0,dashTime:0,dashHitTargets:null,hurt:0,
     jumpZ:0,jumpV:0,jumpsUsed:0,landingSquash:0,moveBlend:0,walkTime:0,moving:false,moveVX:0,moveVY:0,stepDust:0,harvestAnim:0,harvestKind:null,
     stamina:100,guardBroken:0,blockFresh:0,knockTime:0,knockX:0,knockY:0,pointerAim:false,pointerX:VW/2,pointerY:VH/2,
-    influenceDay:0,tradeOrigins:[null,null,null,null],homeTownName:towns[0].name});
+    influenceDay:0,tradeOrigins:[null,null,null,null],homeTownName:towns[0].name,
+    starterLoadoutVersion:0,governmentChosen:false,relationships:{},familyAgentIds:[]});
   document.getElementById("dayNo").textContent="1";ledgerTown=null;
+  if(!loading){worldZoom=WORLD_ZOOM_MAX;exploredWorldCells=new Set()}
+  for(const town of towns)governmentFor(town);
+  applyWorldZoom();revealFogAroundPlayer();
   if(!loading){activePanel="classPanel";document.getElementById("classPanel").classList.add("open")}
   renderLedger();updateUI();updatePhase();
 }
@@ -46,7 +53,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Shift")dash();
   if((e.key==="m"||e.key==="M")&&!e.repeat)toggleMenu();
   if(e.key==="k"||e.key==="K")toggleSkills();
-  if(e.key==="Escape"&&activePanel&&activePanel!=="classPanel")closePanels();
+  if(e.key==="Escape"&&activePanel&&activePanel!=="classPanel"&&activePanel!=="governmentEntryPanel")closePanels();
 });
 document.addEventListener("keyup",e=>{keys[e.key]=false;keys[e.key.toLowerCase()]=false});
 function setPointerPosition(e){
@@ -84,8 +91,10 @@ document.getElementById("musicToggle").addEventListener("change",e=>{audioConfig
 document.getElementById("sfxToggle").addEventListener("change",e=>{audioConfig.sfx=e.target.checked;ensureAudio();saveAudioPrefs()});
 document.getElementById("audioPreview").addEventListener("click",()=>{ensureAudio();playSfx("day")});
 document.getElementById("godTown").addEventListener("change",()=>renderGodMode());document.getElementById("godAgent").addEventListener("change",()=>renderGodMode());document.getElementById("godRefresh").addEventListener("click",()=>renderGodMode());
-document.getElementById("helpBtn").addEventListener("click",()=>{if(!activePanel)openMenu("inventory")});
-document.getElementById("mobileMenu").addEventListener("click",()=>{if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("inventory")});
+document.getElementById("helpBtn").addEventListener("click",()=>{if(!activePanel)openMenu("stats")});
+document.getElementById("mobileMenu").addEventListener("click",()=>{if(activePanel==="menuPanel")closePanels();else if(!activePanel)openMenu("stats")});
+document.getElementById("worldZoom").addEventListener("input",e=>{worldZoom=+e.target.value;applyWorldZoom()});
+document.getElementById("zoomReset").addEventListener("click",()=>{worldZoom=WORLD_ZOOM_MAX;applyWorldZoom()});
 document.getElementById("menuSave").addEventListener("click",()=>saveGame(false));
 document.getElementById("menuLoad").addEventListener("click",loadGame);
 document.getElementById("saveBtn").addEventListener("click",()=>saveGame(false));
@@ -147,6 +156,6 @@ function frame(now){
   }else{
     const town=nearestTown();if(town!==ledgerTown)renderLedger();
   }
-  updatePhase();render();requestAnimationFrame(frame);
+  updatePhase();refreshAbilityBubbles();render();requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
