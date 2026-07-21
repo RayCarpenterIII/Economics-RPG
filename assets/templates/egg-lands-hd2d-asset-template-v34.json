@@ -1,0 +1,569 @@
+{
+  "schemaVersion": 1,
+  "foundation": {
+    "worldTileUnits": 16,
+    "artTilePixels": 32,
+    "pixelsPerWorldUnit": 2,
+    "anchorRule": "world position is the entity foot anchor",
+    "viewport": {
+      "logical": [
+        640,
+        360
+      ],
+      "output": [
+        1280,
+        720
+      ]
+    }
+  },
+  "examples": {
+    "character": {
+      "id": "character.human.farmer.01",
+      "type": "character",
+      "file": "assets/characters/human-farmer-01.png",
+      "artPixels": [
+        40,
+        56
+      ],
+      "anchorPixels": [
+        20,
+        52
+      ],
+      "collider": {
+        "offset": [
+          -6,
+          -8
+        ],
+        "size": [
+          12,
+          8
+        ]
+      },
+      "sheet": {
+        "framePixels": [
+          40,
+          56
+        ],
+        "directions": [
+          "down",
+          "left",
+          "right",
+          "up"
+        ],
+        "stateRows": {
+          "idle": 0,
+          "walk": 1,
+          "work": 2,
+          "carry": 3,
+          "attack": 4
+        },
+        "frames": {
+          "idle": 4,
+          "walk": 6,
+          "work": 6,
+          "carry": 4,
+          "attack": 6
+        }
+      }
+    },
+    "building": {
+      "id": "building.bakery.01",
+      "type": "building",
+      "file": "assets/buildings/bakery-01.png",
+      "artPixels": [
+        192,
+        160
+      ],
+      "anchorPixels": [
+        96,
+        152
+      ],
+      "footprintTiles": [
+        5,
+        4
+      ],
+      "entranceTiles": [
+        2.5,
+        4
+      ],
+      "layers": [
+        "foundation",
+        "walls",
+        "roof",
+        "light"
+      ],
+      "collision": [
+        {
+          "x": -40,
+          "y": -42,
+          "width": 80,
+          "height": 34
+        }
+      ]
+    },
+    "terrain": {
+      "id": "terrain.meadow.01",
+      "type": "terrain",
+      "file": "assets/tiles/meadow-01.png",
+      "artPixels": [
+        32,
+        32
+      ],
+      "anchorPixels": [
+        0,
+        0
+      ],
+      "autotile": "cardinal-4bit",
+      "variants": 4
+    }
+  },
+  "registered": [
+    {
+      "type": "character",
+      "artPixels": [
+        40,
+        56
+      ],
+      "worldSize": [
+        20,
+        28
+      ],
+      "anchorWorld": [
+        10,
+        27
+      ],
+      "collider": {
+        "offset": [
+          1,
+          10
+        ],
+        "size": [
+          9,
+          6
+        ]
+      },
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "animations": {
+        "idle": 4,
+        "walk": 6,
+        "run": 6,
+        "attack": 6,
+        "block": 3,
+        "work": 6,
+        "carry": 4,
+        "hurt": 2,
+        "defeated": 4
+      },
+      "id": "player",
+      "anchorPixels": [
+        20,
+        54
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "character",
+      "artPixels": [
+        36,
+        54
+      ],
+      "worldSize": [
+        18,
+        27
+      ],
+      "anchorWorld": [
+        9,
+        26
+      ],
+      "collider": {
+        "offset": [
+          1,
+          10
+        ],
+        "size": [
+          9,
+          6
+        ]
+      },
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "animations": {
+        "idle": 4,
+        "walk": 6,
+        "run": 6,
+        "attack": 6,
+        "block": 3,
+        "work": 6,
+        "carry": 4,
+        "hurt": 2,
+        "defeated": 4
+      },
+      "id": "adult",
+      "anchorPixels": [
+        18,
+        52
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "character",
+      "artPixels": [
+        26,
+        38
+      ],
+      "worldSize": [
+        13,
+        19
+      ],
+      "anchorWorld": [
+        6.5,
+        18
+      ],
+      "collider": {
+        "offset": [
+          2,
+          11
+        ],
+        "size": [
+          7,
+          5
+        ]
+      },
+      "directions": [
+        "down",
+        "left",
+        "right",
+        "up"
+      ],
+      "animations": {
+        "idle": 4,
+        "walk": 6,
+        "work": 4,
+        "hurt": 2
+      },
+      "id": "child",
+      "anchorPixels": [
+        13,
+        36
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "prop",
+      "artPixels": [
+        56,
+        76
+      ],
+      "worldSize": [
+        28,
+        38
+      ],
+      "anchorWorld": [
+        14,
+        36
+      ],
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "layers": [
+        "trunk",
+        "canopy"
+      ],
+      "id": "tree",
+      "anchorPixels": [
+        28,
+        72
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "prop",
+      "artPixels": [
+        36,
+        28
+      ],
+      "worldSize": [
+        18,
+        14
+      ],
+      "anchorWorld": [
+        9,
+        13
+      ],
+      "footprintTiles": [
+        1,
+        1
+      ],
+      "id": "rock",
+      "anchorPixels": [
+        18,
+        26
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "building",
+      "artPixels": [
+        96,
+        96
+      ],
+      "worldSize": [
+        48,
+        48
+      ],
+      "anchorWorld": [
+        24,
+        46
+      ],
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "layers": [
+        "foundation",
+        "walls",
+        "roof",
+        "light"
+      ],
+      "id": "house",
+      "anchorPixels": [
+        48,
+        92
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "building",
+      "artPixels": [
+        72,
+        64
+      ],
+      "worldSize": [
+        36,
+        32
+      ],
+      "anchorWorld": [
+        18,
+        30
+      ],
+      "footprintTiles": [
+        2,
+        2
+      ],
+      "layers": [
+        "foundation",
+        "walls",
+        "roof",
+        "chimney",
+        "light"
+      ],
+      "id": "workshop",
+      "anchorPixels": [
+        36,
+        60
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "terrain",
+      "artPixels": [
+        32,
+        32
+      ],
+      "worldSize": [
+        16,
+        16
+      ],
+      "anchorWorld": [
+        0,
+        0
+      ],
+      "autotile": "cardinal-4bit",
+      "variants": 4,
+      "id": "terrain_meadow",
+      "anchorPixels": [
+        0,
+        0
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "terrain",
+      "artPixels": [
+        32,
+        32
+      ],
+      "worldSize": [
+        16,
+        16
+      ],
+      "anchorWorld": [
+        0,
+        0
+      ],
+      "autotile": "cardinal-4bit",
+      "variants": 4,
+      "id": "terrain_water",
+      "anchorPixels": [
+        0,
+        0
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "animal",
+      "artPixels": [
+        20,
+        18
+      ],
+      "worldSize": [
+        10,
+        9
+      ],
+      "anchorWorld": [
+        5,
+        8
+      ],
+      "animations": {
+        "idle": 3,
+        "walk": 4
+      },
+      "id": "animal_chicken",
+      "anchorPixels": [
+        10,
+        16
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "animal",
+      "artPixels": [
+        30,
+        24
+      ],
+      "worldSize": [
+        15,
+        12
+      ],
+      "anchorWorld": [
+        7.5,
+        11
+      ],
+      "animations": {
+        "idle": 3,
+        "walk": 6
+      },
+      "id": "animal_goat",
+      "anchorPixels": [
+        15,
+        22
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "animal",
+      "artPixels": [
+        18,
+        16
+      ],
+      "worldSize": [
+        9,
+        8
+      ],
+      "anchorWorld": [
+        4.5,
+        7
+      ],
+      "animations": {
+        "idle": 3,
+        "walk": 5
+      },
+      "id": "animal_rabbit",
+      "anchorPixels": [
+        9,
+        14
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "type": "animal",
+      "artPixels": [
+        38,
+        30
+      ],
+      "worldSize": [
+        19,
+        15
+      ],
+      "anchorWorld": [
+        9.5,
+        14
+      ],
+      "animations": {
+        "idle": 3,
+        "walk": 6
+      },
+      "id": "animal_deer",
+      "anchorPixels": [
+        19,
+        28
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    },
+    {
+      "worldSize": [
+        24,
+        32
+      ],
+      "artPixels": [
+        48,
+        64
+      ],
+      "collider": {
+        "offset": [
+          3,
+          20
+        ],
+        "size": [
+          10,
+          6
+        ]
+      },
+      "id": "custom.large",
+      "type": "prop",
+      "anchorWorld": [
+        12,
+        32
+      ],
+      "anchorPixels": [
+        24,
+        64
+      ],
+      "schemaVersion": 1,
+      "source": "procedural-placeholder"
+    }
+  ]
+}

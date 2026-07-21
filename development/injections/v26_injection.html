@@ -1,0 +1,253 @@
+<style id="living-agriculture-v26-style">
+  .agricultureNoteV26{margin-top:8px;color:var(--dim);font-size:9px;line-height:1.45}
+  .agricultureBadgeV26{display:inline-block;border:1px solid #78925a;color:#b9d18c;padding:2px 5px;margin-left:5px;font-size:8px;vertical-align:middle}
+</style>
+<script id="living-agriculture-v26-script">
+(function(){
+  "use strict";
+  const AGRICULTURE_VERSION_V26=1;
+  const FARM_W_V26=8,FARM_H_V26=5,CROP_COLS_V26=4,CROP_ROWS_V26=4;
+  const CROP_NAMES_V26=["barley","beans","turnips","cabbage"];
+  const ANIMAL_DEFS_V26={
+    chicken:{label:"Chicken",icon:"c",speed:12,size:3,color:"#e4d5ad",yield:.13},
+    goat:{label:"Goat",icon:"g",speed:10,size:5,color:"#d1c4a8",yield:.25},
+    rabbit:{label:"Rabbit",icon:"r",speed:22,size:3,color:"#b7aa98",yield:0},
+    deer:{label:"Deer",icon:"d",speed:28,size:6,color:"#a98563",yield:0}
+  };
+  let farmAnimalsV26=[],animalIdV26=1,animalStepClockV26=0;
+
+  function tileOpenForFarmV26(x,y){
+    if(x<1||y<1||x+FARM_W_V26>=MW-1||y+FARM_H_V26>=MH-1)return false;
+    for(let yy=0;yy<FARM_H_V26;yy++)for(let xx=0;xx<FARM_W_V26;xx++){
+      const gx=x+xx,gy=y+yy,tile=tiles[gy]&&tiles[gy][gx];
+      if(solid.has(keyOf(gx,gy))||tile===2||tile===4||tile===8||insideTownBounds(gx*TILE,gy*TILE,1))return false;
+    }
+    return true;
+  }
+  function findFarmOriginV26(town){
+    const preferred=[
+      [town.rx+2,town.ry+TOWN_H+2],[town.rx+TOWN_W+2,town.ry+3],[town.rx-10,town.ry+3],[town.rx+2,town.ry-7]
+    ];
+    for(const p of preferred)if(tileOpenForFarmV26(p[0],p[1]))return {x:p[0],y:p[1]};
+    for(let radius=2;radius<18;radius++)for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
+      if(Math.abs(ox)!==radius&&Math.abs(oy)!==radius)continue;
+      const x=town.rx+Math.floor(TOWN_W/2)+ox-FARM_W_V26/2,y=town.ry+Math.floor(TOWN_H/2)+oy-FARM_H_V26/2;
+      if(tileOpenForFarmV26(Math.floor(x),Math.floor(y)))return {x:Math.floor(x),y:Math.floor(y)};
+    }
+    return {x:clamp(town.rx+2,1,MW-FARM_W_V26-2),y:clamp(town.ry+TOWN_H+1,1,MH-FARM_H_V26-2)};
+  }
+  function makePlotV26(origin,index){
+    return {x:origin.x+(index%CROP_COLS_V26),y:origin.y+Math.floor(index/CROP_COLS_V26),crop:CROP_NAMES_V26[index%CROP_NAMES_V26.length],stage:index%3,tended:0,lastWorkedDay:0};
+  }
+  function makeFarmV26(town,saved){
+    const origin=saved&&saved.origin||findFarmOriginV26(town),plots=[];
+    for(let i=0;i<CROP_COLS_V26*CROP_ROWS_V26;i++)plots.push(makePlotV26(origin,i));
+    if(saved&&Array.isArray(saved.plots))for(let i=0;i<Math.min(plots.length,saved.plots.length);i++)plots[i]=Object.assign(plots[i],saved.plots[i]);
+    return {
+      origin:{x:origin.x,y:origin.y},plots:plots,farmerIds:[],harvests:Number(saved&&saved.harvests)||0,
+      pen:{x:origin.x+5,y:origin.y,w:3,h:4},lastYield:Number(saved&&saved.lastYield)||0,waterBonus:false
+    };
+  }
+  function farmForTownV26(town){return town&&town.agricultureV26}
+  function plotWorldV26(plot){return {x:plot.x*TILE+8,y:plot.y*TILE+8}}
+  function farmWaterBonusV26(farm){
+    for(const plot of farm.plots)for(let oy=-3;oy<=3;oy++)for(let ox=-3;ox<=3;ox++){
+      const tile=tiles[plot.y+oy]&&tiles[plot.y+oy][plot.x+ox];if(tile===2||tile===16)return true;
+    }
+    return false;
+  }
+  function assignFarmersV26(town){
+    const farm=farmForTownV26(town);if(!farm)return;
+    const eligible=town.agents.filter(a=>a.ageGroup!=="child"&&!a.isGuard&&!a.raidState&&!a.constructionTownV24).sort((a,b)=>{
+      const score=x=>(x.produces==="food"?6:0)+(x.cls==="builder"?3:0)+(x.productivity||1);return score(b)-score(a);
+    });
+    farm.farmerIds=eligible.slice(0,Math.min(2,eligible.length)).map(a=>a.id);
+  }
+  function domesticAnimalPositionV26(town,type,index){
+    const farm=farmForTownV26(town),pen=farm.pen;
+    return {x:(pen.x+.6+(index%2)*1.05)*TILE,y:(pen.y+.65+Math.floor(index/2)*1.05)*TILE};
+  }
+  function makeAnimalV26(type,x,y,options){
+    return Object.assign({id:animalIdV26++,type:type,x:x,y:y,age:1+Math.floor(rand()*6),sex:rand()<.5?"female":"male",domestic:false,homeTown:null,targetX:x,targetY:y,moveTimer:rand()*3,navigationV25:null,lastSafeXV25:x,lastSafeYV25:y},options||{});
+  }
+  function openAnimalCellV26(x,y,wild){
+    if(x<1||y<1||x>=MW-1||y>=MH-1||solid.has(keyOf(x,y)))return false;
+    if(wild&&insideTownBounds(x*TILE,y*TILE,2))return false;
+    return true;
+  }
+  function randomWildPositionV26(){
+    for(let tries=0;tries<500;tries++){
+      const x=2+Math.floor(rand()*(MW-4)),y=2+Math.floor(rand()*(MH-4));
+      if(openAnimalCellV26(x,y,true)&&tiles[y][x]!==2)return {x:x*TILE+5,y:y*TILE+5};
+    }
+    return {x:MW*TILE/2,y:MH*TILE/2};
+  }
+  function spawnDefaultAnimalsV26(){
+    farmAnimalsV26=[];animalIdV26=1;
+    for(const town of towns){
+      const domestic=["chicken","chicken","chicken","goat"];
+      domestic.forEach((type,index)=>{const p=domesticAnimalPositionV26(town,type,index);farmAnimalsV26.push(makeAnimalV26(type,p.x,p.y,{domestic:true,homeTown:town.name}))});
+    }
+    for(let i=0;i<12;i++){const p=randomWildPositionV26();farmAnimalsV26.push(makeAnimalV26("rabbit",p.x,p.y))}
+    for(let i=0;i<6;i++){const p=randomWildPositionV26();farmAnimalsV26.push(makeAnimalV26("deer",p.x,p.y))}
+  }
+  function restoreAnimalsV26(saved){
+    if(!Array.isArray(saved)||!saved.length){spawnDefaultAnimalsV26();return}
+    farmAnimalsV26=saved.filter(a=>ANIMAL_DEFS_V26[a.type]).map(a=>makeAnimalV26(a.type,a.x,a.y,a));
+    animalIdV26=Math.max(1,...farmAnimalsV26.map(a=>Number(a.id)||0))+1;
+  }
+  function initializeAgricultureV26(saved){
+    const savedFarms=new Map(((saved&&saved.farms)||[]).map(item=>[item.name,item.farm]));
+    for(const town of towns){town.agricultureV26=makeFarmV26(town,savedFarms.get(town.name));assignFarmersV26(town)}
+    restoreAnimalsV26(saved&&saved.animals);
+  }
+  function farmPlotNeedsWorkV26(plot,farm){return plot.stage<3&&plot.tended<(farm.waterBonus?4.5:7)}
+  function farmerPlotV26(a,farm){
+    const candidates=farm.plots.filter(p=>farmPlotNeedsWorkV26(p,farm));
+    return candidates.length?candidates[(a.id+dayNo)%candidates.length]:farm.plots[(a.id+dayNo)%farm.plots.length];
+  }
+  function shouldFarmV26(a){
+    if(!a||a.ageGroup==="child"||a.isGuard||a.raidState||a.constructionTownV24)return false;
+    const farm=farmForTownV26(a.town),phase=dayClock/DAY_SECONDS;
+    return !!(farm&&phase>=.18&&phase<.60&&farm.farmerIds.includes(a.id)&&farm.plots.some(p=>farmPlotNeedsWorkV26(p,farm)));
+  }
+
+  const previousAgentTargetV26=agentTarget;
+  agentTarget=function(a){
+    if(shouldFarmV26(a)){
+      const farm=farmForTownV26(a.town),plot=farmerPlotV26(a,farm),target=plotWorldV26(plot);
+      a.currentPlace="farmV26";a.currentActivity="tending the "+plot.crop+" field";a.farmPlotV26=plot.x+","+plot.y;
+      return window.__egglandsNavigationV25?window.__egglandsNavigationV25.navigationTarget(a,{x:target.x-5,y:target.y-8}):{x:target.x-5,y:target.y-8};
+    }
+    a.farmPlotV26=null;return previousAgentTargetV26(a);
+  };
+
+  function workFarmV26(a,dt){
+    if(!shouldFarmV26(a)||!a.farmPlotV26)return;
+    const farm=farmForTownV26(a.town),parts=a.farmPlotV26.split(",").map(Number),plot=farm.plots.find(p=>p.x===parts[0]&&p.y===parts[1]);if(!plot)return;
+    const target=plotWorldV26(plot);if(Math.hypot(a.x+5-target.x,a.y+8-target.y)>22)return;
+    plot.tended+=dt*(.52+(a.productivity||1)*.18);plot.lastWorkedDay=dayNo;a.currentActivity="weeding and watering "+plot.crop;
+    a.farmFxV26=(a.farmFxV26||0)-dt;if(a.farmFxV26<=0){a.farmFxV26=1.4+rand();particles.push({scene:"world",x:target.x,y:target.y,vx:(rand()-.5)*18,vy:-8-rand()*8,life:.35,color:plot.stage<2?"#78a45b":"#d4b65d"})}
+  }
+  const previousStepAgentCoreV26=stepAgentCore;
+  stepAgentCore=function(a,dt,tier){const result=previousStepAgentCoreV26(a,dt,tier);workFarmV26(a,dt);return result};
+
+  function chooseAnimalTargetV26(animal){
+    if(animal.domestic){
+      const town=towns.find(t=>t.name===animal.homeTown),farm=farmForTownV26(town);if(!farm)return;
+      const pen=farm.pen;animal.targetX=(pen.x+.45+rand()*(pen.w-1))*TILE;animal.targetY=(pen.y+.45+rand()*(pen.h-1))*TILE;
+    }else{
+      const px=player.x-animal.x,py=player.y-animal.y,pd=Math.hypot(px,py);
+      if(pd<75){animal.targetX=animal.x-px/Math.max(1,pd)*65;animal.targetY=animal.y-py/Math.max(1,pd)*65}
+      else{animal.targetX=animal.x+(rand()-.5)*150;animal.targetY=animal.y+(rand()-.5)*150}
+      const cellX=clamp(Math.floor(animal.targetX/TILE),1,MW-2),cellY=clamp(Math.floor(animal.targetY/TILE),1,MH-2);
+      if(!openAnimalCellV26(cellX,cellY,true)){const p=randomWildPositionV26();animal.targetX=p.x;animal.targetY=p.y}
+    }
+  }
+  function moveAnimalV26(animal,dt){
+    const def=ANIMAL_DEFS_V26[animal.type];animal.moveTimer-=dt;if(animal.moveTimer<=0){animal.moveTimer=1.8+rand()*4;chooseAnimalTargetV26(animal)}
+    const raw={x:animal.targetX,y:animal.targetY},waypoint=window.__egglandsNavigationV25?window.__egglandsNavigationV25.navigationTarget(animal,raw):raw;
+    const dx=waypoint.x-animal.x,dy=waypoint.y-animal.y,d=Math.hypot(dx,dy);if(d<2)return;
+    const oldX=animal.x,oldY=animal.y,speed=def.speed*(animal.domestic?.72:1)*(Math.hypot(player.x-animal.x,player.y-animal.y)<75&&!animal.domestic?1.55:1);
+    animal.x+=dx/d*speed*dt;animal.y+=dy/d*speed*dt;
+    if(window.__egglandsNavigationV25&&window.__egglandsNavigationV25.blockedAt(animal.x,animal.y)){animal.x=oldX;animal.y=oldY;animal.navigationV25=null;animal.moveTimer=0}
+  }
+  function stepAnimalsV26(dt){
+    if(scene!=="world")return;animalStepClockV26+=dt;
+    for(const animal of farmAnimalsV26)moveAnimalV26(animal,dt);
+  }
+  const previousStepAgentsV26=stepAgents;
+  stepAgents=function(dt){const result=previousStepAgentsV26(dt);stepAnimalsV26(dt);return result};
+
+  function harvestPlotV26(town,plot,toPlayer){
+    const farm=farmForTownV26(town),yieldAmount=(farm.waterBonus?2:1)+(godMode?1:0);plot.stage=0;plot.tended=0;plot.crop=CROP_NAMES_V26[(CROP_NAMES_V26.indexOf(plot.crop)+1)%CROP_NAMES_V26.length];farm.harvests++;farm.lastYield=yieldAmount;
+    if(toPlayer){let gained=0;while(gained<yieldAmount&&canAddCargo(0,gained+1))gained++;player.cargo[0]+=gained;toast("Harvested "+gained+" food from the "+plot.crop+" plot.")}
+    else town.market.inventory[0]+=yieldAmount;
+    return yieldAmount;
+  }
+  function updateAgricultureDayV26(){
+    for(const town of towns){
+      const farm=farmForTownV26(town);if(!farm)continue;farm.waterBonus=farmWaterBonusV26(farm);assignFarmersV26(town);let harvested=0;
+      for(const plot of farm.plots){
+        const required=farm.waterBonus?4.5:7;
+        if(plot.stage>=3){if(plot.tended>=required*.65)harvested+=harvestPlotV26(town,plot,false)}
+        else if(plot.tended>=required)plot.stage++;
+        plot.tended=0;
+      }
+      let animalYield=0;for(const animal of farmAnimalsV26.filter(a=>a.domestic&&a.homeTown===town.name)){const def=ANIMAL_DEFS_V26[animal.type];animalYield+=def.yield;animal.age++}
+      town.market.inventory[0]+=animalYield;farm.lastYield=harvested+animalYield;
+      if(harvested>0)recordVillageEvent(town,"HARVEST",town.name+" gathers "+harvested+" food from its tended fields.",{salience:6,emotion:"relief"});
+    }
+    const wild=farmAnimalsV26.filter(a=>!a.domestic),rabbits=wild.filter(a=>a.type==="rabbit"),deer=wild.filter(a=>a.type==="deer");
+    if(rabbits.length<18&&rand()<.38){const parent=rabbits[Math.floor(rand()*Math.max(1,rabbits.length))],p=parent?{x:parent.x+8,y:parent.y+5}:randomWildPositionV26();farmAnimalsV26.push(makeAnimalV26("rabbit",p.x,p.y,{age:0}))}
+    if(deer.length<9&&rand()<.16){const parent=deer[Math.floor(rand()*Math.max(1,deer.length))],p=parent?{x:parent.x+10,y:parent.y+8}:randomWildPositionV26();farmAnimalsV26.push(makeAnimalV26("deer",p.x,p.y,{age:0}))}
+    paintWorld();
+  }
+  const previousNewDayV26=newDay;
+  newDay=function(){const result=previousNewDayV26();updateAgricultureDayV26();return result};
+
+  function cropColorV26(plot){return plot.stage===0?"#57432b":plot.stage===1?"#587847":plot.stage===2?"#7f9950":"#d2b54f"}
+  function drawAgricultureWorldV26(){
+    if(!worldCanvas)return;const w=worldCanvas.getContext("2d");
+    for(const town of towns){const farm=farmForTownV26(town);if(!farm)continue;const o=farm.origin;
+      w.fillStyle="#725437";w.fillRect(o.x*TILE,o.y*TILE,CROP_COLS_V26*TILE,CROP_ROWS_V26*TILE);
+      for(const plot of farm.plots){const px=plot.x*TILE,py=plot.y*TILE;w.fillStyle="#4b3525";w.fillRect(px,py,TILE,TILE);w.fillStyle="#63482e";for(let row=2;row<15;row+=4)w.fillRect(px+1,py+row,14,1);const color=cropColorV26(plot);w.fillStyle=color;const stems=Math.max(1,plot.stage+1);for(let i=0;i<stems;i++){const sx=px+3+(i*5)%12,sy=py+12-(i%2)*2;w.fillRect(sx,sy-plot.stage*2,2,3+plot.stage*2);if(plot.stage>=2)w.fillRect(sx-1,sy-plot.stage*2-2,4,2)}}
+      }
+      const pen=farm.pen,px=pen.x*TILE,py=pen.y*TILE,pw=pen.w*TILE,ph=pen.h*TILE;w.strokeStyle="#92734a";w.lineWidth=2;w.strokeRect(px+1,py+1,pw-2,ph-2);w.lineWidth=1;for(let x=px+8;x<px+pw;x+=12){w.fillStyle="#765735";w.fillRect(x,py,2,ph)}
+      w.fillStyle="#eadfc7";w.font="6px monospace";w.textAlign="center";w.fillText("FARM",o.x*TILE+32,o.y*TILE-3);w.fillText("PEN",px+pw/2,py-3);
+    }
+  }
+  const previousPaintWorldV26=paintWorld;
+  paintWorld=function(){const result=previousPaintWorldV26();drawAgricultureWorldV26();return result};
+
+  function drawAnimalV26(animal){
+    const def=ANIMAL_DEFS_V26[animal.type],x=animal.x-camera.x,y=animal.y-camera.y,bob=Math.sin((performance.now()/220)+(animal.id||0))*(animal.domestic?.45:1);
+    ctx.fillStyle="rgba(0,0,0,.25)";ctx.fillRect(x-3,y+def.size+2,def.size*2+2,2);ctx.fillStyle=def.color;ctx.fillRect(x-def.size/2,y-def.size/2+bob,def.size*1.7,def.size);ctx.fillRect(x+def.size*.55,y-def.size*.75+bob,def.size*.65,def.size*.65);
+    ctx.fillStyle="#2c241d";ctx.fillRect(x+def.size*.85,y-def.size*.52+bob,1,1);
+    if(animal.type==="deer"){ctx.fillStyle="#725438";ctx.fillRect(x+def.size*.82,y-def.size-2+bob,1,3);ctx.fillRect(x+def.size*1.08,y-def.size-2+bob,1,3)}
+    if(animal.type==="rabbit"){ctx.fillStyle=def.color;ctx.fillRect(x+def.size*.65,y-def.size-3+bob,1,4);ctx.fillRect(x+def.size*.95,y-def.size-3+bob,1,4)}
+    if(animal.type==="chicken"){ctx.fillStyle="#b74735";ctx.fillRect(x+def.size*.8,y-def.size+bob,2,2)}
+  }
+  function drawAnimalsV26(){if(scene!=="world")return;ctx.save();ctx.scale(worldZoom,worldZoom);for(const animal of farmAnimalsV26)drawAnimalV26(animal);ctx.restore()}
+  const previousRenderV26=render;
+  render=function(){const result=previousRenderV26();drawAnimalsV26();return result};
+
+  function nearbyMaturePlotV26(){
+    let best=null,bestD=30;for(const town of towns){const farm=farmForTownV26(town);if(!farm)continue;for(const plot of farm.plots){if(plot.stage<3)continue;const p=plotWorldV26(plot),d=Math.hypot(player.x+5-p.x,player.y+8-p.y);if(d<bestD){best={town,plot};bestD=d}}}return best;
+  }
+  function nearbyAnimalV26(){let best=null,bestD=24;for(const animal of farmAnimalsV26){const d=Math.hypot(player.x+5-animal.x,player.y+8-animal.y);if(d<bestD){best=animal;bestD=d}}return best}
+  const previousInteractV26=interact;
+  interact=function(){
+    if(selectedClass&&!activePanel&&scene==="world"){
+      const mature=nearbyMaturePlotV26();if(mature){harvestPlotV26(mature.town,mature.plot,true);paintWorld();updateUI();saveGame(true);return}
+      const animal=nearbyAnimalV26();if(animal){const def=ANIMAL_DEFS_V26[animal.type];toast(def.label+" - "+(animal.domestic?"part of "+animal.homeTown+"'s farm":"a wild animal that will flee if approached")+".");return}
+    }
+    return previousInteractV26();
+  };
+
+  function serializeFarmV26(farm){return {origin:farm.origin,plots:farm.plots.map(p=>({x:p.x,y:p.y,crop:p.crop,stage:p.stage,tended:p.tended,lastWorkedDay:p.lastWorkedDay})),harvests:farm.harvests,lastYield:farm.lastYield}}
+  function serializeAnimalV26(a){return {id:a.id,type:a.type,x:a.x,y:a.y,age:a.age,sex:a.sex,domestic:a.domestic,homeTown:a.homeTown,targetX:a.targetX,targetY:a.targetY,moveTimer:a.moveTimer}}
+  const previousSnapshotV26=snapshot;
+  snapshot=function(){const data=previousSnapshotV26();data.version=Math.max(26,Number(data.version)||0);data.agricultureV26={version:AGRICULTURE_VERSION_V26,farms:towns.map(t=>({name:t.name,farm:serializeFarmV26(farmForTownV26(t))})),animals:farmAnimalsV26.map(serializeAnimalV26)};return data};
+  const previousApplySaveV26=applySave;
+  applySave=function(data){const result=previousApplySaveV26(data);initializeAgricultureV26(data&&data.agricultureV26);paintWorld();return result};
+  const previousSetupGameV26=setupGame;
+  setupGame=function(newSeed,loading){const result=previousSetupGameV26(newSeed,loading);initializeAgricultureV26(null);paintWorld();return result};
+
+  const previousRenderHomeTownV26=renderHomeTown;
+  renderHomeTown=function(){
+    previousRenderHomeTownV26();const home=towns.find(t=>t.name===(player.homeTownName||towns[0].name))||towns[0],farm=farmForTownV26(home),wrap=document.getElementById("homeTownContent");if(!farm||!wrap)return;
+    const mature=farm.plots.filter(p=>p.stage>=3).length,growing=farm.plots.filter(p=>p.stage>0&&p.stage<3).length,animals=farmAnimalsV26.filter(a=>a.domestic&&a.homeTown===home.name);
+    const box=document.createElement("div");box.className="menuCard";box.innerHTML='<h3>Village agriculture <span class="agricultureBadgeV26">LIVING SYSTEM</span></h3>'+statLine("Fields",growing+" growing - "+mature+" ready")+statLine("Farmers",farm.farmerIds.map(id=>agents.find(a=>a.id===id)?.firstName).filter(Boolean).join(", ")||"No available adults")+statLine("Livestock",animals.filter(a=>a.type==="chicken").length+" chickens - "+animals.filter(a=>a.type==="goat").length+" goats")+statLine("Water access",farm.waterBonus?"Irrigated by nearby water or ditch":"Rain and hand watering")+'<div class="agricultureNoteV26">Crops advance only after villagers spend enough time tending them. Mature fields feed the local market; livestock provide small daily yields.</div>';wrap.appendChild(box)
+  };
+
+  const help=document.querySelector("#helpTab .helpGrid");if(help&&!document.getElementById("agricultureHelpV26")){
+    const k=document.createElement("span");k.id="agricultureHelpV26";k.className="key";k.textContent="Farms and animals";const t=document.createElement("span");t.textContent="Villagers tend visible crop plots over several days. Chickens and goats support town food stores, while rabbits and deer move and reproduce in the wild. Press E beside a mature crop to harvest it yourself.";help.appendChild(k);help.appendChild(t)
+  }
+
+  initializeAgricultureV26(null);paintWorld();
+  window.__egglandsAgricultureV26={version:AGRICULTURE_VERSION_V26,animals:()=>farmAnimalsV26,farms:()=>towns.map(t=>t.agricultureV26),advanceDay:updateAgricultureDayV26};
+  const title=document.querySelector("header h1");if(title)title.title="Living Agriculture and Animal Ecology v26";
+  toast("v26 loaded: villagers now tend crops, livestock feed the towns, and wild animals inhabit the valley.");
+})();
+<\/script>

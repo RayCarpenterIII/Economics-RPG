@@ -1,0 +1,12 @@
+{
+  "name": "The Egg Lands",
+  "version": 34,
+  "release": "HD-2D Massive Migration",
+  "entrypoint": "index.html",
+  "worldTileUnits": 16,
+  "artTilePixels": 32,
+  "logicalViewport": [640, 360],
+  "presentationResolution": [1280, 720],
+  "saveVersion": 34,
+  "bundleDate": "2026-07-21"
+}

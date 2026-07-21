@@ -1,0 +1,272 @@
+<style id="npc-continuity-v30-style">
+  .mindBadgeV30{display:inline-block;border:1px solid #806e45;color:#e2ad45;padding:2px 5px;font-size:8px;letter-spacing:.7px}
+  .mindSummaryV30{margin-top:7px;padding:7px;border:1px solid var(--line);background:rgba(12,16,22,.55);font-size:9px;line-height:1.5;color:var(--dim)}
+  .mindSummaryV30 b{color:var(--ink)}
+  .mindOpinionGridV30{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:5px;margin-top:7px}
+  .mindOpinionV30{border:1px solid var(--line);padding:6px;background:rgba(19,24,32,.72);font-size:8px;line-height:1.45;text-align:left}
+  .mindOpinionV30 strong{color:var(--gold);font-size:9px}
+  .mindPositiveV30{border-color:#4f7559}.mindNegativeV30{border-color:#7d514b}
+</style>
+<script id="npc-continuity-v30-script">
+(function(){
+  "use strict";
+  const NPC_MIND_VERSION_V30=30;
+  const GOALS_V30={
+    protect_family:{label:"Protect my family",kind:"security"},
+    secure_prosperity:{label:"Build lasting prosperity",kind:"wealth"},
+    master_trade:{label:"Master my trade",kind:"mastery"},
+    gain_influence:{label:"Earn civic influence",kind:"status"},
+    strengthen_community:{label:"Strengthen the community",kind:"belonging"},
+    seek_adventure:{label:"Seek danger and discovery",kind:"adventure"},
+    preserve_freedom:{label:"Preserve personal freedom",kind:"independence"},
+    build_legacy:{label:"Leave something that endures",kind:"legacy"}
+  };
+  const POSITIVE_EVENT_KINDS_V30=new Set(["HARVEST","PROJECT","CONSTRUCTION","VICTORY","TRADE","MARRIAGE","BIRTH","COMING OF AGE","PUBLIC WORKS","FOUNDING"]);
+  const NEGATIVE_EVENT_KINDS_V30=new Set(["SHORTAGE","DEATH","WOUNDED","CARAVAN LOST"]);
+
+  function hash01V30(value){
+    let h=2166136261>>>0,s=String(value);
+    for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}
+    h^=h>>>15;h=Math.imul(h,2246822519)>>>0;h^=h>>>13;h>>>=0;
+    return (h%100000)/100000;
+  }
+  function clampOpinionV30(v){return clamp(Number(v)||0,-100,100)}
+  function opinionLabelV30(value){return value>=60?"devoted":value>=32?"supportive":value>=10?"favorable":value>-10?"uncertain":value>-34?"wary":value>-60?"resentful":"hostile"}
+  function moodLabelV30(v,a){if(v>.45)return a>.55?"inspired":"content";if(v>.12)return "hopeful";if(v<-.55)return a>.55?"afraid":"despondent";if(v<-.18)return a>.55?"angry":"worried";return "steady"}
+  function relationToEventActorV30(a,event){
+    const ids=[event.actorId,event.targetId].filter(id=>id!==null&&id!==undefined),family=new Set([a.spouseId].concat(a.parentIds||[],a.childrenIds||[]));
+    if(ids.includes(a.id))return 1;
+    if(ids.some(id=>family.has(id)))return .92;
+    let best=.36;
+    for(const id of ids){const r=a.relationships&&a.relationships[id];if(r)best=Math.max(best,clamp(((r.affection||0)+(r.trust||0)-(r.resentment||0))/120,.1,.85))}
+    return best;
+  }
+  function goalReasonV30(a,id){
+    const reasons={
+      protect_family:"Safety and household stability matter more to me than glory.",
+      secure_prosperity:"I want enough wealth and food that one bad market cannot ruin us.",
+      master_trade:"Competence is the surest way to become useful and independent.",
+      gain_influence:"Decisions shape every household, and I intend to have a voice in them.",
+      strengthen_community:"A village survives through trust, obligation, and people who show up.",
+      seek_adventure:"A safe life can become a small life, and I want to test myself.",
+      preserve_freedom:"No council or ruler should own the shape of my future.",
+      build_legacy:"I want to leave work behind that still matters after I am gone."
+    };
+    return reasons[id]||"I am still deciding what kind of life I mean to build.";
+  }
+  function chooseGoalV30(a,force=false){
+    const mind=ensureMindV30(a,false);if(mind.goal&&!force)return mind.goal;
+    const traits=a.traits||[],needs=a.needs||{},family=(a.spouseId!==null&&a.spouseId!==undefined)||(a.childrenIds||[]).length>0,gov=governmentFor(a.town);
+    const candidates=[
+      {id:"protect_family",score:(needs.safety||0)*1.05+(needs.hunger||0)*.75+(family?28:0)+(traits.includes("protective")?24:0)+(traits.includes("cautious")?14:0)},
+      {id:"secure_prosperity",score:65-Math.min(60,a.wealth||0)+(traits.includes("frugal")?24:0)+(traits.includes("ambitious")?10:0)},
+      {id:"master_trade",score:(needs.purpose||0)*.75+(traits.includes("curious")?19:0)+(traits.includes("dutiful")?16:0)+a.level*2},
+      {id:"gain_influence",score:(needs.status||0)+(traits.includes("ambitious")?30:0)+(a.cls==="noble"?22:0)},
+      {id:"strengthen_community",score:(needs.belonging||0)+(traits.includes("sociable")?26:0)+(traits.includes("generous")?18:0)},
+      {id:"seek_adventure",score:mind.riskTolerance*72+(traits.includes("independent")?16:0)+(a.cls==="warrior"?12:0)},
+      {id:"preserve_freedom",score:(traits.includes("independent")?36:5)+(gov.type==="empire"?30:0)+(1-mind.riskTolerance)*8},
+      {id:"build_legacy",score:(a.cls==="builder"?34:0)+(traits.includes("dutiful")?18:0)+(a.age||25)*.34}
+    ];
+    candidates.forEach(c=>c.score+=hash01V30(a.id+":"+c.id)*5);candidates.sort((x,y)=>y.score-x.score);
+    const chosen=candidates[0],def=GOALS_V30[chosen.id];mind.goal={id:chosen.id,label:def.label,kind:def.kind,reason:goalReasonV30(a,chosen.id),startedDay:dayNo,progress:0,commitment:Math.round((.58+hash01V30("commit:"+a.id+":"+chosen.id)*.37)*100)/100};
+    return mind.goal;
+  }
+  function baseGovernmentOpinionV30(a){
+    const gov=governmentFor(a.town),traits=a.traits||[];let approval=0,legitimacy=10;
+    if(gov.type==="democracy"){approval+=traits.includes("independent")?18:8;legitimacy+=22}
+    if(gov.type==="empire"){approval+=traits.includes("ambitious")?6:-12;legitimacy-=traits.includes("dutiful")?-2:12}
+    if(gov.type==="council")legitimacy+=8;
+    return {approval,legitimacy,fear:gov.type==="empire"?18:4,ideology:traits.includes("independent")?"liberty":traits.includes("dutiful")?"order":traits.includes("generous")?"welfare":"pragmatic"};
+  }
+  function ensureMindV30(a,choose=true){
+    if(!a)return null;
+    const traits=a.traits||[],riskBase=.18+hash01V30("risk:"+a.id)*.65+(traits.includes("cautious")?-.18:0)+(traits.includes("independent")?.10:0)+(traits.includes("protective")?.04:0);
+    const govOpinion=baseGovernmentOpinionV30(a);
+    a.mindV30=Object.assign({version:NPC_MIND_VERSION_V30,riskTolerance:clamp(riskBase,.05,.95),goal:null,emotionalMemories:[],mood:{valence:0,arousal:.2,label:"steady",cause:"ordinary village life"},opinions:{player:{trust:0,affection:0,respect:0,fear:0,gratitude:0,resentment:0},government:govOpinion},lastReaction:"I am watching what happens next.",lastGoalReviewDay:dayNo,lastMindDay:dayNo,completedGoals:[]},a.mindV30||{});
+    const mind=a.mindV30;mind.version=NPC_MIND_VERSION_V30;mind.riskTolerance=clamp(Number(mind.riskTolerance),.05,.95);mind.emotionalMemories=Array.isArray(mind.emotionalMemories)?mind.emotionalMemories.slice(-18):[];mind.completedGoals=Array.isArray(mind.completedGoals)?mind.completedGoals.slice(-6):[];
+    mind.opinions=mind.opinions||{};mind.opinions.player=Object.assign({trust:0,affection:0,respect:0,fear:0,gratitude:0,resentment:0},mind.opinions.player||{});mind.opinions.government=Object.assign(govOpinion,mind.opinions.government||{});mind.mood=Object.assign({valence:0,arousal:.2,label:"steady",cause:"ordinary village life"},mind.mood||{});
+    if(choose&&!mind.goal)chooseGoalV30(a,true);return mind;
+  }
+  function strongestEmotionalMemoryV30(a,tag){
+    const mind=ensureMindV30(a),memories=(mind.emotionalMemories||[]).filter(m=>!tag||(m.tags||[]).includes(tag));
+    return memories.slice().sort((x,y)=>(y.intensity||0)-(x.intensity||0)||y.day-x.day)[0]||null;
+  }
+  function addEmotionalMemoryV30(a,event,options={}){
+    const mind=ensureMindV30(a),eventId=options.eventId!==undefined?options.eventId:event&&event.id;
+    if(eventId!==null&&eventId!==undefined&&mind.emotionalMemories.some(m=>m.eventId===eventId&&m.source===(options.source||"world")))return null;
+    const kind=String(options.kind||event&&event.kind||"EVENT").toUpperCase(),positive=POSITIVE_EVENT_KINDS_V30.has(kind),negative=NEGATIVE_EVENT_KINDS_V30.has(kind)||kind==="RAID",baseValence=options.valence!==undefined?options.valence:positive?.58:negative?-.65:0;
+    const relevance=options.relevance!==undefined?options.relevance:relationToEventActorV30(a,event||{}),salience=Number(options.salience||event&&event.salience||5),intensity=clamp((salience/10)*(.5+relevance*.75)+(options.intensityBonus||0),.12,1);
+    const tags=Array.from(new Set((options.tags||[]).concat(kind.toLowerCase(),positive?["hope"]:negative?["fear"]:[]).flat()));
+    const memory={eventId:eventId??("private:"+a.id+":"+dayNo+":"+mind.emotionalMemories.length),day:dayNo,kind,text:String(options.text||event&&event.text||"Something important happened.").slice(0,220),valence:clamp(baseValence,-1,1),intensity,tags,source:options.source||"world",actorId:(event&&event.actorId)??null,targetId:(event&&event.targetId)??null};
+    mind.emotionalMemories.push(memory);mind.emotionalMemories=mind.emotionalMemories.sort((x,y)=>(y.intensity||0)-(x.intensity||0)||y.day-x.day).slice(0,18);
+    mind.mood.valence=clamp(mind.mood.valence*.55+memory.valence*memory.intensity*.75,-1,1);mind.mood.arousal=clamp(mind.mood.arousal*.55+memory.intensity*.68,0,1);mind.mood.label=moodLabelV30(mind.mood.valence,mind.mood.arousal);mind.mood.cause=memory.text;mind.lastReaction=reactionTextV30(a,memory);
+    return memory;
+  }
+  function reactionTextV30(a,memory){
+    const tag=(memory.tags||[])[0],goal=ensureMindV30(a).goal;
+    if(memory.valence<-.4){if(tag==="death")return "That loss has made my future feel less certain.";if(tag==="shortage")return "I will not forget how quickly scarcity reached our table.";if(tag==="raid")return "Violence has made every promise of safety harder to believe.";return "I am carrying that worry into every decision I make."}
+    if(memory.valence>.4){if(tag==="harvest")return "A full storehouse makes "+goal.label.toLowerCase()+" feel possible.";if(tag==="construction"||tag==="project"||tag==="public works")return "Visible progress has made me more hopeful about this town.";return "That success has given me reason to keep working toward "+goal.label.toLowerCase()+"."}
+    return "I am still deciding what that event means for my future.";
+  }
+  function adjustPlayerOpinionV30(a,delta,reason){
+    const mind=ensureMindV30(a),o=mind.opinions.player;
+    for(const key of Object.keys(delta))o[key]=clampOpinionV30((o[key]||0)+delta[key]);
+    if(reason)addEmotionalMemoryV30(a,null,{source:"player",kind:"PLAYER",text:reason,valence:((delta.gratitude||0)+(delta.affection||0)+(delta.trust||0)-(delta.resentment||0)-(delta.fear||0))/40,intensityBonus:.08,tags:["player"],eventId:"player:"+a.id+":"+dayNo+":"+String(reason).slice(0,24)});
+  }
+  function playerOpinionScoreV30(a){const o=ensureMindV30(a).opinions.player;return (o.trust||0)*.28+(o.affection||0)*.22+(o.respect||0)*.24+(o.gratitude||0)*.18-(o.resentment||0)*.38-(o.fear||0)*.16}
+  function governmentOpinionScoreV30(a){const o=ensureMindV30(a).opinions.government;return (o.approval||0)*.52+(o.legitimacy||0)*.38-(o.fear||0)*.15}
+  function observePlayerSpeechV30(a,line){
+    if(!a||!line)return;const text=String(line).toLowerCase();
+    if(/thank|appreciate|respect|good work|well done|proud of you/.test(text))adjustPlayerOpinionV30(a,{affection:4,respect:3,trust:2},"The traveler spoke to me with respect.");
+    if(/promise|i will help|i'll help|we will help|protect you|bring you|return/.test(text))adjustPlayerOpinionV30(a,{trust:5,gratitude:3},"The traveler made me a promise; I will remember whether it is kept.");
+    if(/stupid|idiot|worthless|hate you|shut up|fool/.test(text))adjustPlayerOpinionV30(a,{resentment:9,trust:-7,affection:-6},"The traveler insulted me directly.");
+    if(/kill you|hurt you|burn|destroy your|threat/.test(text))adjustPlayerOpinionV30(a,{fear:13,resentment:11,trust:-12},"The traveler threatened me, and I do not feel safe around them.");
+    if(/democracy|vote|freedom/.test(text)&&ensureMindV30(a).opinions.government.ideology==="liberty")adjustPlayerOpinionV30(a,{respect:3,trust:2},"The traveler spoke in favor of political freedom.");
+    if(/empire|decree|absolute rule/.test(text)&&ensureMindV30(a).opinions.government.ideology==="order")adjustPlayerOpinionV30(a,{respect:2},"The traveler spoke in favor of decisive rule.");
+  }
+  function reactToVillageEventV30(a,event){
+    const mind=ensureMindV30(a),memory=addEmotionalMemoryV30(a,event);if(!memory)return;
+    const gov=mind.opinions.government,kind=String(event.kind||"").toUpperCase();
+    if(POSITIVE_EVENT_KINDS_V30.has(kind)){gov.approval=clampOpinionV30(gov.approval+memory.intensity*5);gov.legitimacy=clampOpinionV30(gov.legitimacy+memory.intensity*3)}
+    if(NEGATIVE_EVENT_KINDS_V30.has(kind)){gov.approval=clampOpinionV30(gov.approval-memory.intensity*7);gov.legitimacy=clampOpinionV30(gov.legitimacy-memory.intensity*4)}
+    if(kind==="RAID"){const cautious=(a.traits||[]).includes("cautious");gov.approval=clampOpinionV30(gov.approval+(cautious?-8:mind.riskTolerance>.6?3:-4)*memory.intensity)}
+    if(kind==="REGIME"){const type=governmentFor(a.town).type,ideology=gov.ideology,delta=type==="democracy"?(ideology==="liberty"?13:5):type==="empire"?(ideology==="order"?7:-14):3;gov.approval=clampOpinionV30(gov.approval+delta);gov.legitimacy=clampOpinionV30(gov.legitimacy+(type==="democracy"?8:type==="empire"?-4:2));mind.lastReaction=type==="democracy"?"The new vote gives me a stronger sense that my voice matters.":type==="empire"?"The new rule has made me reconsider how much freedom this town will permit.":"I am waiting to see whether the council earns the authority it claims."}
+    if(kind==="DEATH"){a.needs.safety=clamp((a.needs.safety||0)+10*memory.intensity,0,100);a.needs.belonging=clamp((a.needs.belonging||0)+8*memory.intensity,0,100)}
+    if(kind==="SHORTAGE")a.needs.hunger=clamp((a.needs.hunger||0)+6*memory.intensity,0,100);
+    if(kind==="HARVEST"||kind==="TRADE")a.needs.hunger=clamp((a.needs.hunger||0)-4*memory.intensity,0,100);
+  }
+  function recordPlayerActionV30(town,text,delta={gratitude:3,respect:2,trust:1}){
+    if(!town)return;for(const a of town.agents){const traits=a.traits||[],scale=traits.includes("generous")?1.25:traits.includes("stubborn")?.75:1,adjust={};for(const key of Object.keys(delta))adjust[key]=delta[key]*scale;adjustPlayerOpinionV30(a,adjust,text)}
+  }
+  function goalProgressV30(a){
+    const mind=ensureMindV30(a),g=mind.goal;if(!g)return 0;const house=householdFor(a),food=house&&house.stock?house.stock.food:0;
+    if(g.id==="protect_family")return clamp((100-(a.needs.safety||0))*.55+(100-(a.needs.hunger||0))*.35+Math.min(10,food)*1.4,0,100);
+    if(g.id==="secure_prosperity")return clamp((a.wealth||0)*2+(house&&house.stock?house.stock.coins*.6:0),0,100);
+    if(g.id==="master_trade")return clamp((a.level||1)*8+Object.values(a.lifeSkills||{}).reduce((s,v)=>s+v,0)*13,0,100);
+    if(g.id==="gain_influence")return clamp((a.town.institutions&&a.town.institutions.councilIds.includes(a.id)?65:0)+(a.cls==="noble"?18:0)+(100-(a.needs.status||0))*.2,0,100);
+    if(g.id==="strengthen_community")return clamp(100-(a.needs.belonging||0)+Math.max(0,governmentOpinionScoreV30(a))*.15,0,100);
+    if(g.id==="seek_adventure")return clamp(mind.riskTolerance*45+(a.level||1)*7+(governmentFor(a.town).raidHistory||[]).length*8,0,100);
+    if(g.id==="preserve_freedom")return governmentFor(a.town).type==="empire"?15:82;
+    if(g.id==="build_legacy")return clamp((a.level||1)*7+(a.town.building?28:0)+(a.town.publicWorksV29?8:24),0,100);
+    return 0;
+  }
+  function updateMindDayV30(a){
+    const mind=ensureMindV30(a);if(mind.lastMindDay===dayNo)return;mind.lastMindDay=dayNo;
+    for(const m of mind.emotionalMemories){const age=Math.max(0,dayNo-m.day),retention=m.intensity>.78?.985:.955;m.intensity=clamp(m.intensity*Math.pow(retention,Math.max(1,age?1:0)),.04,1)}
+    mind.emotionalMemories=mind.emotionalMemories.filter(m=>m.intensity>.10||dayNo-m.day<4).slice(0,18);
+    const gov=mind.opinions.government,shortage=!!a.town.market.shortage,safety=roadSafety;
+    const targetApproval=(a.utility>=a.town.market.avgUtility?12:-8)+(shortage?-24:8)+(safety-50)*.24+(governmentFor(a.town).type==="democracy"?7:governmentFor(a.town).type==="empire"?-5:0);
+    gov.approval=clampOpinionV30(gov.approval+(targetApproval-gov.approval)*.12);gov.legitimacy=clampOpinionV30(gov.legitimacy+(shortage?-1.5:.5));gov.fear=clampOpinionV30(gov.fear+(governmentFor(a.town).type==="empire"?.8:-.25));
+    mind.goal.progress=Math.round(goalProgressV30(a));
+    if(mind.goal.progress>=92&&dayNo-mind.goal.startedDay>=10){mind.completedGoals.push({id:mind.goal.id,label:mind.goal.label,day:dayNo});addEmotionalMemoryV30(a,null,{source:"self",kind:"GOAL",text:"I made real progress toward "+mind.goal.label.toLowerCase()+".",valence:.72,tags:["goal","hope"],intensityBonus:.24,eventId:"goal:"+a.id+":"+mind.goal.id+":"+dayNo});chooseGoalV30(a,true)}
+    else if(dayNo-mind.lastGoalReviewDay>=14){mind.lastGoalReviewDay=dayNo;if(mind.goal.progress<18&&hash01V30("review:"+a.id+":"+dayNo)>.55)chooseGoalV30(a,true)}
+    mind.mood.valence*=.86;mind.mood.arousal*=.82;mind.mood.label=moodLabelV30(mind.mood.valence,mind.mood.arousal);
+  }
+
+  function seedEstablishedPlayerBondsV30(){
+    let family=[];try{family=typeof playerFamilyIds==="function"?playerFamilyIds():(player.familyAgentIds||[])}catch(error){family=player.familyAgentIds||[]}
+    const ids=new Set(family||[]);for(const a of agents){const mind=ensureMindV30(a),o=mind.opinions.player;if(ids.has(a.id)&&Math.abs(playerOpinionScoreV30(a))<1){o.trust=48;o.affection=56;o.respect=34;o.gratitude=12;addEmotionalMemoryV30(a,null,{source:"player",kind:"FAMILY",text:"The traveler is part of my established family circle.",valence:.72,tags:["player","family","hope"],intensityBonus:.24,eventId:"family:"+a.id})}}
+  }
+
+  const previousInitializeAgentMindV30=initializeAgentMind;
+  initializeAgentMind=function(a){const result=previousInitializeAgentMindV30(a);ensureMindV30(a);return result};
+
+  const previousRecordVillageEventV30=recordVillageEvent;
+  recordVillageEvent=function(town,kind,text,options={}){const event=previousRecordVillageEventV30(town,kind,text,options);if(event&&town)for(const a of town.agents)reactToVillageEventV30(a,event);return event};
+
+  const previousBuildDailyScheduleV30=buildDailySchedule;
+  buildDailySchedule=function(a){const result=previousBuildDailyScheduleV30(a),mind=ensureMindV30(a),fear=strongestEmotionalMemoryV30(a,"fear");if(a.ageGroup!=="child"&&!a.isGuard&&mind.riskTolerance<.30&&roadSafety<38&&fear&&fear.intensity>.52){for(const entry of a.schedule||[])if(entry.place==="gather"){entry.place="work";entry.skill=null;entry.activity="working close to home after recent danger"}}return result};
+
+  const previousCitizenVoteScoreV30=citizenVoteScore;
+  citizenVoteScore=function(agent,town,decision){let score=previousCitizenVoteScoreV30(agent,town,decision);const mind=ensureMindV30(agent),gov=mind.opinions.government,goal=mind.goal;score+=(gov.approval||0)*.12+(gov.legitimacy||0)*.06;
+    if(decision.kind==="raid")score+=(mind.riskTolerance-.5)*44-(strongestEmotionalMemoryV30(agent,"fear")?.intensity||0)*18;
+    if(decision.kind==="focus"&&goal){const focus=GOVERNMENT_FOCI[decision.focus];if(goal.id==="master_trade"&&focus&&focus.skill)score+=10;if(goal.id==="secure_prosperity"&&decision.focus!=="balanced")score+=5;if(goal.id==="preserve_freedom"&&governmentFor(town).type==="empire")score-=7}
+    return score};
+
+  const previousRunLivingDayV30=runLivingDay;
+  runLivingDay=function(){const result=previousRunLivingDayV30();for(const a of agents)updateMindDayV30(a);return result};
+
+  const previousDeepenPlayerRelationshipV30=deepenPlayerRelationship;
+  deepenPlayerRelationship=function(a,positive=true){const result=previousDeepenPlayerRelationshipV30(a,positive);adjustPlayerOpinionV30(a,positive?{familiarity:0,trust:1.4,affection:1.1}:{resentment:3,trust:-2},positive?null:"The traveler treated me poorly.");return result};
+
+  function socialBondSummaryV30(a){
+    const entries=Object.entries(a.relationships||{}).map(([id,r])=>({person:agents.find(x=>x.id===+id),r})).filter(x=>x.person&&x.person.town===a.town);
+    entries.sort((x,y)=>((y.r.affection||0)+(y.r.trust||0)-(y.r.resentment||0))-((x.r.affection||0)+(x.r.trust||0)-(x.r.resentment||0)));
+    const friend=entries[0],grudge=entries.slice().sort((x,y)=>(y.r.resentment||0)-(x.r.resentment||0))[0];return {friend:friend&&friend.r.affection>35?friend:null,grudge:grudge&&grudge.r.resentment>24?grudge:null};
+  }
+  function deterministicFallbackV30(a,line){
+    const mind=ensureMindV30(a),memory=strongestEmotionalMemoryV30(a),bonds=socialBondSummaryV30(a),options=[
+      "I keep returning to one aim: "+mind.goal.label.toLowerCase()+". "+mind.goal.reason,
+      "I feel "+mind.mood.label+" today. "+mind.lastReaction,
+      memory?"The event I cannot put aside is this: "+memory.text:"Most days are ordinary, but ordinary days still shape a life.",
+      bonds.friend?bonds.friend.person.firstName+" is the person I trust most here. That trust affects which risks I am willing to take.":"Trust grows slowly here, especially when the road and market are uncertain.",
+      "My view of the government is "+opinionLabelV30(governmentOpinionScoreV30(a))+", and my view of you is "+opinionLabelV30(playerOpinionScoreV30(a))+". Neither opinion is permanent."
+    ];
+    const idx=Math.floor(hash01V30(a.id+":"+dayNo+":"+line)*options.length);return options[idx];
+  }
+  const previousNpcOpeningV30=npcOpening;
+  npcOpening=function(a){const mind=ensureMindV30(a),memory=strongestEmotionalMemoryV30(a),playerView=opinionLabelV30(playerOpinionScoreV30(a));if(memory&&memory.intensity>.72)return '"I am feeling '+mind.mood.label+'. '+mind.lastReaction+' My longer purpose is to '+mind.goal.label.toLowerCase()+', and I currently regard you as '+playerView+'."';return '"I am '+a.currentActivity+'. I mean to '+mind.goal.label.toLowerCase()+'. '+mind.goal.reason+' Today I feel '+mind.mood.label+', and I see you as '+playerView+'."'};
+  const previousNpcResponseV30=npcResponse;
+  npcResponse=function(a,line){const text=String(line||"").toLowerCase(),mind=ensureMindV30(a),memory=strongestEmotionalMemoryV30(a),bonds=socialBondSummaryV30(a);
+    if(/your goal|long.term|ambition|dream|future|what do you want|purpose/.test(text))return "My long-term goal is to "+mind.goal.label.toLowerCase()+". "+mind.goal.reason+" I think I am about "+Math.round(mind.goal.progress||0)+" percent of the way toward a life that feels like that.";
+    if(/risk|danger|afraid|fear|brave|coward/.test(text))return "My willingness to take risks is "+Math.round(mind.riskTolerance*100)+" out of 100. "+(mind.riskTolerance>.65?"I would rather face uncertainty than live without possibility.":mind.riskTolerance<.35?"Recent danger weighs heavily on me, so I choose safety when I can.":"I will take a risk when the reason is strong enough.");
+    if(/what do you think of me|opinion of me|do you trust me|like me|hate me|traveler/.test(text)){const o=mind.opinions.player;return "I currently see you as "+opinionLabelV30(playerOpinionScoreV30(a))+". My trust is "+Math.round(o.trust)+", respect "+Math.round(o.respect)+", gratitude "+Math.round(o.gratitude)+", and resentment "+Math.round(o.resentment)+". I judge you by what you do and what you remember."}
+    if(/government|empire|democracy|council|ruler|vote|politic/.test(text)){const o=mind.opinions.government;return "My view of the government is "+opinionLabelV30(governmentOpinionScoreV30(a))+". I value "+o.ideology+", approval stands near "+Math.round(o.approval)+", and legitimacy near "+Math.round(o.legitimacy)+". "+mind.lastReaction}
+    if(/death|died|killed|loss|funeral|grief/.test(text)){const m=strongestEmotionalMemoryV30(a,"death");return m?"I remember this: "+m.text+" "+reactionTextV30(a,m):"No recent death is at the center of my thoughts, though everyone here knows loss eventually comes."}
+    if(/shortage|hungry|scarcity|starving/.test(text)){const m=strongestEmotionalMemoryV30(a,"shortage");return m?"I have not forgotten: "+m.text+" It changed how much security I need before I call a market healthy.":previousNpcResponseV30(a,line)}
+    if(/prosper|success|good times|wealthy|better/.test(text)){const positive=(mind.emotionalMemories||[]).filter(m=>m.valence>.35).sort((x,y)=>y.intensity-x.intensity)[0];return positive?"The success I remember most is this: "+positive.text+" It made me more hopeful about "+mind.goal.label.toLowerCase()+".":"Prosperity still feels more like a possibility than a memory."}
+    if(/friend|trust most|grudge|enemy|resent|romance|love/.test(text)){if(/grudge|enemy|resent/.test(text))return bonds.grudge?"I still resent "+bonds.grudge.person.firstName+". Some injuries become part of how you interpret every later choice.":"I have disagreements, but no grudge strong enough to rule my life.";return bonds.friend?"I trust "+bonds.friend.person.firstName+" most. Friendship changes what burdens I will carry and whose word I believe.":"I know people here, but deep friendship takes time and shared hardship."}
+    if(/remember|memory|what happened|recent event|news/.test(text))return memory?"The memory with the strongest hold on me is: "+memory.text+" It leaves me feeling "+mind.mood.label+".":"No single event dominates my thoughts right now.";
+    if(/family|husband|wife|child|children|parent|home|house|price|market|food|shelter|status|training|road|rat|caravan|trade|guard|special|class|level|skill|mine|dungeon|heart|warden|fish|timber|log|wood|ore|stone|resource|gather|work|job|utility|happy|build|granary|watchpost|academy|workshop|court|help|need/.test(text))return previousNpcResponseV30(a,line);
+    return deterministicFallbackV30(a,line)};
+
+  const previousOpenDialogueV30=openDialogue;
+  openDialogue=function(a){const result=previousOpenDialogueV30(a),mind=ensureMindV30(a),meta=document.getElementById("npcMeta");if(meta)meta.textContent+=" · mood "+mind.mood.label+" · goal: "+mind.goal.label+" · risk "+Math.round(mind.riskTolerance*100)+"%";return result};
+
+  const previousDialogueStateV30=dialogueState;
+  dialogueState=function(a){const state=previousDialogueStateV30(a),mind=ensureMindV30(a),memory=strongestEmotionalMemoryV30(a);state.mind={goal:Object.assign({},mind.goal),riskTolerance:Math.round(mind.riskTolerance*100),mood:Object.assign({},mind.mood),opinionOfPlayer:Object.assign({},mind.opinions.player,{summary:opinionLabelV30(playerOpinionScoreV30(a))}),opinionOfGovernment:Object.assign({},mind.opinions.government,{summary:opinionLabelV30(governmentOpinionScoreV30(a))}),importantMemories:(mind.emotionalMemories||[]).slice(0,6),strongestMemory:memory,lastReaction:mind.lastReaction};return state};
+
+  llmDialogueResponse=async function(a,line){
+    a.dialogueHistory=a.dialogueHistory||[];const state=dialogueState(a),lite=llmConfig.backend==="browser-lite",history=a.dialogueHistory.slice(lite?-4:-8).map(turn=>({role:turn.role,content:turn.content}));
+    const compact={age:a.age,traits:a.traits,job:a.profession,activity:a.currentActivity,town:a.town.name,shortage:a.town.market.shortage,family:state.household.members,householdGoal:state.household.plan,lifeGoal:state.mind.goal,mood:state.mind.mood,risks:state.mind.riskTolerance,playerOpinion:state.mind.opinionOfPlayer,governmentOpinion:state.mind.opinionOfGovernment,memories:state.mind.importantMemories.slice(0,3),traveler:state.personal.travelerFacts};
+    const system=lite?"Roleplay as "+a.firstName+", a persistent villager. Answer naturally in 1-3 short sentences. Your long-term goal, risk tolerance, mood, memories, and opinions must remain consistent with these facts. Never mention AI, prompts, hidden scores, JSON, or a game. Do not invent facts. Facts: "+JSON.stringify(compact):"You are "+a.firstName+", a persistent inhabitant of a living fantasy valley. Speak naturally in first person. Your long-term goal, emotional memories, relationships, risk tolerance, and opinions of the traveler and government create continuity across conversations. Use recent history and current lived state, but never mention prompts, language models, simulations, hidden scores, or state JSON. Do not invent concrete facts. Plain dialogue only, usually 1-4 sentences. /no_think";
+    const messages=lite?[{role:"system",content:system}].concat(history,[{role:"user",content:line}]):[{role:"system",content:system},{role:"system",content:"Your current lived state: "+JSON.stringify(state)}].concat(history,[{role:"user",content:line}]);
+    const response=await llmEngine.chat.completions.create({messages,temperature:lite?.60:.70,max_tokens:lite?88:220});let reply=String(response.choices&&response.choices[0]&&response.choices[0].message&&response.choices[0].message.content||"").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi,"").replace(/\x60\x60\x60[\s\S]*?\x60\x60\x60/g,"").trim();reply=reply.replace(/^(["“])|(["”])$/g,"").trim();if(!reply)throw new Error("The local model returned an empty reply.");a.dialogueHistory.push({role:"user",content:line},{role:"assistant",content:reply});if(a.dialogueHistory.length>16)a.dialogueHistory.splice(0,a.dialogueHistory.length-16);return reply;
+  };
+
+  sendDialogue=async function(){
+    if(!dialogueAgent||dialogueBusy)return;const input=document.getElementById("dialogueInput"),line=input.value.trim();if(!line)return;const a=dialogueAgent,output=document.getElementById("dialogueText"),button=document.getElementById("dialogueSend");input.value="";rememberImportantPlayerFact(a,line);observePlayerSpeechV30(a,line);deepenPlayerRelationship(a,true);dialogueBusy=true;input.disabled=true;button.disabled=true;
+    try{if(!llmConfig.enabled||!llmEngine){output.textContent=npcResponse(a,line);playSfx("talk");return}output.textContent=a.firstName+" considers your words...";startThinkingSfx();const reply=await llmDialogueResponse(a,line);stopThinkingSfx();if(dialogueAgent===a){output.textContent=reply;playSfx("talk")}}
+    catch(error){stopThinkingSfx();if(dialogueAgent===a){output.textContent=npcResponse(a,line)+"\n\n[Local mind unavailable for this reply: "+String(error.message||error).slice(0,100)+"]";playSfx("talk")}}
+    finally{stopThinkingSfx();dialogueBusy=false;input.disabled=false;button.disabled=false;if(dialogueAgent===a)input.focus()}
+  };
+  function installDialogueButtonV30(){const old=document.getElementById("dialogueSend");if(!old||old.dataset.mindV30)return;const button=old.cloneNode(true);button.dataset.mindV30="1";old.replaceWith(button);button.addEventListener("click",sendDialogue)}
+
+  const previousClassInfluenceV30=classInfluence;
+  classInfluence=function(){const town=scene==="world"?nearestTown():null,before=player.influenceDay,result=previousClassInfluenceV30();if(town&&player.influenceDay!==before)recordPlayerActionV30(town,"The traveler used their influence to support "+town.name+".",{gratitude:4,respect:4,trust:2});return result};
+  const previousDeliverCaravanV30=deliverCaravan;
+  deliverCaravan=function(c){const escorted=(c.escorted||0)>=6,result=previousDeliverCaravanV30(c);if(escorted)recordPlayerActionV30(c.to,"The traveler protected a caravan until it reached our market.",{gratitude:7,respect:5,trust:4});return result};
+  const previousDefeatEnemyV30=defeatEnemy;
+  defeatEnemy=function(e,source="player"){const nearby=source==="player"&&scene==="world"?towns.slice().sort((a,b)=>Math.hypot(a.cx-e.x,a.cy-e.y)-Math.hypot(b.cx-e.x,b.cy-e.y))[0]:null,result=previousDefeatEnemyV30(e,source);if(nearby&&Math.hypot(nearby.cx-e.x,nearby.cy-e.y)<260)recordPlayerActionV30(nearby,"The traveler defeated a threat near our settlement.",{gratitude:3,respect:5,trust:1});return result};
+
+  const previousSnapshotV30=snapshot;
+  snapshot=function(){const data=previousSnapshotV30();data.version=Math.max(NPC_MIND_VERSION_V30,Number(data.version)||0);const byId=new Map(agents.map(a=>[a.id,a]));for(const saved of data.agents||[]){const a=byId.get(saved.id);if(a)saved.mindV30=JSON.parse(JSON.stringify(ensureMindV30(a)))}data.npcContinuityV30={version:NPC_MIND_VERSION_V30};return data};
+  const previousApplySaveV30=applySave;
+  applySave=function(data){const result=previousApplySaveV30(data);for(const a of agents)ensureMindV30(a);seedEstablishedPlayerBondsV30();installDialogueButtonV30();return result};
+  const previousSetupGameV30=setupGame;
+  setupGame=function(newSeed,loading=false){const result=previousSetupGameV30(newSeed,loading);for(const a of agents)ensureMindV30(a);seedEstablishedPlayerBondsV30();window.setTimeout(installDialogueButtonV30,0);return result};
+
+  const previousRenderPlayerRelationshipsV30=renderPlayerRelationships;
+  renderPlayerRelationships=function(){previousRenderPlayerRelationshipsV30();const wrap=document.getElementById("relationshipsContent"),town=homeGovernmentTown();if(!wrap||!town)return;const people=town.agents.map(a=>({a,score:playerOpinionScoreV30(a),mind:ensureMindV30(a)})).sort((x,y)=>y.score-x.score),avg=people.reduce((s,x)=>s+x.score,0)/Math.max(1,people.length);const card=document.createElement("div");card.className="menuCard";card.innerHTML='<h3>How villagers see you <span class="mindBadgeV30">PERSISTENT OPINIONS</span></h3>'+statLine("Town reputation",opinionLabelV30(avg))+statLine("Warmest view",people[0]?people[0].a.firstName+" - "+opinionLabelV30(people[0].score):"None")+statLine("Most skeptical",people.length?people[people.length-1].a.firstName+" - "+opinionLabelV30(people[people.length-1].score):"None")+'<div class="mindOpinionGridV30">'+people.map(x=>'<div class="mindOpinionV30 '+(x.score>=15?'mindPositiveV30':x.score<=-15?'mindNegativeV30':'')+'"><strong>'+escapeHTML(x.a.firstName)+'</strong><br>'+opinionLabelV30(x.score)+' toward you<br>Goal: '+escapeHTML(x.mind.goal.label)+'<br>Mood: '+escapeHTML(x.mind.mood.label)+'</div>').join("")+'</div>';wrap.appendChild(card)};
+
+  const previousRenderHomeTownV30=renderHomeTown;
+  renderHomeTown=function(){previousRenderHomeTownV30();const wrap=document.getElementById("homeTownContent"),home=homeGovernmentTown();if(!wrap||!home)return;const minds=home.agents.map(a=>ensureMindV30(a)),goalCounts={};for(const m of minds)goalCounts[m.goal.label]=(goalCounts[m.goal.label]||0)+1;const top=Object.entries(goalCounts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]+" ("+x[1]+")").join(", "),govAvg=home.agents.reduce((s,a)=>s+governmentOpinionScoreV30(a),0)/Math.max(1,home.agents.length),moods={};for(const m of minds)moods[m.mood.label]=(moods[m.mood.label]||0)+1;const mood=Object.entries(moods).sort((a,b)=>b[1]-a[1])[0];const box=document.createElement("div");box.className="menuCard";box.innerHTML='<h3>Citizen continuity <span class="mindBadgeV30">LIVING MINDS</span></h3>'+statLine("Common goals",escapeHTML(top||"Still forming"))+statLine("Public mood",mood?escapeHTML(mood[0])+" - "+mood[1]+" villagers":"Steady")+statLine("Government confidence",opinionLabelV30(govAvg))+'<div class="mindSummaryV30"><b>Continuity is active.</b> Goals, risk tolerance, emotional memories, and opinions now carry across days, votes, saves, and conversations. The local LLM remains optional; deterministic dialogue uses the same lived state.</div>';wrap.appendChild(box)};
+
+  for(const a of agents){ensureMindV30(a);const recent=villageEvents.filter(e=>e.town===a.town.name).slice(-3);for(const event of recent)reactToVillageEventV30(a,event)}
+  seedEstablishedPlayerBondsV30();installDialogueButtonV30();
+  const help=document.querySelector("#helpTab .helpGrid");if(help&&!document.getElementById("npcMindHelpV30")){const k=document.createElement("span");k.id="npcMindHelpV30";k.className="key";k.textContent="Persistent NPC minds";const t=document.createElement("span");t.textContent="Villagers remember emotionally important events, pursue long-term goals, form opinions of you and their government, and carry those beliefs into votes and conversations. The tiny local LLM is optional; deterministic dialogue remains fully functional.";help.appendChild(k);help.appendChild(t)}
+  window.__egglandsMindsV30={version:NPC_MIND_VERSION_V30,ensure:ensureMindV30,addMemory:addEmotionalMemoryV30,playerOpinion:playerOpinionScoreV30,governmentOpinion:governmentOpinionScoreV30,recordPlayerAction:recordPlayerActionV30};
+  const title=document.querySelector("header h1");if(title)title.title="NPC Continuity Foundations v30";
+  toast("v30 loaded: villagers now carry long-term goals, emotional memories, risk tolerance, and persistent opinions into decisions and conversations.");
+})();
+<\/script>

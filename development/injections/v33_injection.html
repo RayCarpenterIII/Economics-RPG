@@ -1,0 +1,221 @@
+<style id="production-chains-v33-style">
+  .productionBadgeV33{display:inline-block;border:1px solid #8d7449;color:var(--gold);font-size:8px;padding:2px 5px;margin-left:4px}
+  .productionGridV33{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}
+  .productionWorkshopV33{border:1px solid var(--line);background:rgba(15,18,24,.55);padding:7px;font-size:9px;line-height:1.45}
+  .productionWorkshopV33 strong{color:var(--gold)}
+  .productionBarV33{height:7px;border:1px solid var(--line);background:#10141b;margin-top:4px;overflow:hidden}
+  .productionBarV33 span{display:block;height:100%;background:var(--gold)}
+  .productionStocksV33{font-size:9px;color:var(--dim);line-height:1.55;margin-top:7px}
+  .productionNoteV33{margin-top:8px;border-left:2px solid var(--gold);padding-left:8px;color:var(--dim);font-size:9px;line-height:1.5}
+  @media(max-width:650px){.productionGridV33{grid-template-columns:1fr}}
+</style>
+<script id="production-chains-v33-script">
+(function(){
+  "use strict";
+  const PRODUCTION_VERSION_V33=33;
+  const PRODUCT_LABELS_V33={
+    grain:"grain",produce:"vegetables",ore:"ore",eggs:"eggs",milk:"milk",wool:"wool",hides:"hides",meat:"meat",
+    lumber:"lumber",masonry:"cut stone",metal:"refined metal",flour:"flour",feed:"animal feed",bread:"bread",furniture:"furniture",components:"building components",tools:"tools",cloth:"cloth",leather:"leather"
+  };
+  const WORKSHOP_DEFS_V33={
+    sawmill:{label:"Sawmill",icon:"SAW",offset:[TOWN_W+2,2]},
+    mason:{label:"Mason Yard",icon:"STONE",offset:[TOWN_W+2,6]},
+    bloomery:{label:"Bloomery",icon:"IRON",offset:[TOWN_W+2,9]},
+    mill:{label:"Mill",icon:"MILL",offset:[-3,3]},
+    foodworks:{label:"Bakehouse",icon:"BREAD",offset:[-3,8]},
+    artisan:{label:"Artisan Workshop",icon:"TOOLS",offset:[6,TOWN_H+2]}
+  };
+  const RECIPES_V33={
+    saw_lumber:{label:"Saw lumber",workshop:"sawmill",duration:22,inputs:{logs:2},outputs:{lumber:3}},
+    cut_masonry:{label:"Cut masonry",workshop:"mason",duration:28,inputs:{stone:2},outputs:{masonry:2}},
+    smelt_metal:{label:"Smelt metal",workshop:"bloomery",duration:35,inputs:{ore:2,logs:1},outputs:{metal:1.5}},
+    mill_flour:{label:"Mill flour",workshop:"mill",duration:23,inputs:{grain:2},outputs:{flour:2.5}},
+    mill_feed:{label:"Mix animal feed",workshop:"mill",duration:18,inputs:{grain:1,produce:1},outputs:{feed:2.5}},
+    bake_bread:{label:"Bake bread",workshop:"foodworks",duration:25,inputs:{flour:1},outputs:{bread:3}},
+    prepare_dairy:{label:"Prepare dairy meals",workshop:"foodworks",duration:21,inputs:{eggs:.8,milk:.8},outputs:{bread:2.2}},
+    butcher_meat:{label:"Preserve meat",workshop:"foodworks",duration:24,inputs:{meat:1},outputs:{bread:2.6}},
+    make_components:{label:"Make building components",workshop:"artisan",duration:31,inputs:{lumber:1,masonry:1},outputs:{components:2}},
+    craft_tools:{label:"Forge tools",workshop:"artisan",duration:38,inputs:{metal:1,lumber:.5},outputs:{tools:1}},
+    make_furniture:{label:"Build furniture",workshop:"artisan",duration:34,inputs:{lumber:2},outputs:{furniture:1.5}},
+    weave_cloth:{label:"Weave cloth",workshop:"artisan",duration:30,inputs:{wool:1.5},outputs:{cloth:1}},
+    tan_leather:{label:"Tan leather",workshop:"artisan",duration:32,inputs:{hides:1.5},outputs:{leather:1}}
+  };
+  let productionClockV33=0,productionSaveClockV33=0;
+
+  function blankStockV33(){return {grain:3,produce:2,ore:2,eggs:1,milk:1,wool:.5,hides:.25,meat:.4,lumber:1,masonry:1,metal:0,flour:0,feed:1,bread:0,furniture:0,components:0,tools:1,cloth:0,leather:0}}
+  function productionCellBlockedV33(x,y){
+    if(x<1||y<1||x>=MW-1||y>=MH-1||solid.has(keyOf(x,y)))return true;
+    for(const town of towns){
+      const farm=town.agricultureV26;if(farm){if(x>=farm.origin.x-1&&x<farm.origin.x+5&&y>=farm.origin.y-1&&y<farm.origin.y+4)return true;const p=farm.pen;if(x>=p.x-1&&x<p.x+p.w+1&&y>=p.y-1&&y<p.y+p.h+1)return true}
+      if(x>=town.rx-1&&x<town.rx+TOWN_W+1&&y>=town.ry-1&&y<town.ry+TOWN_H+1)return true;
+    }
+    return false;
+  }
+  function findWorkshopPointV33(town,key){
+    const def=WORKSHOP_DEFS_V33[key],baseX=town.rx+def.offset[0],baseY=town.ry+def.offset[1];
+    for(let radius=0;radius<=8;radius++)for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
+      if(Math.max(Math.abs(ox),Math.abs(oy))!==radius)continue;const x=baseX+ox,y=baseY+oy;if(!productionCellBlockedV33(x,y))return {x:x*TILE+8,y:y*TILE+8,cellX:x,cellY:y};
+    }
+    return {x:town.marketPoint.x,y:town.marketPoint.y,cellX:Math.floor(town.marketPoint.x/TILE),cellY:Math.floor(town.marketPoint.y/TILE)};
+  }
+  function ensureProductionV33(town,saved=null){
+    if(!town)return null;
+    const prior=saved||town.productionV33||{},stock=Object.assign(blankStockV33(),prior.stock||{}),workshops={};
+    for(const key of Object.keys(WORKSHOP_DEFS_V33)){
+      const old=prior.workshops&&prior.workshops[key]||{},point=old.point||findWorkshopPointV33(town,key);
+      workshops[key]={key,label:WORKSHOP_DEFS_V33[key].label,point,workerIds:Array.isArray(old.workerIds)?old.workerIds.slice():[],batch:old.batch?JSON.parse(JSON.stringify(old.batch)):null,status:old.status||"Waiting for assignment",completed:Number(old.completed)||0};
+    }
+    town.productionV33={version:PRODUCTION_VERSION_V33,stock,workshops,bottleneck:prior.bottleneck||"none",history:Array.isArray(prior.history)?prior.history.slice(-20):[],lastAgricultureDay:Number(prior.lastAgricultureDay)||0};
+    return town.productionV33;
+  }
+  function stockAmountV33(town,key){
+    const p=ensureProductionV33(town);if(key==="logs")return town.materialStock[1]||0;if(key==="stone")return town.materialStock[2]||0;return p.stock[key]||0;
+  }
+  function changeStockV33(town,key,delta){
+    const p=ensureProductionV33(town);if(key==="logs"){town.materialStock[1]=Math.max(0,(town.materialStock[1]||0)+delta);return}if(key==="stone"){town.materialStock[2]=Math.max(0,(town.materialStock[2]||0)+delta);return}p.stock[key]=Math.max(0,(p.stock[key]||0)+delta);
+  }
+  function hasInputsV33(town,recipe){return Object.entries(recipe.inputs).every(([key,q])=>stockAmountV33(town,key)+1e-6>=q)}
+  function missingInputsV33(town,recipe){return Object.entries(recipe.inputs).filter(([key,q])=>stockAmountV33(town,key)+1e-6<q).map(([key,q])=>PRODUCT_LABELS_V33[key]||key)}
+  function consumeInputsV33(town,recipe){for(const [key,q] of Object.entries(recipe.inputs))changeStockV33(town,key,-q)}
+  function produceOutputsV33(town,recipe){for(const [key,q] of Object.entries(recipe.outputs))changeStockV33(town,key,q)}
+  function recipeCandidatesV33(town,key){
+    const p=ensureProductionV33(town),s=p.stock,food=town.market.inventory[0]||0,shelter=town.market.inventory[1]||0,project=town.civicProjectV24;
+    if(key==="sawmill")return [RECIPES_V33.saw_lumber];
+    if(key==="mason")return [RECIPES_V33.cut_masonry];
+    if(key==="bloomery")return [RECIPES_V33.smelt_metal];
+    if(key==="mill")return food<12||s.flour<3?[RECIPES_V33.mill_flour,RECIPES_V33.mill_feed]:[RECIPES_V33.mill_feed,RECIPES_V33.mill_flour];
+    if(key==="foodworks")return food<10?[RECIPES_V33.bake_bread,RECIPES_V33.prepare_dairy,RECIPES_V33.butcher_meat]:[RECIPES_V33.prepare_dairy,RECIPES_V33.butcher_meat,RECIPES_V33.bake_bread];
+    if(key==="artisan"){
+      if(project||town.publicWorksV29)return [RECIPES_V33.make_components,RECIPES_V33.craft_tools,RECIPES_V33.make_furniture,RECIPES_V33.weave_cloth,RECIPES_V33.tan_leather];
+      if(s.tools<2)return [RECIPES_V33.craft_tools,RECIPES_V33.make_components,RECIPES_V33.make_furniture,RECIPES_V33.weave_cloth,RECIPES_V33.tan_leather];
+      if(shelter<10)return [RECIPES_V33.make_furniture,RECIPES_V33.make_components,RECIPES_V33.craft_tools,RECIPES_V33.weave_cloth,RECIPES_V33.tan_leather];
+      return [RECIPES_V33.make_components,RECIPES_V33.weave_cloth,RECIPES_V33.tan_leather,RECIPES_V33.make_furniture,RECIPES_V33.craft_tools];
+    }
+    return [];
+  }
+  function preferredRecipeV33(town,key){const list=recipeCandidatesV33(town,key);return list.find(r=>hasInputsV33(town,r))||list[0]||null}
+  function workshopPriorityV33(town,key){
+    const p=ensureProductionV33(town),s=p.stock,recipe=preferredRecipeV33(town,key),ready=recipe&&hasInputsV33(town,recipe)?18:-18;
+    if(key==="foodworks")return 70-(town.market.inventory[0]||0)*3+ready;
+    if(key==="mill")return 50-s.flour*6+ready;
+    if(key==="sawmill")return 38-s.lumber*4+ready;
+    if(key==="mason")return 34-s.masonry*4+ready;
+    if(key==="bloomery")return 36-s.metal*8+ready;
+    if(key==="artisan")return 42-s.tools*7-s.components*2+((town.civicProjectV24||town.publicWorksV29)?25:0)+ready;
+    return ready;
+  }
+  function workerAvailableV33(a,town){
+    const farm=town.agricultureV26,farmer=farm&&farm.farmerIds&&farm.farmerIds.includes(a.id);
+    return a.town===town&&a.ageGroup!=="child"&&!a.isGuard&&!a.raidState&&!a.constructionTownV24&&!a.publicWorksV29&&!farmer;
+  }
+  function workerFitV33(a,key){
+    let score=(a.productivity||1)*8+(a.level||1)*.6;
+    if((key==="sawmill"||key==="mason"||key==="artisan")&&a.cls==="builder")score+=12;
+    if(key==="bloomery"&&a.cls==="mage")score+=7;
+    if((key==="mill"||key==="foodworks")&&a.cls==="warrior")score+=6;
+    if(key==="artisan"&&a.cls==="noble")score+=4;
+    return score;
+  }
+  function clearProductionJobV33(a){if(!a)return;a.productionJobV33=null;a.productionTownV33=null;if(a.currentPlace==="productionV33")a.currentPlace=null;a.cachedTarget=null;a.targetRefresh=0}
+  function assignProductionWorkersV33(town){
+    const p=ensureProductionV33(town);for(const w of Object.values(p.workshops))w.workerIds=[];
+    for(const a of town.agents)if(a.productionTownV33===town.name)clearProductionJobV33(a);
+    const available=town.agents.filter(a=>workerAvailableV33(a,town)),ranked=Object.keys(p.workshops).map(key=>({key,score:workshopPriorityV33(town,key)})).sort((a,b)=>b.score-a.score);
+    const limit=Math.min(3,available.length);for(let slot=0;slot<limit;slot++){
+      const target=ranked[slot%Math.min(ranked.length,Math.max(1,limit))];if(!target)break;
+      const worker=available.filter(a=>!a.productionJobV33).sort((a,b)=>workerFitV33(b,target.key)-workerFitV33(a,target.key))[0];if(!worker)break;
+      p.workshops[target.key].workerIds.push(worker.id);worker.productionJobV33=target.key;worker.productionTownV33=town.name;worker.currentActivity="assigned to the "+WORKSHOP_DEFS_V33[target.key].label.toLowerCase();worker.cachedTarget=null;worker.targetRefresh=0;buildDailySchedule(worker);
+    }
+    for(const w of Object.values(p.workshops))if(!w.workerIds.length&&!w.batch)w.status="No worker assigned";
+  }
+  function tryStartBatchV33(town,w){
+    if(w.batch||!w.workerIds.length)return false;const recipe=preferredRecipeV33(town,w.key);if(!recipe)return false;
+    if(!hasInputsV33(town,recipe)){const missing=missingInputsV33(town,recipe);w.status="Waiting for "+missing.join(" and ");return false}
+    consumeInputsV33(town,recipe);w.batch={recipeKey:Object.keys(RECIPES_V33).find(k=>RECIPES_V33[k]===recipe),progress:0,duration:recipe.duration,startedDay:dayNo};w.status=recipe.label;paintWorld();return true;
+  }
+  function completeBatchV33(town,w){
+    const recipe=RECIPES_V33[w.batch.recipeKey];if(!recipe){w.batch=null;return}produceOutputsV33(town,recipe);w.completed++;w.status="Completed "+recipe.label.toLowerCase();ensureProductionV33(town).history.push({day:dayNo,workshop:w.key,recipe:w.batch.recipeKey});ensureProductionV33(town).history=ensureProductionV33(town).history.slice(-20);
+    for(const id of w.workerIds){const a=agents.find(x=>x.id===id);if(a){gainAgentXP(a,1.2);const wage=Math.min(.18,town.market.treasury);town.market.treasury-=wage;a.wealth+=wage}}
+    recordVillageEvent(town,"PRODUCTION",town.name+" completes a batch of "+recipe.label.toLowerCase()+".",{actorId:w.workerIds[0],salience:4,emotion:"pride"});w.batch=null;paintWorld();
+  }
+  function workerRateV33(a,town){const tools=ensureProductionV33(town).stock.tools||0;return (.72+(a.productivity||1)*.35+(a.level||1)*.025+(a.cls==="builder"?.14:0))*(1+Math.min(.18,tools*.025))}
+  function stepProductionV33(dt){
+    if(scene!=="world")return;productionClockV33+=dt;productionSaveClockV33+=dt;
+    for(const town of towns){const p=ensureProductionV33(town);for(const w of Object.values(p.workshops)){
+      if(!w.batch){if(productionClockV33>.8)tryStartBatchV33(town,w);continue}
+      const workers=w.workerIds.map(id=>agents.find(a=>a.id===id)).filter(a=>a&&workerAvailableV33(a,town));let rate=0;
+      for(const a of workers){const d=Math.hypot(a.x-w.point.x,a.y-w.point.y);if(d<34){rate+=workerRateV33(a,town);a.currentPlace="productionV33";a.currentActivity=RECIPES_V33[w.batch.recipeKey].label.toLowerCase()}}
+      if(rate>0){w.batch.progress+=dt*rate;w.status=RECIPES_V33[w.batch.recipeKey].label+" - "+Math.floor(100*w.batch.progress/w.batch.duration)+"%";if(w.batch.progress>=w.batch.duration)completeBatchV33(town,w)}
+      else w.status="Workers traveling to "+w.label.toLowerCase();
+    }}
+    if(productionClockV33>.8)productionClockV33=0;if(productionSaveClockV33>15){productionSaveClockV33=0;if(towns.some(t=>Object.values(ensureProductionV33(t).workshops).some(w=>w.batch)))saveGame(true)}
+  }
+
+  function captureAgricultureV33(){
+    const map=new Map();for(const town of towns){const farm=town.agricultureV26,animals=window.__egglandsAgricultureV26?window.__egglandsAgricultureV26.animals().filter(a=>a.domestic&&a.homeTown===town.name):[];map.set(town.name,{plots:farm?farm.plots.map(p=>({x:p.x,y:p.y,stage:p.stage,crop:p.crop})):[],chickens:animals.filter(a=>a.type==="chicken").length,goats:animals.filter(a=>a.type==="goat").length})}return map;
+  }
+  function expectedCropYieldV33(town,plot){const farm=town.agricultureV26;let value=farm&&farm.waterBonus?2:1;if(godMode)value++;if(window.__egglandsWorldEcologyV28){const cell=window.__egglandsWorldEcologyV28.cell(plot.x,plot.y);if(cell&&(cell.biome==="wetland"||cell.biome==="riverland"||(cell.biome==="meadow"&&cell.elevation<.55)))value++}return value}
+  function routeAgricultureV33(before){
+    for(const town of towns){const prior=before.get(town.name)||{plots:[],chickens:0,goats:0},farm=town.agricultureV26,p=ensureProductionV33(town);let replacedFood=prior.chickens*.13+prior.goats*.25;
+      if(farm)for(const old of prior.plots){const now=farm.plots.find(x=>x.x===old.x&&x.y===old.y);if(old.stage>=3&&now&&now.stage===0){const amount=expectedCropYieldV33(town,old);replacedFood+=amount;if(old.crop==="barley")p.stock.grain+=amount;else p.stock.produce+=amount;}}
+      town.market.inventory[0]=Math.max(0,(town.market.inventory[0]||0)-replacedFood);
+      const feedNeed=(prior.chickens+prior.goats)*.07,feedUsed=Math.min(p.stock.feed,feedNeed);p.stock.feed-=feedUsed;const husbandry=feedNeed>0?.75+.5*(feedUsed/feedNeed):1;
+      p.stock.eggs+=prior.chickens*.48*husbandry;p.stock.milk+=prior.goats*.42*husbandry;p.stock.wool+=prior.goats*.10*husbandry;p.stock.hides+=prior.goats*.025;p.stock.meat+=prior.goats*.035;
+      const miners=town.agents.filter(a=>a.ageGroup!=="child"&&a.equipment&&a.equipment.mining).length;p.stock.ore+=miners*.12;
+      p.lastAgricultureDay=dayNo;
+    }
+  }
+  function distributeFinishedGoodsV33(town){
+    const p=ensureProductionV33(town),s=p.stock;
+    const bread=Math.min(s.bread,3);if(bread>0){s.bread-=bread;town.market.inventory[0]+=bread}
+    const furniture=Math.min(s.furniture,.8);if(furniture>0){s.furniture-=furniture;town.market.inventory[1]+=furniture*1.8}
+    const cloth=Math.min(s.cloth,.4),leather=Math.min(s.leather,.4);if(cloth+leather>0){s.cloth-=cloth;s.leather-=leather;town.market.inventory[2]+=(cloth+leather)*1.4}
+    if(s.tools>2.5){const sold=Math.min(.5,s.tools-2);s.tools-=sold;town.market.inventory[3]+=sold*1.5}
+    if(town.civicProjectV24&&s.components>=.25){const used=Math.min(.5,s.components);s.components-=used;town.civicProjectV24.progress=clamp((town.civicProjectV24.progress||0)+used*5,0,100)}
+    if(town.publicWorksV29&&s.components>=.20){const used=Math.min(.35,s.components);s.components-=used;town.publicWorksV29.work=(town.publicWorksV29.work||0)+used*3}
+  }
+  function updateProductionEconomyV33(town){
+    const p=ensureProductionV33(town),s=p.stock,needs=[];
+    if((town.market.inventory[0]||0)<9)needs.push({label:"food",pressure:3});if(s.flour<1&&s.grain<2)needs.push({label:"grain",pressure:2.5});if(s.lumber<2)needs.push({label:"lumber",pressure:2});if(s.metal<1)needs.push({label:"metal",pressure:1.5});if(s.tools<1)needs.push({label:"tools",pressure:1.5});
+    needs.sort((a,b)=>b.pressure-a.pressure);p.bottleneck=needs[0]?needs[0].label:"none";
+    town.market.prices[0]=clamp(town.market.prices[0]*((p.bottleneck==="food"||p.bottleneck==="grain")?1.025:.995),.35,3.5);
+    town.market.prices[1]=clamp(town.market.prices[1]*(s.lumber+s.masonry<3?1.018:.997),.35,3.5);
+    town.market.prices[3]=clamp(town.market.prices[3]*(s.tools<1?1.012:.998),.35,3.5);
+  }
+  function productionDayV33(before){routeAgricultureV33(before);for(const town of towns){ensureProductionV33(town);distributeFinishedGoodsV33(town);updateProductionEconomyV33(town);assignProductionWorkersV33(town);for(const w of Object.values(town.productionV33.workshops))tryStartBatchV33(town,w)}saveGame(true)}
+
+  const previousBuildDailyScheduleV33=buildDailySchedule;
+  buildDailySchedule=function(a){const result=previousBuildDailyScheduleV33(a);if(a.productionJobV33&&a.productionTownV33===a.town.name&&workerAvailableV33(a,a.town)){const work=a.schedule&&a.schedule.find(x=>x.until===.60)||a.schedule&&a.schedule[1];if(work)Object.assign(work,{activity:"working at the "+WORKSHOP_DEFS_V33[a.productionJobV33].label.toLowerCase(),place:"productionV33",productionKey:a.productionJobV33})}return result};
+  const previousScheduleTargetV33=scheduleTarget;
+  scheduleTarget=function(a){const phase=dayClock/DAY_SECONDS,entry=(a.schedule||[]).find(s=>phase<s.until)||(a.schedule||[]).slice(-1)[0];if(entry&&entry.place==="productionV33"&&a.productionJobV33){const p=ensureProductionV33(a.town),w=p.workshops[a.productionJobV33];if(w){a.currentActivity=entry.activity;a.currentPlace="productionV33";return w.point}}return previousScheduleTargetV33(a)};
+  const previousStepAgentsV33=stepAgents;stepAgents=function(dt){const result=previousStepAgentsV33(dt);stepProductionV33(dt);return result};
+  const previousNewDayV33=newDay;newDay=function(){const before=captureAgricultureV33(),result=previousNewDayV33();productionDayV33(before);return result};
+
+  function drawProductionWorldV33(){if(!worldCanvas)return;const w=worldCanvas.getContext("2d");for(const town of towns){const p=ensureProductionV33(town);for(const shop of Object.values(p.workshops)){const x=shop.point.x-10,y=shop.point.y-9,active=!!shop.batch;w.fillStyle="#4c3a2a";w.fillRect(x,y+6,20,12);w.fillStyle=active?"#9a6138":"#70543b";w.fillRect(x-1,y,22,9);w.fillStyle="#d8c79d";w.font="5px monospace";w.textAlign="center";w.fillText(WORKSHOP_DEFS_V33[shop.key].icon,x+10,y-2);w.fillStyle="#2c2119";w.fillRect(x+8,y+10,4,8);if(shop.key==="bloomery"&&active){w.fillStyle="#c36f3d";w.fillRect(x+16,y-5,2,4)}}}}
+  const previousPaintWorldV33=paintWorld;paintWorld=function(){const result=previousPaintWorldV33();drawProductionWorldV33();return result};
+  function drawProductionRuntimeV33(){if(scene!=="world")return;ctx.save();ctx.scale(worldZoom,worldZoom);for(const town of towns)for(const w of Object.values(ensureProductionV33(town).workshops)){if(!w.batch)continue;const x=w.point.x-camera.x-12,y=w.point.y-camera.y-17,pct=clamp(w.batch.progress/w.batch.duration,0,1);ctx.fillStyle="rgba(12,15,20,.82)";ctx.fillRect(x,y,24,4);ctx.fillStyle="#e2ad45";ctx.fillRect(x+1,y+1,22*pct,2)}ctx.restore()}
+  const previousRenderV33=render;render=function(){const result=previousRenderV33();drawProductionRuntimeV33();return result};
+
+  function nearestWorkshopV33(){let best=null,bestD=28;for(const town of towns)for(const w of Object.values(ensureProductionV33(town).workshops)){const d=Math.hypot(player.x+5-w.point.x,player.y+8-w.point.y);if(d<bestD){best={town,w};bestD=d}}return best}
+  const previousInteractV33=interact;interact=function(){if(scene==="world"){const found=nearestWorkshopV33();if(found){const w=found.w,workers=w.workerIds.map(id=>agents.find(a=>a.id===id)?.firstName).filter(Boolean).join(", ")||"none";toast(w.label+": "+w.status+". Workers: "+workers+".");return}}return previousInteractV33()};
+
+  function productionStockTextV33(stock,keys){return keys.map(k=>(PRODUCT_LABELS_V33[k]||k)+" "+(stock[k]||0).toFixed((stock[k]||0)%1?1:0)).join(" · ")}
+  const previousRenderHomeTownV33=renderHomeTown;renderHomeTown=function(){previousRenderHomeTownV33();const wrap=document.getElementById("homeTownContent"),home=homeGovernmentTown();if(!wrap||!home)return;const p=ensureProductionV33(home),shops=Object.values(p.workshops);const box=document.createElement("div");box.className="menuCard";box.innerHTML='<h3>Production chains <span class="productionBadgeV33">WORKSHOPS + BOTTLENECKS</span></h3>'+statLine("Current bottleneck",escapeHTML(p.bottleneck))+statLine("Assigned workers",shops.reduce((n,w)=>n+w.workerIds.length,0))+statLine("Completed batches",shops.reduce((n,w)=>n+w.completed,0))+'<div class="productionStocksV33"><b>Raw:</b> '+escapeHTML(productionStockTextV33(p.stock,["grain","produce","ore","eggs","milk","wool","hides","meat"]))+'<br><b>Processed:</b> '+escapeHTML(productionStockTextV33(p.stock,["lumber","masonry","metal","flour","feed","bread","furniture","components","tools","cloth","leather"]))+'</div><div class="productionGridV33">'+shops.map(w=>{const pct=w.batch?Math.floor(100*w.batch.progress/w.batch.duration):0,workers=w.workerIds.map(id=>agents.find(a=>a.id===id)?.firstName).filter(Boolean).join(", ")||"Unstaffed";return '<div class="productionWorkshopV33"><strong>'+escapeHTML(w.label)+'</strong><br>'+escapeHTML(w.status)+'<br><span>'+escapeHTML(workers)+'</span>'+(w.batch?'<div class="productionBarV33"><span style="width:'+pct+'%"></span></div>':'')+'</div>'}).join("")+'</div><div class="productionNoteV33">Harvests and livestock now enter raw inventories first. Villagers process them through timed batches; missing inputs stall workshops, redirect labor, and increase the relevant market prices.</div>';wrap.appendChild(box)};
+
+  if(typeof INTENT_LABELS_V32!=="undefined")INTENT_LABELS_V32.production="Production";
+  if(typeof classifyIntentV32==="function"){const previousClassifyIntentV33=classifyIntentV32;classifyIntentV32=function(line,a){if(/production|workshop|sawmill|mason|bloomery|forge|mill|flour|bread|lumber|furniture|component|tool|metal|ore|feed|egg|milk|wool|hide|leather|cloth/.test(String(line).toLowerCase()))return "production";return previousClassifyIntentV33(line,a)}}
+  if(typeof baseDraftV32==="function"){const previousBaseDraftV33=baseDraftV32;baseDraftV32=function(a,line,intent){if(intent==="production"){const p=ensureProductionV33(a.town),job=a.productionJobV33?WORKSHOP_DEFS_V33[a.productionJobV33].label:null;return "Our production bottleneck is "+p.bottleneck+". "+(job?"I am assigned to the "+job.toLowerCase()+". ":"")+"Logs become lumber, stone becomes masonry, ore becomes metal, grain becomes flour and bread, and livestock products move through the food and artisan workshops before they reach the market."}return previousBaseDraftV33(a,line,intent)}}
+
+  function serializableProductionV33(town){const p=ensureProductionV33(town);return JSON.parse(JSON.stringify(p))}
+  const previousSnapshotV33=snapshot;snapshot=function(){const data=previousSnapshotV33();data.version=Math.max(PRODUCTION_VERSION_V33,Number(data.version)||0);data.productionChainsV33={version:PRODUCTION_VERSION_V33,towns:towns.map(t=>({name:t.name,production:serializableProductionV33(t)}))};for(const saved of data.agents||[]){const a=agents.find(x=>x.id===saved.id);if(a){saved.productionJobV33=a.productionJobV33||null;saved.productionTownV33=a.productionTownV33||null}}return data};
+  function restoreProductionV33(data){const entries=data&&data.productionChainsV33&&data.productionChainsV33.towns||[];for(const town of towns){const entry=entries.find(x=>x.name===town.name);ensureProductionV33(town,entry&&entry.production)}for(const a of agents)clearProductionJobV33(a);for(const town of towns){const p=ensureProductionV33(town);for(const w of Object.values(p.workshops)){w.workerIds=w.workerIds.filter(id=>{const a=agents.find(x=>x.id===id);if(!a||!workerAvailableV33(a,town))return false;a.productionJobV33=w.key;a.productionTownV33=town.name;buildDailySchedule(a);return true})}assignProductionWorkersV33(town)}}
+  const previousApplySaveV33=applySave;applySave=function(data){const result=previousApplySaveV33(data);restoreProductionV33(data);paintWorld();return result};
+  const previousSetupGameV33=setupGame;setupGame=function(newSeed,loading=false){const result=previousSetupGameV33(newSeed,loading);if(!loading){for(const town of towns)ensureProductionV33(town);for(const town of towns)assignProductionWorkersV33(town)}paintWorld();return result};
+
+  for(const town of towns){ensureProductionV33(town);assignProductionWorkersV33(town);for(const w of Object.values(town.productionV33.workshops))tryStartBatchV33(town,w)}paintWorld();
+  const help=document.querySelector("#helpTab .helpGrid");if(help&&!document.getElementById("productionHelpV33")){const k=document.createElement("span");k.id="productionHelpV33";k.className="key";k.textContent="Production chains";const t=document.createElement("span");t.textContent="Crops, livestock products, timber, stone, and ore enter town inventories as raw inputs. Assigned villagers operate timed workshop batches. Visit a workshop and press E to inspect its current job, workers, or missing input.";help.appendChild(k);help.appendChild(t)}
+  window.__egglandsProductionV33={version:PRODUCTION_VERSION_V33,ensure:ensureProductionV33,assign:assignProductionWorkersV33,step:stepProductionV33,day:productionDayV33,recipes:RECIPES_V33};
+  const title=document.querySelector("header h1");if(title)title.title="Workshop Production Chains v33";
+  toast("v33 loaded: raw resources now move through staffed, timed workshop production chains with visible bottlenecks.");
+})();
+<\/script>

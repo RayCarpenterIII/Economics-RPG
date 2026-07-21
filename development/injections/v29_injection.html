@@ -1,0 +1,213 @@
+<style id="infrastructure-v29-style">
+  #infrastructureHudV29{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);z-index:8;display:none;min-width:250px;max-width:72%;padding:7px 10px;border:1px solid var(--gold);background:rgba(12,16,22,.92);color:var(--paper);font:8px/1.45 monospace;text-align:center;pointer-events:none}
+  #infrastructureHudV29 strong{display:block;color:var(--gold);font-size:9px;letter-spacing:1px}
+  #touchInfrastructureV29{border-color:#b9955d}
+  .infrastructureControlsV29{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .infrastructureControlsV29 .uibtn.active{border-color:var(--gold);color:var(--gold)}
+  .infrastructureBadgeV29{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:2px 5px;font-size:8px;margin-left:5px}
+  .publicWorksBarV29{height:8px;border:1px solid var(--line);background:#10141b;margin-top:5px;overflow:hidden}
+  .publicWorksBarV29 span{display:block;height:100%;background:var(--gold)}
+</style>
+<script id="infrastructure-v29-script">
+(function(){
+  "use strict";
+  const INFRASTRUCTURE_VERSION_V29=29;
+  const INFRASTRUCTURE_MODES_V29=["off","path","bridge","remove"];
+  const INFRASTRUCTURE_LABELS_V29={off:"Infrastructure off",path:"Lay stone path",bridge:"Build timber bridge",remove:"Remove improvement"};
+  let infrastructureModeV29="off",infrastructureCellsV29=new Map(),publicWorksSaveClockV29=0;
+
+  if(!EQUIPMENT.engineering)EQUIPMENT.engineering={name:"Roadwright Tools",icon:"⌘",price:10};
+  if(!LIFE_SKILLS.engineering)LIFE_SKILLS.engineering={name:"Engineering",icon:"⌘",material:2,nodes:[
+    ["Measured Grade","Paths cost one less stone every third placement."],
+    ["Bridgewright","Bridges require one fewer log."],
+    ["Public Works","Commissioned town roads are completed faster."]
+  ]};
+  if(!PACK_DEFS.tool_engineering)PACK_DEFS.tool_engineering={name:"Roadwright Tools",icon:"⌘",w:2,h:2,stack:1};
+
+  function ensureInfrastructurePlayerV29(){
+    player.equipment=player.equipment||{};player.lifeSkills=player.lifeSkills||{};
+    if(player.equipment.engineering==null)player.equipment.engineering=false;
+    if(!Number.isFinite(player.lifeSkills.engineering))player.lifeSkills.engineering=0;
+    if(!Number.isFinite(player.infrastructurePathCountV29))player.infrastructurePathCountV29=0;
+  }
+  function farmOccupiesV29(x,y){
+    for(const town of towns){const farm=town.agricultureV26;if(!farm)continue;
+      if(x>=farm.origin.x&&x<farm.origin.x+CROP_COLS_V26&&y>=farm.origin.y&&y<farm.origin.y+CROP_ROWS_V26)return true;
+      const p=farm.pen;if(x>=p.x&&x<p.x+p.w&&y>=p.y&&y<p.y+p.h)return true;
+    }
+    return false;
+  }
+  function cellHasTownStructureV29(x,y){
+    for(const town of towns){
+      for(const b of town.layout.buildings)if(x>=town.rx+b.dx&&x<town.rx+b.dx+b.w&&y>=town.ry+b.dy&&y<town.ry+b.dy+b.h)return true;
+      for(const h of town.houses)if(x>=town.rx+h.dx&&x<town.rx+h.dx+2&&y>=town.ry+h.dy&&y<town.ry+h.dy+2)return true;
+      for(const stall of town.layout.stalls)if(x===town.rx+stall[0]&&y===town.ry+stall[1])return true;
+      const px=Math.floor((town.plot.x-8)/TILE),py=Math.floor((town.plot.y-8)/TILE);if(x>=px&&x<px+2&&y>=py&&y<py+2)return true;
+    }
+    return false;
+  }
+  function facingInfrastructureCellV29(){
+    const distance=20,x=clamp(Math.floor((player.x+5+player.face.x*distance)/TILE),0,MW-1),y=clamp(Math.floor((player.y+8+player.face.y*distance)/TILE),0,MH-1);return {x,y,key:keyOf(x,y),tile:tiles[y]&&tiles[y][x]};
+  }
+  function testingFreeV29(){return !!(player.testingGodModeV22&&godMode)}
+  function engineeringRankV29(){return typeof lifeRank==="function"?lifeRank(player,"engineering"):(player.lifeSkills.engineering||0)}
+  function pathStoneCostV29(){
+    if(testingFreeV29())return 0;const rank=engineeringRankV29(),next=(player.infrastructurePathCountV29||0)+1;return rank>=1&&next%3===0?0:1;
+  }
+  function bridgeCostV29(){return {logs:testingFreeV29()?0:Math.max(1,3-(engineeringRankV29()>=2?1:0)),stone:testingFreeV29()?0:1}}
+  function canPayInfrastructureV29(kind){
+    if(kind==="path")return player.materials[2]>=pathStoneCostV29();
+    if(kind==="bridge"){const c=bridgeCostV29();return player.materials[1]>=c.logs&&player.materials[2]>=c.stone}
+    return true;
+  }
+  function payInfrastructureV29(kind){
+    if(kind==="path"){player.materials[2]-=pathStoneCostV29();player.infrastructurePathCountV29=(player.infrastructurePathCountV29||0)+1}
+    else if(kind==="bridge"){const c=bridgeCostV29();player.materials[1]-=c.logs;player.materials[2]-=c.stone}
+  }
+  function restoreSolidForTileV29(x,y,tile){const key=keyOf(x,y);if(tile===1||tile===2||tile===4||tile===8)solid.add(key);else solid.delete(key)}
+  function canLayPathV29(cell){
+    if(!cell||cell.x<=0||cell.y<=0||cell.x>=MW-1||cell.y>=MH-1)return false;
+    if(cell.tile===2||cell.tile===6||cell.tile===7||cell.tile===8||cell.tile===16)return false;
+    if(solid.has(cell.key)||farmOccupiesV29(cell.x,cell.y)||cellHasTownStructureV29(cell.x,cell.y))return false;
+    return !infrastructureCellsV29.has(cell.key)&&cell.tile!==5;
+  }
+  function canBuildBridgeV29(cell){
+    if(!cell||cell.tile!==2||farmOccupiesV29(cell.x,cell.y))return false;
+    const horizontal=(tiles[cell.y]?.[cell.x-1]!==2&&tiles[cell.y]?.[cell.x+1]!==2)||(tiles[cell.y]?.[cell.x-1]===6||tiles[cell.y]?.[cell.x+1]===6);
+    const vertical=(tiles[cell.y-1]?.[cell.x]!==2&&tiles[cell.y+1]?.[cell.x]!==2)||(tiles[cell.y-1]?.[cell.x]===6||tiles[cell.y+1]?.[cell.x]===6);
+    return horizontal||vertical||[[-1,0],[1,0],[0,-1],[0,1]].some(d=>tiles[cell.y+d[1]]?.[cell.x+d[0]]===6);
+  }
+  function placeInfrastructureCellV29(cell,kind,options={}){
+    if(!cell||infrastructureCellsV29.has(cell.key))return false;
+    const originalTile=cell.tile,placedTile=kind==="bridge"?6:5;
+    infrastructureCellsV29.set(cell.key,{x:cell.x,y:cell.y,originalTile,kind,placedDay:dayNo,townName:options.townName||null});
+    tiles[cell.y][cell.x]=placedTile;solid.delete(cell.key);if(!options.free)payInfrastructureV29(kind);paintWorld();
+    if(!options.silent){playSfx("mine");gainPlayerXP(1,"engineering");toast(kind==="bridge"?"Bridge segment secured across the water.":"Stone path laid. Villagers will prefer this faster route.")}
+    updateUI();return true;
+  }
+  function removeInfrastructureCellV29(cell){
+    const saved=cell&&infrastructureCellsV29.get(cell.key);if(!saved)return false;
+    tiles[cell.y][cell.x]=saved.originalTile;restoreSolidForTileV29(cell.x,cell.y,saved.originalTile);infrastructureCellsV29.delete(cell.key);paintWorld();playSfx("mine");toast("The improvement is removed and the underlying terrain restored.");updateUI();return true;
+  }
+  function useInfrastructureV29(){
+    ensureInfrastructurePlayerV29();if(infrastructureModeV29==="off")return false;
+    if(!entityHasEquipment(player,"engineering")){toast("You need Roadwright Tools from a town market.");return true}
+    const cell=facingInfrastructureCellV29();
+    if(infrastructureModeV29==="remove"){if(!removeInfrastructureCellV29(cell))toast("Face a path or bridge segment that you constructed.");saveGame(true);return true}
+    if(infrastructureModeV29==="path"){
+      if(!canLayPathV29(cell)){toast("Paths require open ground without crops, buildings, water, walls, or ditches.");return true}
+      if(!canPayInfrastructureV29("path")){toast("You need "+pathStoneCostV29()+" stone to lay this path segment.");return true}
+      placeInfrastructureCellV29(cell,"path");saveGame(true);return true;
+    }
+    if(infrastructureModeV29==="bridge"){
+      if(!canBuildBridgeV29(cell)){toast("Face a shoreline water tile connected to land or another bridge segment.");return true}
+      if(!canPayInfrastructureV29("bridge")){const c=bridgeCostV29();toast("A bridge segment requires "+c.logs+" logs and "+c.stone+" stone.");return true}
+      placeInfrastructureCellV29(cell,"bridge");saveGame(true);return true;
+    }
+    return false;
+  }
+  function setInfrastructureModeV29(mode,quiet=false){
+    ensureInfrastructurePlayerV29();if(!INFRASTRUCTURE_MODES_V29.includes(mode))mode="off";infrastructureModeV29=mode;updateInfrastructureHudV29();
+    document.querySelectorAll("[data-infrastructure-mode-v29]").forEach(btn=>btn.classList.toggle("active",btn.dataset.infrastructureModeV29===mode));
+    if(!quiet)toast(INFRASTRUCTURE_LABELS_V29[mode]+(mode==="off"?".":". Face a tile and press E / Use."));
+  }
+  function cycleInfrastructureModeV29(){const i=INFRASTRUCTURE_MODES_V29.indexOf(infrastructureModeV29);setInfrastructureModeV29(INFRASTRUCTURE_MODES_V29[(i+1)%INFRASTRUCTURE_MODES_V29.length])}
+  function updateInfrastructureHudV29(){
+    const hud=document.getElementById("infrastructureHudV29");if(!hud)return;
+    if(infrastructureModeV29==="off"||scene!=="world"){hud.style.display="none";return}
+    const cell=facingInfrastructureCellV29(),detail=infrastructureModeV29==="path"?pathStoneCostV29()+" stone":infrastructureModeV29==="bridge"?(bridgeCostV29().logs+" logs + "+bridgeCostV29().stone+" stone"):"restore terrain";
+    hud.style.display="block";hud.innerHTML='<strong>'+INFRASTRUCTURE_LABELS_V29[infrastructureModeV29].toUpperCase()+'</strong><span>Facing tile '+cell.x+', '+cell.y+' · '+detail+' · E / Use to apply · R to change mode</span>';
+  }
+  function installInfrastructureUIV29(){
+    if(!document.getElementById("infrastructureHudV29")){const stage=document.getElementById("stage")||document.body,hud=document.createElement("div");hud.id="infrastructureHudV29";stage.appendChild(hud)}
+    const touchSpec=document.getElementById("touchSpec");if(touchSpec&&!document.getElementById("touchInfrastructureV29")){const button=document.createElement("button");button.className="pad round";button.id="touchInfrastructureV29";button.textContent="Build";button.addEventListener("click",cycleInfrastructureModeV29);touchSpec.parentNode.insertBefore(button,touchSpec)}
+    updateInfrastructureHudV29();
+  }
+
+  function nearestOpenForProjectV29(x,y){return window.__egglandsNavigationV25?.nearestOpen?window.__egglandsNavigationV25.nearestOpen(x,y,12):{x,y}}
+  function publicWorksRouteV29(town){
+    const farm=town.agricultureV26;if(!farm)return [];
+    const start=nearestOpenForProjectV29(Math.floor(town.marketPoint.x/TILE),Math.floor(town.marketPoint.y/TILE));
+    const goal=nearestOpenForProjectV29(farm.origin.x-1,farm.origin.y+Math.floor(CROP_ROWS_V26/2));
+    let path=window.__egglandsNavigationV25?.findPath?window.__egglandsNavigationV25.findPath(start,goal):[];
+    path=path.filter(c=>{const tile=tiles[c.y]?.[c.x],key=keyOf(c.x,c.y);return tile!==7&&tile!==5&&tile!==6&&tile!==2&&!solid.has(key)&&!farmOccupiesV29(c.x,c.y)&&!cellHasTownStructureV29(c.x,c.y)&&!infrastructureCellsV29.has(key)});
+    const sampled=[];for(const c of path){const last=sampled[sampled.length-1];if(!last||last.x!==c.x||last.y!==c.y)sampled.push(c)}return sampled.slice(0,30);
+  }
+  function availablePublicWorkerV29(town){
+    return town.agents.filter(a=>a.ageGroup!=="child"&&!a.isGuard&&!a.raidState&&!a.constructionWorkerV24&&!a.publicWorksV29).sort((a,b)=>(b.cls==="builder")-(a.cls==="builder")||b.productivity-a.productivity)[0]||null;
+  }
+  function assignPublicWorkerV29(town){
+    const p=town.publicWorksV29;if(!p)return null;let worker=agents.find(a=>a.id===p.workerId&&a.town===town);
+    if(!worker){worker=availablePublicWorkerV29(town);p.workerId=worker?worker.id:null}
+    if(worker){worker.publicWorksV29={townName:town.name};worker.currentPlace="publicWorksV29";worker.currentActivity="building the farm lane";worker.cachedTarget=null;worker.targetRefresh=0}
+    return worker;
+  }
+  function commissionFarmLaneV29(town){
+    if(town.publicWorksV29){toast(town.name+" already has an active public works project.");return}
+    const route=publicWorksRouteV29(town);if(!route.length){toast("No suitable open route remains between the market and farm.");return}
+    const logCost=4,stoneCost=6;if(!testingFreeV29()&&(town.materialStock[1]<logCost||town.materialStock[2]<stoneCost)){toast(town.name+" needs "+logCost+" logs and "+stoneCost+" stone in town stores.");return}
+    if(!testingFreeV29()){town.materialStock[1]-=logCost;town.materialStock[2]-=stoneCost}
+    town.publicWorksV29={type:"farm_lane",cells:route,index:0,work:0,workerId:null,startedDay:dayNo};assignPublicWorkerV29(town);
+    recordVillageEvent(town,"PUBLIC WORKS",town.name+" commissions a stone farm lane from the market toward its fields.",{salience:8,emotion:"resolve"});paintWorld();toast("Public works commissioned. A villager will build the farm lane segment by segment.");saveGame(true);
+  }
+  function finishPublicWorksV29(town){
+    const p=town.publicWorksV29,worker=p&&agents.find(a=>a.id===p.workerId);if(worker){worker.publicWorksV29=null;worker.currentActivity="returning from road work";worker.cachedTarget=null}
+    town.publicWorksV29=null;recordVillageEvent(town,"PUBLIC WORKS",town.name+" completes its farm lane, shortening the daily trip between market and field.",{salience:9,emotion:"pride"});paintWorld();toast(town.name+" completes its farm lane.");saveGame(true);
+  }
+  function currentPublicCellV29(town){const p=town.publicWorksV29;return p&&p.cells[p.index]||null}
+  function stepPublicWorksV29(dt){
+    if(scene!=="world")return;publicWorksSaveClockV29+=dt;
+    for(const town of towns){const p=town.publicWorksV29;if(!p)continue;const worker=assignPublicWorkerV29(town),cell=currentPublicCellV29(town);if(!worker||!cell)continue;
+      const target={x:cell.x*TILE+4,y:cell.y*TILE+4},distance=Math.hypot(worker.x-target.x,worker.y-target.y);worker.currentPlace="publicWorksV29";worker.currentActivity="laying the farm lane";
+      if(distance<18){p.work+=dt*(worker.cls==="builder"?1.25:1)*(engineeringRankV29()>=3?1.25:1);if(p.work>=6){p.work=0;const live={x:cell.x,y:cell.y,key:keyOf(cell.x,cell.y),tile:tiles[cell.y][cell.x]};if(canLayPathV29(live))placeInfrastructureCellV29(live,"path",{free:true,silent:true,townName:town.name});p.index++;worker.cachedTarget=null;worker.targetRefresh=0;if(p.index>=p.cells.length)finishPublicWorksV29(town)}}
+    }
+    if(publicWorksSaveClockV29>12){publicWorksSaveClockV29=0;if(towns.some(t=>t.publicWorksV29))saveGame(true)}
+  }
+  function drawPublicWorksV29(){
+    if(!worldCanvas)return;const w=worldCanvas.getContext("2d");w.save();
+    for(const town of towns){const p=town.publicWorksV29;if(!p)continue;for(let i=p.index;i<Math.min(p.cells.length,p.index+8);i++){const c=p.cells[i],px=c.x*TILE,py=c.y*TILE;w.fillStyle=i===p.index?"#e1c16e":"#9c8051";w.fillRect(px+3,py+3,2,10);w.fillRect(px+11,py+3,2,10);w.fillRect(px+3,py+6,10,1)}}w.restore();
+  }
+
+  const previousPaintWorldV29=paintWorld;
+  paintWorld=function(){const result=previousPaintWorldV29();drawPublicWorksV29();return result};
+  const previousAgentTargetV29=agentTarget;
+  agentTarget=function(a){if(a.publicWorksV29){const town=towns.find(t=>t.name===a.publicWorksV29.townName),cell=town&&currentPublicCellV29(town);if(cell)return {x:cell.x*TILE+4,y:cell.y*TILE+4}}return previousAgentTargetV29(a)};
+  const previousStepAgentsV29=stepAgents;
+  stepAgents=function(dt){const result=previousStepAgentsV29(dt);stepPublicWorksV29(dt);return result};
+  const previousInteractV29=interact;
+  interact=function(){if(useInfrastructureV29())return;return previousInteractV29()};
+  const previousRenderV29=render;
+  render=function(){const result=previousRenderV29();updateInfrastructureHudV29();return result};
+
+  document.addEventListener("keydown",event=>{if(document.activeElement===document.getElementById("dialogueInput"))return;if((event.key==="r"||event.key==="R")&&!event.repeat){event.preventDefault();cycleInfrastructureModeV29()}});
+
+  const previousSnapshotV29=snapshot;
+  snapshot=function(){
+    const data=previousSnapshotV29();data.version=Math.max(INFRASTRUCTURE_VERSION_V29,Number(data.version)||0);data.infrastructureV29={version:INFRASTRUCTURE_VERSION_V29,cells:[...infrastructureCellsV29.values()].map(v=>Object.assign({},v)),towns:towns.map(t=>({name:t.name,project:t.publicWorksV29?JSON.parse(JSON.stringify(t.publicWorksV29)):null}))};return data;
+  };
+  function restoreInfrastructureV29(saved){
+    infrastructureCellsV29=new Map();for(const entry of saved&&saved.cells||[]){if(!entry||!Number.isFinite(entry.x)||!Number.isFinite(entry.y))continue;const key=keyOf(entry.x,entry.y),kind=entry.kind==="bridge"?"bridge":"path";infrastructureCellsV29.set(key,Object.assign({},entry,{kind}));tiles[entry.y][entry.x]=kind==="bridge"?6:5;solid.delete(key)}
+    for(const town of towns){const entry=(saved&&saved.towns||[]).find(v=>v.name===town.name);town.publicWorksV29=entry&&entry.project?JSON.parse(JSON.stringify(entry.project)):null;if(town.publicWorksV29)assignPublicWorkerV29(town)}
+  }
+  const previousApplySaveV29=applySave;
+  applySave=function(data){const result=previousApplySaveV29(data);ensureInfrastructurePlayerV29();restoreInfrastructureV29(data&&data.infrastructureV29);setInfrastructureModeV29("off",true);window.setTimeout(installInfrastructureUIV29,0);paintWorld();return result};
+  const previousSetupGameV29=setupGame;
+  setupGame=function(newSeed,loading=false){infrastructureCellsV29=new Map();const result=previousSetupGameV29(newSeed,loading);ensureInfrastructurePlayerV29();if(!loading)for(const town of towns)town.publicWorksV29=null;window.setTimeout(installInfrastructureUIV29,0);paintWorld();return result};
+
+  const previousRenderHomeTownV29=renderHomeTown;
+  renderHomeTown=function(){
+    previousRenderHomeTownV29();const wrap=document.getElementById("homeTownContent");if(!wrap)return;ensureInfrastructurePlayerV29();const home=towns.find(t=>t.name===(player.homeTownName||towns[0].name))||towns[0],p=home.publicWorksV29;
+    const box=document.createElement("div");box.className="menuCard";let project="No commissioned road project";if(p){const complete=p.index,all=Math.max(1,p.cells.length),worker=agents.find(a=>a.id===p.workerId);project=(worker?worker.firstName:"Awaiting worker")+" · "+complete+" / "+all+" segments"}
+    box.innerHTML='<h3>Infrastructure <span class="infrastructureBadgeV29">TERRAIN SYSTEM</span></h3>'+statLine("Roadwright Tools",entityHasEquipment(player,"engineering")?"Owned":"Buy at a market")+statLine("Player improvements",infrastructureCellsV29.size+" paths and bridges")+statLine("Town public works",project)+(p?'<div class="publicWorksBarV29"><span style="width:'+Math.floor(100*p.index/Math.max(1,p.cells.length))+'%"></span></div>':'')+'<div class="agricultureNoteV26">R cycles build modes. Paths cost stone and improve routing; bridges cross water. Towns can commission a villager-built farm lane using materials from public stores.</div>';
+    const controls=document.createElement("div");controls.className="infrastructureControlsV29";for(const mode of INFRASTRUCTURE_MODES_V29){const button=document.createElement("button");button.className="uibtn mini"+(mode===infrastructureModeV29?" active":"");button.dataset.infrastructureModeV29=mode;button.textContent=mode==="off"?"Build off":mode[0].toUpperCase()+mode.slice(1);button.addEventListener("click",()=>setInfrastructureModeV29(mode));controls.appendChild(button)}
+    const commission=document.createElement("button");commission.className="uibtn";commission.textContent=p?"Farm lane in progress":"Commission farm lane";commission.disabled=!!p;commission.addEventListener("click",()=>{commissionFarmLaneV29(home);renderHomeTown()});controls.appendChild(commission);box.appendChild(controls);wrap.appendChild(box);
+  };
+
+  const help=document.querySelector("#helpTab .helpGrid");if(help&&!document.getElementById("infrastructureHelpV29")){const k=document.createElement("span");k.id="infrastructureHelpV29";k.className="key";k.textContent="R · Infrastructure";const t=document.createElement("span");t.textContent="Cycle between path, bridge, removal, and off. Face a tile and press E / Use. Roadwright Tools are sold at town markets. The Home Town tab can commission a villager-built farm lane.";help.appendChild(k);help.appendChild(t)}
+
+  ensureInfrastructurePlayerV29();installInfrastructureUIV29();paintWorld();
+  window.__egglandsInfrastructureV29={version:INFRASTRUCTURE_VERSION_V29,cells:()=>infrastructureCellsV29,mode:()=>infrastructureModeV29,setMode:setInfrastructureModeV29,place:placeInfrastructureCellV29,commission:commissionFarmLaneV29};
+  const title=document.querySelector("header h1");if(title)title.title="Terrain Manipulation and Infrastructure v29";
+  toast("v29 loaded: build permanent paths and bridges, or commission villagers to construct a farm lane.");
+})();
+<\/script>

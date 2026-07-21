@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0f1218">
+<title>The Egg Lands - Hidden Fish Ecology v23</title>
+<style>
+  html,body{height:100%;margin:0;background:#0f1218;color:#eadfc7;font-family:"Courier New",monospace}
+  body{display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;box-sizing:border-box}
+  #loader{max-width:720px;border:1px solid #354052;background:#1a202a;padding:24px;line-height:1.55}
+  #loader strong{display:block;color:#e2ad45;letter-spacing:2px;margin-bottom:10px}
+  #loader small{color:#a69c87}
+</style>
+</head>
+<body>
+<div id="loader"><strong>THE EGG LANDS - HIDDEN FISH ECOLOGY v23</strong><small>Loading the pinned Economics-RPG build and applying character creation, hidden fish ecology, physical resources, and the testing loadout...</small></div>
+<script>
+(async function(){
+  const BASE_URL="https://raw.githubusercontent.com/RayCarpenterIII/Economics-RPG/305c70fdda6531d6913f31b0ec17ce61b68c4cf3/index.html";
+  const patch=String.raw`
+<style id="character-foundations-v20-style">
+  #classPanel{justify-content:flex-start;padding:18px 16px 40px;gap:10px}
+  #classPanel>h2{margin-top:2px}
+  #identityForm{width:min(850px,100%);display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:9px;text-align:left;background:rgba(26,32,42,.96);border:1px solid var(--line);padding:12px}
+  .identityField{display:flex;flex-direction:column;gap:5px;font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  .identityField input,.identityField select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:9px;font:11px "Courier New",monospace;text-transform:none;letter-spacing:0}
+  .identityField input:focus,.identityField select:focus{border-color:var(--gold);outline:none}
+  #identitySummary{grid-column:1/-1;border-top:1px solid var(--line);padding-top:9px;display:grid;grid-template-columns:minmax(170px,.7fr) minmax(260px,1.3fr);gap:10px;align-items:start}
+  #identitySummary strong{color:var(--gold);font-size:11px;letter-spacing:1px}
+  #identitySummary small{display:block;color:var(--dim);line-height:1.45;margin-top:4px}
+  #identityModifiers{font-size:9px;line-height:1.55;color:var(--ink)}
+  #identityError{grid-column:1/-1;color:var(--bad);font-size:10px;min-height:15px;text-align:center}
+  #classCards{width:min(850px,100%)}
+  #classCards .card{position:relative}
+  #classCards.identityLocked .card{opacity:.58}
+  #classCards.identityLocked .card:after{content:"Complete identity first";position:absolute;inset:auto 6px 6px;background:rgba(15,18,24,.92);border:1px solid var(--line);padding:3px;text-align:center;font-size:8px;color:var(--dim)}
+  .identityBadge{display:inline-block;border:1px solid var(--line);padding:2px 5px;margin:2px 3px 2px 0;color:var(--gold);font-size:9px}
+  @media(max-width:680px){#identityForm{grid-template-columns:1fr}#identitySummary{grid-template-columns:1fr}.card{width:min(100%,320px)}}
+</style>
+<script id="character-foundations-v20-script">
+(function(){
+  "use strict";
+  const PROFILE_VERSION=1;
+  const ANCESTRIES={
+    human:{label:"Human",icon:"●",description:"Adaptable settlers with balanced abilities and broad cultural flexibility.",hp:0,speed:1,attack:0,special:0,defense:0,stamina:5},
+    elf:{label:"Elf",icon:"◇",description:"Long-lived woodland folk with quick movement and a strong affinity for magic.",hp:-1,speed:1.06,attack:0,special:1,defense:0,stamina:0},
+    dwarf:{label:"Dwarf",icon:"◆",description:"Mountain-born builders who endure hard labor and resist physical danger.",hp:2,speed:.94,attack:0,special:0,defense:1,stamina:5},
+    halfling:{label:"Halfling",icon:"○",description:"Small, energetic travelers with exceptional stamina and nimble movement.",hp:-1,speed:1.08,attack:0,special:0,defense:0,stamina:10},
+    goblin:{label:"Goblin",icon:"▲",description:"Ingenious scavengers who move quickly and turn improvised tools into weapons.",hp:0,speed:1.05,attack:1,special:0,defense:0,stamina:5},
+    fey:{label:"Fey-Touched",icon:"✦",description:"Mortals altered by the Fey Wild, carrying subtle magic and unusual grace.",hp:0,speed:1.03,attack:0,special:1,defense:0,stamina:5},
+    dragon:{label:"Dragon-Blooded",icon:"⬢",description:"Rare descendants of ancient wyrms, physically powerful and naturally resilient.",hp:2,speed:.96,attack:1,special:0,defense:1,stamina:0},
+    grung:{label:"Grung",icon:"♣",description:"Amphibious forest folk who are agile, colorful, and unusually attuned to natural magic.",hp:-1,speed:1.07,attack:0,special:1,defense:0,stamina:5},
+    cat:{label:"Catfolk",icon:"♠",description:"Upright magical cats with humanlike hands, fast reflexes, and instinctive spellcraft.",hp:-1,speed:1.09,attack:0,special:1,defense:0,stamina:0}
+  };
+  const DEFAULT_PROFILE={name:"The Wanderer",age:25,ancestry:"human",gender:"Unspecified",customGender:"",identityVersion:PROFILE_VERSION};
+
+  function ageProfile(age){
+    age=Math.max(16,Math.min(100,Number(age)||25));
+    if(age<=24)return {label:"Young adult",speed:1.04,hp:0,attack:0,special:0,defense:0,stamina:8,description:"Quick to recover and eager to learn."};
+    if(age<=49)return {label:"Adult",speed:1,hp:0,attack:0,special:0,defense:0,stamina:0,description:"Balanced physical conditioning and experience."};
+    if(age<=64)return {label:"Mature adult",speed:.97,hp:0,attack:0,special:1,defense:0,stamina:-5,description:"Greater practiced judgment with slightly reduced endurance."};
+    return {label:"Elder",speed:.90,hp:-1,attack:0,special:1,defense:1,stamina:-12,description:"Deep experience and resolve, offset by slower movement."};
+  }
+  function safe(value){return String(value??"").replace(/[&<>\"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]))}
+  function ensureProfile(){
+    if(!player||typeof player!=="object")return;
+    for(const key of Object.keys(DEFAULT_PROFILE))if(player[key]===undefined||player[key]===null)player[key]=DEFAULT_PROFILE[key];
+    if(!ANCESTRIES[player.ancestry])player.ancestry="human";
+    player.age=Math.max(16,Math.min(100,Number(player.age)||25));
+  }
+  function genderLabel(){return player.gender==="Custom"?(player.customGender||"Custom"):player.gender}
+  function combinedBonuses(){
+    ensureProfile();
+    const ancestry=ANCESTRIES[player.ancestry]||ANCESTRIES.human,age=ageProfile(player.age);
+    return {ancestry,age,hp:ancestry.hp+age.hp,speed:ancestry.speed*age.speed,attack:ancestry.attack+age.attack,special:ancestry.special+age.special,defense:ancestry.defense+age.defense,stamina:ancestry.stamina+age.stamina};
+  }
+
+  const originalMods=mods;
+  mods=function(){
+    const base=originalMods(),bonus=combinedBonuses();
+    return Object.assign({},base,{
+      maxHp:Math.max(6,base.maxHp+bonus.hp),
+      speed:base.speed*bonus.speed,
+      attackPower:base.attackPower+bonus.attack,
+      specialBonus:base.specialBonus+bonus.special,
+      defense:base.defense+bonus.defense,
+      maxStamina:Math.max(60,base.maxStamina+bonus.stamina)
+    });
+  };
+
+  const originalSnapshot=snapshot;
+  snapshot=function(){
+    ensureProfile();
+    const data=originalSnapshot();
+    data.version=Math.max(20,Number(data.version)||0);
+    Object.assign(data.player,{name:player.name,age:player.age,ancestry:player.ancestry,gender:player.gender,customGender:player.customGender,identityVersion:PROFILE_VERSION});
+    return data;
+  };
+
+  const originalSetupGame=setupGame;
+  setupGame=function(newSeed,loading=false){
+    const result=originalSetupGame(newSeed,loading);
+    if(!loading)Object.assign(player,DEFAULT_PROFILE);
+    ensureProfile();
+    window.setTimeout(syncFormFromPlayer,0);
+    return result;
+  };
+
+  const originalRenderPlayerStats=renderPlayerStats;
+  renderPlayerStats=function(){
+    originalRenderPlayerStats();
+    if(!selectedClass)return;
+    ensureProfile();
+    const wrap=document.getElementById("statsContent"),hero=wrap&&wrap.querySelector(".statsHero"),grid=hero&&hero.querySelector(".statsGrid"),portrait=hero&&hero.querySelector(".statsPortrait"),heading=hero&&hero.querySelector("h3");
+    const ancestry=ANCESTRIES[player.ancestry]||ANCESTRIES.human,age=ageProfile(player.age);
+    if(portrait)portrait.textContent=ancestry.icon;
+    if(heading)heading.textContent=(player.name||"The Wanderer").toUpperCase()+" - "+selectedClass.toUpperCase()+" - LEVEL "+player.level;
+    if(grid)grid.insertAdjacentHTML("afterbegin",statLine("Ancestry",safe(ancestry.label))+statLine("Age",player.age+" - "+safe(age.label))+statLine("Gender",safe(genderLabel())));
+  };
+
+  function formValues(){
+    const name=(document.getElementById("identityName")?.value||"").trim();
+    const age=Number(document.getElementById("identityAge")?.value||25);
+    const ancestry=document.getElementById("identityAncestry")?.value||"human";
+    const gender=document.getElementById("identityGender")?.value||"Unspecified";
+    const customGender=(document.getElementById("identityCustomGender")?.value||"").trim();
+    return {name,age,ancestry,gender,customGender};
+  }
+  function validateProfile(showError=true){
+    const values=formValues(),errors=[];
+    if(values.name.length<2)errors.push("Enter a character name.");
+    if(!Number.isFinite(values.age)||values.age<16||values.age>100)errors.push("Age must be between 16 and 100.");
+    if(!ANCESTRIES[values.ancestry])errors.push("Choose an ancestry.");
+    if(values.gender==="Custom"&&!values.customGender)errors.push("Describe the custom gender identity.");
+    const error=document.getElementById("identityError");if(error&&showError)error.textContent=errors.join(" ");
+    document.getElementById("classCards")?.classList.toggle("identityLocked",errors.length>0);
+    return errors.length===0;
+  }
+  function applyProfile(){
+    const values=formValues();
+    Object.assign(player,values,{age:Math.round(values.age),identityVersion:PROFILE_VERSION});
+    const m=mods();player.maxHp=m.maxHp;player.hp=Math.min(player.maxHp,Math.max(1,player.hp||player.maxHp));player.stamina=Math.min(m.maxStamina,Math.max(0,player.stamina||m.maxStamina));
+  }
+  function modifierText(value,suffix=""){return value===0?"none":(value>0?"+":"")+value+suffix}
+  function updateIdentitySummary(){
+    const values=formValues(),ancestry=ANCESTRIES[values.ancestry]||ANCESTRIES.human,age=ageProfile(values.age),custom=document.getElementById("identityCustomField");
+    if(custom)custom.style.display=values.gender==="Custom"?"flex":"none";
+    const summary=document.getElementById("identitySummaryText"),modsEl=document.getElementById("identityModifiers");
+    if(summary)summary.innerHTML='<strong>'+ancestry.icon+' '+safe(ancestry.label)+' - '+safe(age.label)+'</strong><small>'+safe(ancestry.description)+' '+safe(age.description)+'</small>';
+    if(modsEl)modsEl.innerHTML='<span class="identityBadge">HP '+modifierText(ancestry.hp+age.hp)+'</span><span class="identityBadge">Speed '+Math.round((ancestry.speed*age.speed-1)*100)+(ancestry.speed*age.speed>=1?"% faster":"%")+'</span><span class="identityBadge">Attack '+modifierText(ancestry.attack+age.attack)+'</span><span class="identityBadge">Magic '+modifierText(ancestry.special+age.special)+'</span><span class="identityBadge">Defense '+modifierText(ancestry.defense+age.defense)+'</span><span class="identityBadge">Stamina '+modifierText(ancestry.stamina+age.stamina)+'</span>';
+    validateProfile(false);
+  }
+  function syncFormFromPlayer(){
+    ensureProfile();
+    const pairs={identityName:player.name,identityAge:player.age,identityAncestry:player.ancestry,identityGender:player.gender,identityCustomGender:player.customGender};
+    for(const [id,value] of Object.entries(pairs)){const element=document.getElementById(id);if(element)element.value=value}
+    updateIdentitySummary();
+  }
+  function installIdentityForm(){
+    const panel=document.getElementById("classPanel"),cards=document.getElementById("classCards");if(!panel||!cards||document.getElementById("identityForm"))return;
+    panel.querySelector("h2").textContent="Create Your Character";
+    const intro=panel.querySelector(".sub");if(intro)intro.textContent="Choose your identity first, then commit to a permanent combat Specialty. Gathering Skills remain open to every character with the right equipment.";
+    const form=document.createElement("div");form.id="identityForm";
+    form.innerHTML='<label class="identityField">Name<input id="identityName" maxlength="28" value="The Wanderer" autocomplete="off"></label><label class="identityField">Age<input id="identityAge" type="number" min="16" max="100" step="1" value="25"></label><label class="identityField">Ancestry<select id="identityAncestry">'+Object.entries(ANCESTRIES).map(([key,value])=>'<option value="'+key+'">'+value.icon+' '+value.label+'</option>').join("")+'</select></label><label class="identityField">Gender<select id="identityGender"><option>Woman</option><option>Man</option><option>Nonbinary</option><option selected>Unspecified</option><option>Custom</option></select></label><label class="identityField" id="identityCustomField" style="display:none;grid-column:1/-1">Custom gender<input id="identityCustomGender" maxlength="32" placeholder="Enter your character identity"></label><div id="identitySummary"><div id="identitySummaryText"></div><div id="identityModifiers"></div></div><div id="identityError"></div>';
+    cards.parentNode.insertBefore(form,cards);
+    for(const id of ["identityName","identityAge","identityAncestry","identityGender","identityCustomGender"]){document.getElementById(id).addEventListener("input",updateIdentitySummary);document.getElementById(id).addEventListener("change",updateIdentitySummary)}
+    const guard=function(event){
+      if(!event.target.closest(".card"))return;
+      if(!validateProfile(true)){event.preventDefault();event.stopImmediatePropagation();return}
+      applyProfile();
+    };
+    cards.addEventListener("click",guard,true);cards.addEventListener("keydown",event=>{if(event.key==="Enter")guard(event)},true);
+    syncFormFromPlayer();
+  }
+
+  ensureProfile();
+  installIdentityForm();
+  const title=document.querySelector("header h1");if(title)title.title="Hidden Fish Ecology v23";
+})();
+<\/script>
+<style id="physical-resources-v21-style">
+  #resourceHudV21{position:absolute;right:8px;top:8px;z-index:8;pointer-events:none;display:none;min-width:155px;max-width:235px;background:rgba(15,18,24,.88);border:1px solid var(--line);padding:7px 9px;text-align:left;font-size:9px;line-height:1.45;color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.32)}
+  #resourceHudV21 strong{display:block;color:var(--gold);font-size:10px;letter-spacing:1px;margin-bottom:2px}
+  #resourceHudV21 .healthy{color:var(--good)}#resourceHudV21 .strained{color:var(--gold)}#resourceHudV21 .depleted{color:var(--bad)}
+  #resourceHudV21 .meter{height:4px;background:#0b0e14;border:1px solid var(--line);margin-top:4px}.resourceMeterFill{height:100%;background:var(--good)}
+  #touchDigV21{border-color:#8b6a41}
+  .earthworksNote{margin-top:8px;color:var(--dim);font-size:9px;line-height:1.45}
+  @media(pointer:coarse) and (orientation:landscape) and (max-height:650px){#resourceHudV21{top:58px;right:8px;opacity:.72;max-width:180px}}
+</style>
+<script id="physical-resources-v21-script">
+(function(){
+  "use strict";
+  const PHYSICAL_RESOURCE_VERSION=2;
+  const DITCH_TILE_V21=16;
+  let physicalFishBodiesV21=[];
+  let fishBodyByTileV21=new Map();
+  let ditchCellsV21=new Map();
+  let resourceEffectsV21=[];
+  let fishJumpsV23=[];
+  let physicalFrameTimeV21=performance.now();
+
+  function ensurePhysicalPlayerV21(){
+    player.equipment=Object.assign({fishing:false,forestry:false,mining:false,hunting:false,digging:false},player.equipment||{});
+    player.lifeSkills=Object.assign({fishing:0,forestry:0,mining:0,hunting:0,digging:0},player.lifeSkills||{});
+  }
+  function installShovelDataV21(){
+    if(!EQUIPMENT.digging)EQUIPMENT.digging={name:"Field Shovel",icon:"Y",price:6};
+    if(!LIFE_SKILLS.digging)LIFE_SKILLS.digging={name:"Earthworks",icon:"▱",material:2,nodes:[
+      ["Strong Back","Dig and refill ditches with less recovery time."],
+      ["Water Reader","Wet ditches are easier to identify and extend."],
+      ["Canal Keeper","Connected ditches retain water through dry ground."]
+    ]};
+    if(!PACK_DEFS.tool_digging)PACK_DEFS.tool_digging={name:"Field Shovel",icon:"Y",w:1,h:3,stack:1};
+  }
+  function waterKeyV21(x,y){return x+","+y}
+  function bodyLabelV21(body){return body.cells.length>70?"Great Water":body.cells.length>24?"Lake":body.cells.length>8?"Pond":"Pool"}
+  function buildFishBodiesV21(savedBodies){
+    physicalFishBodiesV21=[];fishBodyByTileV21=new Map();
+    const visited=new Set(),savedMap=new Map((savedBodies||[]).map(b=>[b.id,b]));
+    const pondX=resourceNodes&&resourceNodes.fishing?Math.floor(resourceNodes.fishing.x/TILE):25;
+    const pondY=resourceNodes&&resourceNodes.fishing?Math.floor(resourceNodes.fishing.y/TILE):5;
+    for(let sy=0;sy<MH;sy++)for(let sx=0;sx<MW;sx++){
+      const start=waterKeyV21(sx,sy);if(visited.has(start)||tiles[sy]?.[sx]!==2)continue;
+      const queue=[[sx,sy]],cells=[];visited.add(start);
+      while(queue.length){
+        const [x,y]=queue.shift();cells.push({x,y});
+        for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+          const nx=x+dx,ny=y+dy,key=waterKeyV21(nx,ny);
+          if(nx<0||ny<0||nx>=MW||ny>=MH||visited.has(key)||tiles[ny]?.[nx]!==2)continue;
+          visited.add(key);queue.push([nx,ny]);
+        }
+      }
+      const ordered=cells.slice().sort((a,b)=>a.y-b.y||a.x-b.x),id=waterKeyV21(ordered[0].x,ordered[0].y);
+      const isPond=cells.some(c=>c.x===pondX&&c.y===pondY);
+      const calculatedMax=isPond?60:Math.max(12,Math.min(180,Math.round(cells.length*1.8)));
+      const saved=savedMap.get(id),savedMax=Number(saved&&saved.max),savedStock=Number(saved&&saved.stock),max=Math.max(1,Number.isFinite(savedMax)?savedMax:calculatedMax);
+      const initialStock=Number.isFinite(savedStock)?savedStock:(isPond&&resourceNodes.fishing?resourceNodes.fishing.stock:max);
+      const body={id,cells,max,stock:Math.max(0,Math.min(max,initialStock)),isPond};
+      body.cx=cells.reduce((n,c)=>n+c.x,0)/cells.length;body.cy=cells.reduce((n,c)=>n+c.y,0)/cells.length;
+      body.jumpClock=rand();
+      physicalFishBodiesV21.push(body);for(const c of cells)fishBodyByTileV21.set(waterKeyV21(c.x,c.y),body);
+    }
+    syncFishingNodeV21();
+  }
+  function syncFishingNodeV21(){
+    const pond=physicalFishBodiesV21.find(b=>b.isPond);if(pond&&resourceNodes&&resourceNodes.fishing){resourceNodes.fishing.max=pond.max;resourceNodes.fishing.stock=pond.stock}
+  }
+  function fishBodyAtV21(x,y){return fishBodyByTileV21.get(waterKeyV21(x,y))||null}
+  function nearbyFishBodyV21(radiusTiles=3){
+    if(scene!=="world")return null;
+    const px=Math.floor((player.x+8)/TILE),py=Math.floor((player.y+8)/TILE);let best=null,bestD=Infinity;
+    for(let y=py-radiusTiles;y<=py+radiusTiles;y++)for(let x=px-radiusTiles;x<=px+radiusTiles;x++){
+      const body=fishBodyAtV21(x,y);if(!body)continue;const d=Math.hypot(x-px,y-py);if(d<bestD){best=body;bestD=d}
+    }
+    return best;
+  }
+  function fishStatusV21(body){
+    const ratio=body.max?body.stock/body.max:0;
+    return ratio<=0?{label:"Depleted",cls:"depleted"}:ratio<.28?{label:"Strained",cls:"strained"}:ratio<.68?{label:"Stable",cls:"strained"}:{label:"Abundant",cls:"healthy"};
+  }
+  function regenerateFishV21(){
+    for(const body of physicalFishBodiesV21){
+      const ratio=body.stock/body.max,base=Math.max(1,Math.round(body.max*.055)),recovery=ratio<.25?Math.max(1,Math.round(base*.6)):base;
+      body.stock=Math.min(body.max,body.stock+recovery);
+    }
+    syncFishingNodeV21();
+  }
+  function refreshDitchWaterV21(){
+    for(const state of ditchCellsV21.values())state.wet=false;
+    const queue=[];
+    for(const [key,state] of ditchCellsV21){
+      const [x,y]=key.split(",").map(Number);
+      const touchesWater=[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>tiles[y+dy]?.[x+dx]===2);
+      if(touchesWater){state.wet=true;queue.push([x,y])}
+    }
+    while(queue.length){
+      const [x,y]=queue.shift();
+      for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+        const key=waterKeyV21(x+dx,y+dy),state=ditchCellsV21.get(key);if(!state||state.wet)continue;
+        state.wet=true;queue.push([x+dx,y+dy]);
+      }
+    }
+  }
+  function drawDitchesOnWorldV21(){
+    if(!worldCanvas)return;refreshDitchWaterV21();const w=worldCanvas.getContext("2d");
+    for(const [key,state] of ditchCellsV21){
+      const [x,y]=key.split(",").map(Number),px=x*TILE,py=y*TILE;
+      w.fillStyle=state.wet?"#294b5b":"#5b452c";w.fillRect(px,py,TILE,TILE);
+      w.fillStyle=state.wet?"#3e7080":"#2e241a";w.fillRect(px+2,py+6,TILE-4,5);
+      w.fillStyle=state.wet?"#79a8b3":"#8b6a41";w.fillRect(px+3,py+7,TILE-6,1);
+      w.fillStyle="#2a3f32";w.fillRect(px,py,2,TILE);w.fillRect(px+TILE-2,py,2,TILE);
+    }
+  }
+  function facingTileV21(){
+    const reach=21,x=Math.floor((player.x+8+player.face.x*reach)/TILE),y=Math.floor((player.y+8+player.face.y*reach)/TILE);return {x,y,key:waterKeyV21(x,y)};
+  }
+  function canDigTileV21(x,y){
+    if(x<1||y<1||x>=MW-1||y>=MH-1)return false;
+    if(insideTownBounds(x*TILE,y*TILE,0))return false;
+    return [0,11,12,13,14,15].includes(tiles[y]?.[x]);
+  }
+  function digDitchV21(){
+    if(scene!=="world"||!selectedClass)return false;
+    ensurePhysicalPlayerV21();if(!entityHasEquipment(player,"digging"))return false;
+    const target=facingTileV21(),existing=ditchCellsV21.get(target.key);
+    if(existing){
+      tiles[target.y][target.x]=existing.originalTile;ditchCellsV21.delete(target.key);solid.delete(target.key);refreshDitchWaterV21();paintWorld();
+      player.harvestAnim=.28;player.harvestKind="mining";playSfx("mine");toast("You refill the ditch and level the ground.");saveGame(true);return true;
+    }
+    if(!canDigTileV21(target.x,target.y)){toast("Face open meadow, forest floor, wetland, or scrub to dig a ditch.");return true}
+    ditchCellsV21.set(target.key,{originalTile:tiles[target.y][target.x],wet:false,dugDay:dayNo});tiles[target.y][target.x]=DITCH_TILE_V21;solid.delete(target.key);
+    refreshDitchWaterV21();paintWorld();player.harvestAnim=.32;player.harvestKind="mining";playSfx("mine");
+    const cx=target.x*TILE+8,cy=target.y*TILE+8;for(let i=0;i<7;i++)particles.push({scene:"world",x:cx,y:cy,vx:(rand()-.5)*36,vy:(rand()-.5)*36,life:.32,color:"#8b6a41"});
+    const state=ditchCellsV21.get(target.key);gainPlayerXP(1,"earthworks");toast(state.wet?"Ditch dug. Water flows into the new channel.":"Ditch dug. Connect it to water to create an irrigation channel.");updateUI();saveGame(true);return true;
+  }
+  function spawnResourceEffectV21(type,target){
+    const cx=target.x*TILE+8,cy=target.y*TILE+8,dx=cx-(player.x+8),dy=cy-(player.y+8),d=Math.max(1,Math.hypot(dx,dy));
+    if(type==="tree")resourceEffectsV21.push({type,x:cx,y:cy,t:0,duration:.95,dx:dx/d,dy:dy/d});
+    else{
+      const fragments=Array.from({length:9},(_,i)=>{const angle=(Math.PI*2*i/9)+(rand()-.5)*.45,speed=12+rand()*26;return {angle,speed,size:2+Math.floor(rand()*3)}});
+      resourceEffectsV21.push({type:"rock",x:cx,y:cy,t:0,duration:.72,fragments});
+    }
+  }
+  function visibleWaterCellsV23(body){
+    const left=Math.floor(camera.x/TILE)-1,right=Math.ceil((camera.x+viewW())/TILE)+1,top=Math.floor(camera.y/TILE)-1,bottom=Math.ceil((camera.y+viewH())/TILE)+1;
+    return body.cells.filter(cell=>cell.x>=left&&cell.x<=right&&cell.y>=top&&cell.y<=bottom);
+  }
+  function spawnFishJumpV23(body){
+    const visible=visibleWaterCellsV23(body);if(!visible.length)return;
+    const cell=visible[Math.floor(rand()*visible.length)];
+    fishJumpsV23.push({x:cell.x*TILE+4+rand()*8,y:cell.y*TILE+7+rand()*5,t:0,duration:.68+rand()*.22,dir:rand()<.5?-1:1,size:rand()<.22?2:1});
+    if(fishJumpsV23.length>28)fishJumpsV23.shift();
+  }
+  function stepResourceEffectsV21(dt){
+    for(const effect of resourceEffectsV21)effect.t+=dt;
+    resourceEffectsV21=resourceEffectsV21.filter(effect=>effect.t<effect.duration);
+    for(const jump of fishJumpsV23)jump.t+=dt;
+    fishJumpsV23=fishJumpsV23.filter(jump=>jump.t<jump.duration);
+    if(scene!=="world")return;
+    for(const body of physicalFishBodiesV21){
+      const ratio=body.max?body.stock/body.max:0;if(ratio<=.01)continue;
+      const sizeFactor=Math.min(1.55,.45+Math.sqrt(body.cells.length)/11);
+      const jumpsPerSecond=.025+Math.pow(ratio,1.65)*1.05*sizeFactor;
+      body.jumpClock=(body.jumpClock||0)+dt*jumpsPerSecond;
+      if(body.jumpClock>=1){body.jumpClock-=1;spawnFishJumpV23(body)}
+    }
+  }
+  function drawResourceEffectsV21(){
+    if(scene!=="world")return;const vw=viewW(),vh=viewH(),now=performance.now()/1000;
+    ctx.save();ctx.scale(worldZoom,worldZoom);
+    for(const jump of fishJumpsV23){
+      const p=Math.min(1,jump.t/jump.duration),sx=jump.x-camera.x+jump.dir*(p-.5)*9,waterY=jump.y-camera.y,sy=waterY-Math.sin(Math.PI*p)*(7+2*jump.size);
+      if(sx<-12||waterY<-12||sx>vw+12||waterY>vh+12)continue;
+      ctx.globalAlpha=Math.min(1,Math.min(p/.12,(1-p)/.12));
+      ctx.fillStyle="#d5eef0";
+      ctx.fillRect(Math.round(sx-2*jump.dir),Math.round(sy-1),4*jump.dir,2);
+      ctx.fillRect(Math.round(sx-3*jump.dir),Math.round(sy),jump.dir,1);
+      ctx.fillStyle="#8fc5d2";ctx.fillRect(Math.round(sx+jump.dir),Math.round(sy-1),1,1);
+      ctx.fillStyle="rgba(176,222,232,.65)";
+      if(p<.16||p>.84){ctx.fillRect(Math.round(sx-4),Math.round(waterY),3,1);ctx.fillRect(Math.round(sx+2),Math.round(waterY+1),3,1)}
+    }
+    ctx.globalAlpha=1;
+    for(const effect of resourceEffectsV21){
+      const p=Math.min(1,effect.t/effect.duration),alpha=1-Math.max(0,(p-.72)/.28),sx=effect.x-camera.x,sy=effect.y-camera.y;
+      ctx.globalAlpha=alpha;
+      if(effect.type==="tree"){
+        const eased=1-Math.pow(1-p,3),length=8+eased*24,tx=sx+effect.dx*length,ty=sy+effect.dy*length;
+        ctx.strokeStyle="rgba(25,20,14,.35)";ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(sx+2,sy+3);ctx.lineTo(tx+3,ty+5);ctx.stroke();
+        ctx.strokeStyle="#5b3b24";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(tx,ty);ctx.stroke();
+        ctx.fillStyle="#315b38";ctx.beginPath();ctx.arc(tx,ty,7-p*2,0,Math.PI*2);ctx.fill();ctx.fillStyle="#46764c";ctx.fillRect(tx-3,ty-4,6,3);
+        ctx.fillStyle="#8b6a41";ctx.fillRect(sx-2,sy-2,4,4);ctx.lineWidth=1;
+      }else{
+        for(const frag of effect.fragments){
+          const travel=frag.speed*p,fx=sx+Math.cos(frag.angle)*travel,fy=sy+Math.sin(frag.angle)*travel+p*p*9;
+          ctx.fillStyle=p<.55?"#858b91":"#555c63";ctx.fillRect(Math.round(fx),Math.round(fy),frag.size,frag.size);
+        }
+      }
+    }
+    ctx.globalAlpha=1;ctx.restore();
+  }
+  function installResourceHudV21(){
+    const stage=document.getElementById("stage");if(!stage||document.getElementById("resourceHudV21"))return;
+    const hud=document.createElement("div");hud.id="resourceHudV21";stage.appendChild(hud);
+  }
+  function updateResourceHudV21(){
+    const hud=document.getElementById("resourceHudV21");if(!hud)return;
+    const target=facingTileV21(),ditch=ditchCellsV21.get(target.key);
+    if(scene!=="world"||!ditch){hud.style.display="none";return}
+    hud.style.display="block";
+    hud.innerHTML='<strong>EARTHWORKS</strong><span class="'+(ditch.wet?'healthy':'strained')+'">Facing a '+(ditch.wet?'water-filled irrigation ditch':'dry ditch')+'. Use again to refill it.</span>';
+  }
+  function restorePhysicalStateV21(saved){
+    buildFishBodiesV21(saved&&saved.fishBodies);
+    ditchCellsV21=new Map();
+    for(const entry of saved&&saved.ditches||[]){
+      const key=entry.key,[x,y]=key.split(",").map(Number);if(x<0||y<0||x>=MW||y>=MH)continue;
+      ditchCellsV21.set(key,{originalTile:Number.isFinite(entry.originalTile)?entry.originalTile:0,wet:false,dugDay:entry.dugDay||dayNo});tiles[y][x]=DITCH_TILE_V21;solid.delete(key);
+    }
+    refreshDitchWaterV21();paintWorld();
+  }
+  function installHelpAndTouchV21(){
+    const help=document.querySelector("#helpTab .helpGrid");
+    if(help&&!document.getElementById("earthworksHelpV21")){
+      const key=document.createElement("span");key.className="key";key.id="earthworksHelpV21";key.textContent="Shovel + E / Use";
+      const text=document.createElement("span");text.textContent="Buy a Field Shovel at a market. Face open ground and use it to dig a ditch; connect ditch tiles to water for visible irrigation flow. Use the shovel on a ditch again to refill it.";
+      help.insertBefore(key,help.children[4]||null);help.insertBefore(text,key.nextSibling);
+      const resourceKey=[...help.children].find(el=>el.classList&&el.classList.contains("key")&&el.textContent.trim()==="Resources");
+      if(resourceKey&&resourceKey.nextElementSibling)resourceKey.nextElementSibling.textContent="Buy the appropriate tool at a market. Fish from any shoreline or water tile; no marked fishing spot is required. Trees fall into stumps when felled, and rocks collapse into rubble when broken.";
+    }
+    const touchSpec=document.getElementById("touchSpec");
+    if(touchSpec&&!document.getElementById("touchDigV21")){
+      const button=document.createElement("button");button.className="pad round";button.id="touchDigV21";button.textContent="Dig";button.addEventListener("click",()=>{if(!digDitchV21())toast("Buy a Field Shovel at a town market first.")});touchSpec.parentNode.insertBefore(button,touchSpec);
+    }
+  }
+
+  installShovelDataV21();ensurePhysicalPlayerV21();resourceLandmarks=resourceLandmarks.filter(site=>site.tile!==2);buildFishBodiesV21();installResourceHudV21();installHelpAndTouchV21();
+
+  const originalSetupGameV21=setupGame;
+  setupGame=function(newSeed,loading=false){
+    const result=originalSetupGameV21(newSeed,loading);ensurePhysicalPlayerV21();resourceLandmarks=resourceLandmarks.filter(site=>site.tile!==2);ditchCellsV21=new Map();resourceEffectsV21=[];fishJumpsV23=[];buildFishBodiesV21();window.setTimeout(()=>{installResourceHudV21();installHelpAndTouchV21();paintWorld()},0);return result;
+  };
+  const originalPaintWorldV21=paintWorld;
+  paintWorld=function(){const result=originalPaintWorldV21();drawDitchesOnWorldV21();return result};
+  paintWorld();
+
+  const originalGatherNearbyV21=gatherNearby;
+  gatherNearby=function(){
+    const target=findGatherTarget(),body=target&&target.def&&target.def.index===0?fishBodyAtV21(target.x,target.y):null;
+    if(body&&body.stock<1){toast(bodyLabelV21(body)+" has been fished out. Its population will recover over future days.");return true}
+    const fishBefore=player.materials[0]||0,tileBefore=target&&tiles[target.y]?.[target.x],result=originalGatherNearbyV21();
+    if(target&&tileBefore===1&&tiles[target.y]?.[target.x]===9)spawnResourceEffectV21("tree",target);
+    if(target&&tileBefore===4&&tiles[target.y]?.[target.x]===10)spawnResourceEffectV21("rock",target);
+    if(body){
+      const gained=Math.max(0,(player.materials[0]||0)-fishBefore);if(gained){const allowed=Math.min(gained,Math.floor(body.stock));if(allowed<gained)player.materials[0]-=(gained-allowed);body.stock=Math.max(0,body.stock-allowed);syncFishingNodeV21();updateUI()}
+    }
+    return result;
+  };
+
+  const NPC_GATHER_EFFORT_V23={fishing:10,forestry:18,mining:24,hunting:15,digging:20};
+  const NPC_GATHER_YIELD_V23={fishing:.10,forestry:.14,mining:.12,hunting:.12,digging:.10};
+  agentGatherTick=function(a,dt){
+    const skill=a.gatherSkill,node=skill&&resourceNodes[skill];if(!node)return;
+    const rank=lifeRank(a,skill),effort=Math.max(8,(NPC_GATHER_EFFORT_V23[skill]||18)*(1-rank*.06));
+    a.gatherTick=(a.gatherTick||0)+dt;
+    const workName=skill==="forestry"?"working through a tree":skill==="mining"?"chipping slowly at stone":skill==="fishing"?"waiting patiently for a catch":"carefully gathering in the wild";
+    a.currentActivity=workName;
+    if(a.gatherTick<effort)return;
+    a.gatherTick=0;const idx=node.index;
+    if(node.stock<=.1){
+      a.currentActivity="finding "+node.label+" picked bare";
+      if(node.exhaustedDay!==dayNo){node.exhaustedDay=dayNo;recordVillageEvent(a.town,"SHORTAGE","Gatherers report "+node.label+" is nearly exhausted; it needs time to recover.",{actorId:a.id,salience:7})}
+      return;
+    }
+    const take=Math.min(node.stock,(NPC_GATHER_YIELD_V23[skill]||.11)+rank*.02);
+    node.stock-=take;a.town.materialStock[idx]+=take;gainAgentXP(a,.18);
+    particles.push({scene:"world",x:node.x+(rand()-.5)*16,y:node.y+(rand()-.5)*12,vx:(rand()-.5)*22,vy:-9-rand()*10,life:.28,color:["#83b9d7","#8e6842","#b8b7b1","#c98f6a"][idx]});
+  };
+
+  const originalInteractV21=interact;
+  interact=function(){
+    if(!selectedClass)return;
+    if(activePanel){closePanels();return}
+    if(scene==="shop"){if(Math.hypot(player.x-currentShop.exit.x,player.y-currentShop.exit.y)<30){leaveShop();return}if(Math.hypot(player.x-currentShop.bench.x,player.y-currentShop.bench.y)<38){openMenu("crafting");return}toast("The displays are beautiful, but the crafting bench is at the front of the shop.");return}
+    if(scene!=="world"){if(Math.hypot(player.x-dungeon.entry.x,player.y-dungeon.entry.y)<25){leaveDungeon();return}if(Math.hypot(player.x-dungeon.chest.x,player.y-dungeon.chest.y)<28){openDungeonChest();return}toast("The mine answers only with dripping stone.");return}
+    if(Math.hypot(player.x-dungeon.entrance.x,player.y-dungeon.entrance.y)<30){enterDungeon();return}
+    for(const town of towns){const shop=town.shops.find(s=>Math.hypot(player.x-s.x,player.y-s.y)<18);if(shop){enterShop(town,shop);return}if(Math.hypot(player.x-town.marketPoint.x,player.y-town.marketPoint.y)<28){openMarket(town);return}if(Math.hypot(player.x-town.plot.x,player.y-town.plot.y)<30){openBuild(town);return}}
+    const a=nearestAgent();if(a){openDialogue(a);return}const c=caravans.find(c=>Math.hypot(c.x-player.x,c.y-player.y)<28);if(c){toast(c.from.name+" caravan: "+c.qty+" "+GOODS[c.good]+" bound for "+c.to.name+".");return}
+    if(entityHasEquipment(player,"digging")){const digTarget=facingTileV21();if(ditchCellsV21.has(digTarget.key)||canDigTileV21(digTarget.x,digTarget.y)){if(digDitchV21())return}}
+    if(gatherNearby())return;toast(entityHasEquipment(player,"digging")?"Face open ground to dig, or approach something that can be used.":"Nothing here needs your attention.");
+  };
+
+  const originalNewDayV21=newDay;
+  newDay=function(){const result=originalNewDayV21();regenerateFishV21();refreshDitchWaterV21();paintWorld();return result};
+  const originalTerrainMoveFactorV21=terrainMoveFactor;
+  terrainMoveFactor=function(tile){return tile===DITCH_TILE_V21?.62:originalTerrainMoveFactorV21(tile)};
+
+  const originalSnapshotV21=snapshot;
+  snapshot=function(){
+    const data=originalSnapshotV21();data.version=Math.max(23,Number(data.version)||0);data.physicalResources={version:PHYSICAL_RESOURCE_VERSION,fishBodies:physicalFishBodiesV21.map(b=>({id:b.id,stock:b.stock,max:b.max})),ditches:[...ditchCellsV21.entries()].map(([key,state])=>({key,originalTile:state.originalTile,dugDay:state.dugDay}))};return data;
+  };
+  const originalApplySaveV21=applySave;
+  applySave=function(data){const result=originalApplySaveV21(data);ensurePhysicalPlayerV21();restorePhysicalStateV21(data&&data.physicalResources);installResourceHudV21();installHelpAndTouchV21();return result};
+
+  const originalRenderV21=render;
+  render=function(){originalRenderV21();drawResourceEffectsV21();updateResourceHudV21()};
+  const originalFrameV21=frame;
+  frame=function(now){const dt=Math.min(.05,Math.max(0,(now-physicalFrameTimeV21)/1000));physicalFrameTimeV21=now;stepResourceEffectsV21(dt);return originalFrameV21(now)};
+
+  const originalRenderMenuMapV21=renderMenuMap;
+  renderMenuMap=function(){originalRenderMenuMapV21()};
+  const originalRenderPlayerStatsV21=renderPlayerStats;
+  renderPlayerStats=function(){
+    originalRenderPlayerStatsV21();if(!selectedClass)return;const wrap=document.getElementById("statsContent"),wet=[...ditchCellsV21.values()].filter(d=>d.wet).length;
+    if(wrap)wrap.insertAdjacentHTML("beforeend",'<div class="menuCard"><h3>World interaction</h3>'+statLine("Field Shovel",entityHasEquipment(player,"digging")?"Owned":"Buy at a market")+statLine("Ditches",ditchCellsV21.size+" total - "+wet+" carrying water")+'<div class="earthworksNote">Trees fall when felled, rocks collapse when broken, fish ecology runs invisibly in each connected body of water, and shovel-dug channels can carry water.</div></div>');
+  };
+
+  const title=document.querySelector("header h1");if(title)title.title="Hidden Fish Ecology v23";
+  toast("Hidden fish ecology loaded: fish populations remain simulated, jumps reveal abundance naturally, and villagers gather slowly.");
+})();
+<\/script>
+<style id="testing-start-v22-style">
+  #testingStartV22{grid-column:1/-1;border:1px solid var(--line);background:rgba(32,39,53,.7);padding:10px;display:grid;grid-template-columns:minmax(210px,.8fr) minmax(260px,1.2fr);gap:10px;align-items:center}
+  #testingStartButtonV22{width:100%;min-height:46px;border-color:var(--gold);font-weight:bold}
+  #testingStartButtonV22.enabled{background:#5a4925;color:#fff1b8;box-shadow:0 0 0 1px rgba(226,173,69,.35) inset}
+  #testingStartDetailsV22{font-size:9px;line-height:1.5;color:var(--dim);text-align:left}
+  #testingStartDetailsV22 strong{color:var(--gold);display:block;margin-bottom:3px;letter-spacing:1px}
+  .testingBadgeV22{display:inline-block;border:1px solid var(--gold);color:var(--gold);padding:2px 5px;margin-left:6px;font-size:8px;vertical-align:middle}
+  @media(max-width:680px){#testingStartV22{grid-template-columns:1fr}}
+</style>
+<script id="testing-start-v22-script">
+(function(){
+  "use strict";
+  const TESTING_START_VERSION_V22=1;
+  let testingStartSelectedV22=false;
+
+  function setGodModeV22(enabled){
+    godMode=!!enabled;
+    const toggle=document.getElementById("godModeToggle");if(toggle)toggle.checked=godMode;
+    if(typeof updateGodModeVisibility==="function")updateGodModeVisibility();
+  }
+  function ensureTestingGearV22(key){
+    player.gearInventory=Array.isArray(player.gearInventory)?player.gearInventory:[];
+    let item=player.gearInventory.find(entry=>entry&&entry.key===key);
+    if(!item){item={uid:nextGearUid(),key,craftedDay:dayNo,testing:true};player.gearInventory.push(item)}
+    return item;
+  }
+  function equipTestingGearV22(slot,key){
+    const item=ensureTestingGearV22(key);player.equippedSlots[slot]=item.uid;
+  }
+  function updateTestingButtonV22(){
+    const button=document.getElementById("testingStartButtonV22"),details=document.getElementById("testingStartDetailsV22");
+    const enabled=testingStartSelectedV22||!!player.testingGodModeV22;
+    if(button){button.classList.toggle("enabled",enabled);button.textContent=enabled?"TESTING GOD MODE: ENABLED":"ENABLE TESTING GOD MODE";button.setAttribute("aria-pressed",String(enabled))}
+    if(details)details.innerHTML=enabled?'<strong>TEST LOADOUT ARMED</strong>Choose a Specialty to receive every gathering tool, maximum gathering skills, top equipment, abundant materials, expanded storage, invulnerability, and the existing God Mode inspector.':'<strong>OPTIONAL TEST START</strong>Use this for development testing. Normal characters retain the standard economy, progression, tools, and danger.';
+  }
+  function grantTestingLoadoutV22(silent=false){
+    if(!selectedClass){testingStartSelectedV22=true;setGodModeV22(true);updateTestingButtonV22();return false}
+    player.testingGodModeV22=true;player.testingStartVersion=TESTING_START_VERSION_V22;testingStartSelectedV22=true;setGodModeV22(true);
+    player.backpackCols=Math.max(16,player.backpackCols||8);player.backpackRows=Math.max(12,player.backpackRows||5);
+    player.capacity=999;player.materialCapacity=999;player.coins=Math.max(9999,Number(player.coins)||0);player.relics=Math.max(99,Number(player.relics)||0);
+    player.level=Math.max(20,Number(player.level)||1);player.xp=0;player.specialtyPoints=99;player.skillPoints=99;
+    player.cargo=[12,12,12,12];player.materials=[30,30,30,30];
+    player.equipment=player.equipment||{};player.lifeSkills=player.lifeSkills||{};
+    Object.keys(EQUIPMENT).forEach(key=>player.equipment[key]=true);
+    Object.keys(LIFE_SKILLS).forEach(key=>player.lifeSkills[key]=3);
+    for(let branch=0;branch<3;branch++)for(let tier=0;tier<3;tier++)purchased.add(branch+","+tier);
+    Object.keys(GEAR_DEFS).forEach(ensureTestingGearV22);
+    player.equippedSlots=Object.assign({helmet:null,shield:null,weapon:null,gauntlets:null,pants:null,amulet:null,ring:null},player.equippedSlots||{});
+    equipTestingGearV22("helmet","spellweave_hood");
+    equipTestingGearV22("shield","tower_shield");
+    equipTestingGearV22("weapon",selectedClass==="mage"?"runed_staff":selectedClass==="noble"?"court_rapier":"iron_sword");
+    equipTestingGearV22("gauntlets","iron_gauntlets");
+    equipTestingGearV22("pants","courtly_pants");
+    equipTestingGearV22("amulet","moon_amulet");
+    equipTestingGearV22("ring","signet_ring");
+    roadSafety=100;
+    const m=mods();player.maxHp=m.maxHp;player.hp=player.maxHp;player.stamina=m.maxStamina;player.guardBroken=0;player.hurt=0;
+    updateTestingButtonV22();updateUI();
+    if(typeof renderInventory==="function"&&document.getElementById("inventoryTab")?.classList.contains("active"))renderInventory();
+    if(typeof renderPlayerStats==="function"&&document.getElementById("statsTab")?.classList.contains("active"))renderPlayerStats();
+    if(!silent)toast("Testing God Mode enabled: every tool, maximum skills, top gear, full resources, and invulnerability granted.");
+    saveGame(true);return true;
+  }
+  function installTestingStartV22(){
+    const form=document.getElementById("identityForm"),cards=document.getElementById("classCards");if(!form||!cards||document.getElementById("testingStartV22"))return;
+    const panel=document.createElement("div");panel.id="testingStartV22";
+    panel.innerHTML='<button class="uibtn" id="testingStartButtonV22" type="button" aria-pressed="false">ENABLE TESTING GOD MODE</button><div id="testingStartDetailsV22"></div>';
+    const error=document.getElementById("identityError");form.insertBefore(panel,error||null);
+    document.getElementById("testingStartButtonV22").addEventListener("click",()=>{
+      testingStartSelectedV22=!testingStartSelectedV22;player.testingGodModeV22=false;setGodModeV22(testingStartSelectedV22);updateTestingButtonV22();
+      toast(testingStartSelectedV22?"Testing start armed. Choose a Specialty to receive the complete test loadout.":"Testing start disabled. This character will use normal progression.");
+    });
+    const afterChoice=event=>{if(!event.target.closest(".card")||!testingStartSelectedV22)return;window.setTimeout(()=>grantTestingLoadoutV22(false),0)};
+    cards.addEventListener("click",afterChoice);cards.addEventListener("keydown",event=>{if(event.key==="Enter")afterChoice(event)});
+    updateTestingButtonV22();
+  }
+
+  const originalHurtPlayerV22=hurtPlayer;
+  hurtPlayer=function(amount,source=null){
+    if(player.testingGodModeV22&&godMode){player.hp=player.maxHp;player.stamina=mods().maxStamina;player.hurt=0;return}
+    return originalHurtPlayerV22(amount,source);
+  };
+  const originalSetupGameV22=setupGame;
+  setupGame=function(newSeed,loading=false){
+    const result=originalSetupGameV22(newSeed,loading);
+    if(!loading){testingStartSelectedV22=false;player.testingGodModeV22=false;player.testingStartVersion=0;setGodModeV22(false)}
+    window.setTimeout(installTestingStartV22,0);return result;
+  };
+  const originalSnapshotV22=snapshot;
+  snapshot=function(){
+    const data=originalSnapshotV22();data.version=Math.max(22,Number(data.version)||0);data.player.testingGodModeV22=!!player.testingGodModeV22;data.player.testingStartVersion=player.testingStartVersion||0;return data;
+  };
+  const originalApplySaveV22=applySave;
+  applySave=function(data){
+    const result=originalApplySaveV22(data),enabled=!!(data&&data.player&&data.player.testingGodModeV22);player.testingGodModeV22=enabled;player.testingStartVersion=enabled?(data.player.testingStartVersion||1):0;testingStartSelectedV22=enabled;
+    if(enabled)grantTestingLoadoutV22(true);setGodModeV22(enabled||godMode);window.setTimeout(installTestingStartV22,0);return result;
+  };
+  const originalRenderPlayerStatsV22=renderPlayerStats;
+  renderPlayerStats=function(){
+    originalRenderPlayerStatsV22();if(!selectedClass||!player.testingGodModeV22)return;const hero=document.querySelector("#statsContent .statsHero h3");if(hero&&!hero.querySelector(".testingBadgeV22"))hero.insertAdjacentHTML("beforeend",'<span class="testingBadgeV22">TEST GOD MODE</span>');
+  };
+
+  installTestingStartV22();
+  const title=document.querySelector("header h1");if(title)title.title="Hidden Fish Ecology v23";
+  toast("Hidden Fish Ecology v23 loaded. Enable the testing start during character creation for the complete development loadout.");
+})();
+<\/script>`.replaceAll("<\\/script>","<"+"/script>");
+
+  try{
+    const response=await fetch(BASE_URL,{cache:"no-store"});
+    if(!response.ok)throw new Error("GitHub returned "+response.status+" "+response.statusText);
+    let html=await response.text();
+    html=html.replace(/<title>The Egg Lands<\/title>/,'<title>The Egg Lands - Hidden Fish Ecology v23<\/title>');
+    if(!html.includes("</body>"))throw new Error("The pinned game build is malformed.");
+    html=html.replace("</body>",patch+"\n</body>");
+    document.open();document.write(html);document.close();
+  }catch(error){
+    document.getElementById("loader").innerHTML='<strong>THE EGG LANDS - v23</strong><small>This intermediate build could not retrieve its pinned base game. Connect to the internet and reopen the HTML.<br><br>'+String(error&&error.message||error)+'</small>';
+  }
+})();
+</script>
+</body>
+</html>

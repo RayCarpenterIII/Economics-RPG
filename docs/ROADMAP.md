@@ -1,41 +1,61 @@
-# Roadmap
+# Development Roadmap
 
-## Phase 0 — Foundation (done)
+## Current visual migration
 
-- [x] Single-file game: valley, three towns, dungeon, combat, gathering, crafting, grid inventory, skill trees, quests.
-- [x] Deterministic living-world simulation: Cobb-Douglas markets, needs, traits, memories, rumors, relationships, households, councils, public Chronicle.
-- [x] Bounded LLM planner for household plans and council policy.
-- [x] Swappable local backends: OpenAI-compatible servers (Ollama / LM Studio / llama.cpp / vLLM) and in-browser WebLLM.
-- [x] Mobile touch HUD + PWA manifest; LAN play from a phone.
+- [x] Preserve 16-unit simulation grid
+- [x] Establish 32-pixel art contract
+- [x] Add 16:9 presentation foundation
+- [x] Add foot-anchored larger procedural characters
+- [x] Add compact colliders and depth sorting
+- [x] Add foreground roofs and tree canopies
+- [x] Add lighting, atmosphere, and asset metadata
+- [ ] Split the composed build into source modules
+- [ ] Produce authored terrain and character sprite sheets
+- [ ] Add texture atlases and chunk caching
+- [ ] Add multi-layer building and interior assets
+- [ ] Add weather and advanced water rendering
+- [ ] Evaluate WebGL/Pixi after Canvas parity
 
-## Phase 1 — LLM dialogue with real grounding
+## Deeper production chains
 
-- [ ] Route the free-text NPC conversation box through the local LLM, with the villager's traits, needs, memories, rumors, and relationship to the player injected as context.
-- [ ] Strict output contract (say / offer / refuse) so dialogue can never mutate state directly.
-- [ ] Per-villager voice: derive a compact persona block (bias, speech style) from traits + class + history.
-- [ ] Dialogue memory: conversations become event memories the villager can reference later.
+- [x] Raw and intermediate workshop inventory
+- [x] Timed batches and assigned workers
+- [x] Basic production bottlenecks and price effects
+- [ ] Villager-owned tools
+- [ ] Tool durability and repair
+- [ ] Item and batch quality
+- [ ] Workshop specialization and upgrades
+- [ ] More explicit hauling between workplaces
+- [ ] Business ownership, wages, and profits
 
-## Phase 2 — Persona documents and self-update
+## Housing and settlement expansion
 
-- [ ] Persistent per-NPC persona document (bias, reflections, desires, relationship summaries).
-- [ ] Nightly reflection pass: the LLM consolidates the day's memories into short reflections and may propose bounded edits to its own persona.
-- [ ] Validation layer for self-edits (size caps, schema, no game-state claims).
-- [ ] Persona persistence in save files; export/import a villager.
+- [ ] Physical house-construction projects
+- [ ] Ownership and rent
+- [ ] Homelessness and overcrowding
+- [ ] Family housing requests
+- [ ] Residential, commercial, agricultural, and civic zoning
+- [ ] Roads expanding toward new structures
+- [ ] Migration and population growth constrained by food and housing
+- [ ] Utility-based residential selection
 
-## Phase 3 — Depth and scale
+## Diplomacy, territory, and warfare
 
-- [ ] Priority scheduler: budget LLM calls across the population (important villagers and on-screen villagers think more often; everyone gets a turn).
-- [ ] Life-cycle depth: aging, apprenticeship outcomes, inheritance, migration between towns driven by utility gaps.
-- [ ] Player base-building: found and grow a settlement that real villagers choose to migrate to.
-- [ ] Larger populations via simulation LOD (full sim near player, statistical sim far away).
+- [ ] Trade agreements
+- [ ] Alliances and rivalries
+- [ ] Tribute and demands
+- [ ] Territorial borders and claims
+- [ ] Patrols and border incidents
+- [ ] Supply-dependent raids
+- [ ] Sieges and settlement capture
+- [ ] Peace negotiations
+- [ ] Refugees and postwar migration
 
-## Phase 4 — Packaging
+## NPC minds already established
 
-- [ ] Proper PWA offline support (service worker) and installability polish.
-- [ ] Optional desktop shell (Tauri) bundling a llama.cpp server so "download and play" needs zero setup.
-- [ ] Optional mobile wrapper (Capacitor) with an on-device inference option for capable phones.
-
-## Non-goals
-
-- Cloud LLM dependencies, accounts, or telemetry.
-- Letting any language model bypass the deterministic simulation's validation.
+- [x] Long-term goals and risk tolerance
+- [x] Emotional memories and moods
+- [x] Player and government opinions
+- [x] Friendship, grudges, loyalty, romance, and factions
+- [x] Grounded deterministic conversation
+- [x] Optional fact-constrained local-LLM phrasing
