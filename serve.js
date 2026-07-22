@@ -7,6 +7,7 @@
  *                            Wi-Fi can play (the phone URL is printed at start)
  *   node serve.js --dev      load separate source files for easier debugging
  *   node serve.js --port N   use a different port
+ *   node serve.js --password X  require password X to play (or set GAME_PASSWORD)
  *   node serve.js --no-open  do not open a browser window
  */
 "use strict";
@@ -22,6 +23,8 @@ const dev = args.includes("--dev");
 const noOpen = args.includes("--no-open");
 const portIdx = args.indexOf("--port");
 const port = portIdx >= 0 ? Number(args[portIdx + 1]) || 8420 : 8420;
+const pwIdx = args.indexOf("--password");
+const password = pwIdx >= 0 ? args[pwIdx + 1] : process.env.GAME_PASSWORD || "";
 const host = lan ? "0.0.0.0" : "127.0.0.1";
 const root = __dirname;
 
@@ -39,7 +42,22 @@ const MIME = {
   ".md": "text/markdown; charset=utf-8"
 };
 
+function checkAuth(req, res) {
+  if (!password) return true;
+  const header = req.headers.authorization || "";
+  if (header.startsWith("Basic ")) {
+    const decoded = Buffer.from(header.slice(6), "base64").toString();
+    if (decoded === "player:" + password) return true;
+  }
+  res.writeHead(401, {
+    "WWW-Authenticate": 'Basic realm="The Egg Lands"',
+    "Content-Type": "text/plain"
+  }).end("Password required. Username: player");
+  return false;
+}
+
 const server = http.createServer((req, res) => {
+  if (!checkAuth(req, res)) return;
   const urlPath = decodeURIComponent((req.url || "/").split("?")[0]);
   const entry = dev ? "dev.html" : "index.html";
   let filePath = path.normalize(path.join(root, urlPath === "/" ? entry : urlPath));
@@ -82,6 +100,11 @@ server.listen(port, host, () => {
     }
   } else {
     console.log("  (run with --lan to also allow phones on your Wi-Fi to connect)");
+  }
+  if (password) {
+    console.log("  Password protection:    ON (username: player)");
+  } else {
+    console.log("  Password protection:    off (use --password or GAME_PASSWORD to enable)");
   }
   console.log("  LLM setup guide:        docs/LLM-SETUP.md");
   console.log("  Stop with Ctrl+C");
