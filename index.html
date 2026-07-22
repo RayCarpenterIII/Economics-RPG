@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0f1218">
-<title>The Egg Lands - HD-2D Massive Migration v34</title>
+<title>The Egg Lands - Highlands v37</title>
 <style>
   html,body{height:100%;margin:0;background:#0f1218;color:#eadfc7;font-family:"Courier New",monospace}
   body{display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;box-sizing:border-box}
@@ -14,7 +14,7 @@
 </style>
 </head>
 <body>
-<div id="loader"><strong>THE EGG LANDS - HD-2D MASSIVE MIGRATION v34</strong><small>Loading the pinned Economics-RPG build and applying character creation, physical ecology, testing tools, living construction, collision-safe villager routing, the full three-minute soundtrack, living farms, livestock, wild animal ecology, cleaner pens, improved animal sprites, biomes, elevation, terrain effects, permanent paths, bridges, villager-built public works, persistent goals, emotional memories, risk tolerance, state-aware NPC opinions, friendships, grudges, loyalty, romance, courtship, political factions, persistent voices, fact-first dialogue, topic memory, and optional cache-aware local phrasing, raw production inventories, staffed workshops, timed processing, market bottlenecks, a true 640x360 logical viewport, 1280x720 presentation output, a 32-pixel art grid over the preserved 16-unit simulation, larger foot-anchored characters, independent collision, foot-based depth sorting, high-resolution terrain and foreground caches, procedural placeholder art, smooth camera look-ahead, local lighting, atmosphere, animation-state metadata, a render-layer contract, a custom PNG asset registry, JSON asset templates, save-safe visual IDs, first-launch source caching, and an in-game standalone HTML exporter...</small></div>
+<div id="loader"><strong>THE EGG LANDS - HIGHLANDS v37</strong><small>Loading the pinned Economics-RPG build and applying character creation, physical ecology, testing tools, living construction, collision-safe villager routing, the full three-minute soundtrack, living farms, livestock, wild animal ecology, cleaner pens, improved animal sprites, biomes, elevation, terrain effects, permanent paths, bridges, villager-built public works, persistent goals, emotional memories, risk tolerance, state-aware NPC opinions, friendships, grudges, loyalty, romance, courtship, political factions, persistent voices, fact-first dialogue, topic memory, and optional cache-aware local phrasing, raw production inventories, staffed workshops, timed processing, market bottlenecks, a true 640x360 logical viewport, 1280x720 presentation output, a 32-pixel art grid over the preserved 16-unit simulation, larger foot-anchored characters, independent collision, foot-based depth sorting, high-resolution terrain and foreground caches, procedural placeholder art, smooth camera look-ahead, local lighting, atmosphere, animation-state metadata, a render-layer contract, a custom PNG asset registry, JSON asset templates, save-safe visual IDs, first-launch source caching, an in-game standalone HTML exporter, PC space-bar jumping with hold-for-height variable jump control, tameable rideable velociraptors with a sneak-and-ride taming minigame, and Perlin-noise highland relief with drifting cloud shadows and sparkling water...</small></div>
 <script>
 (async function(){
   const BASE_URL="https://raw.githubusercontent.com/RayCarpenterIII/Economics-RPG/305c70fdda6531d6913f31b0ec17ce61b68c4cf3/index.html";
@@ -2902,10 +2902,771 @@
 })();
 <\/script>
 
+<script id="variable-jump-v35-script">
+(function(){
+  "use strict";
+  const JUMP_TUNING_V35={firstImpulse:130,secondImpulse:118,sustainAccel:175,sustainTime:.26,cutVelocity:55};
+  let jumpKeyHeldV35=false,jumpHoldElapsedV35=0,variableJumpArmedV35=false,variableJumpActiveV35=false;
+
+  function editableTargetV35(){
+    const el=document.activeElement;
+    return !!el&&(el.tagName==="INPUT"||el.tagName==="TEXTAREA"||el.tagName==="SELECT"||el.isContentEditable);
+  }
+
+  const baseJumpV35=jump;
+  jump=function(){
+    const jumpsBefore=player.jumpsUsed;
+    baseJumpV35();
+    if(player.jumpsUsed===jumpsBefore)return;
+    if(variableJumpArmedV35){
+      player.jumpV=jumpsBefore===0?JUMP_TUNING_V35.firstImpulse:JUMP_TUNING_V35.secondImpulse;
+      variableJumpActiveV35=true;jumpHoldElapsedV35=0;
+    }else variableJumpActiveV35=false;
+  };
+
+  const baseStepPlayerV35=stepPlayer;
+  stepPlayer=function(dt){
+    const result=baseStepPlayerV35(dt);
+    if(variableJumpActiveV35&&selectedClass&&!activePanel){
+      if(player.jumpZ<=0&&player.jumpV<=0)variableJumpActiveV35=false;
+      else if(jumpKeyHeldV35&&player.jumpV>0&&jumpHoldElapsedV35<JUMP_TUNING_V35.sustainTime){
+        player.jumpV+=JUMP_TUNING_V35.sustainAccel*dt;jumpHoldElapsedV35+=dt;
+      }
+    }
+    return result;
+  };
+
+  function releaseJumpKeyV35(){
+    jumpKeyHeldV35=false;
+    if(variableJumpActiveV35&&player.jumpV>JUMP_TUNING_V35.cutVelocity)player.jumpV=JUMP_TUNING_V35.cutVelocity;
+  }
+
+  window.addEventListener("keydown",function(e){
+    if(e.code==="Space"||e.key===" "){
+      if(editableTargetV35()){
+        if(document.activeElement!==document.getElementById("dialogueInput"))e.stopPropagation();
+        return;
+      }
+      e.preventDefault();e.stopPropagation();
+      if(typeof ensureAudio==="function")ensureAudio();
+      jumpKeyHeldV35=true;
+      if(e.repeat)return;
+      variableJumpArmedV35=true;jump();variableJumpArmedV35=false;
+    }else if((e.key==="x"||e.key==="X")&&!e.repeat&&!editableTargetV35()){
+      jumpKeyHeldV35=true;variableJumpArmedV35=true;
+      window.setTimeout(function(){variableJumpArmedV35=false},0);
+    }
+  },true);
+  window.addEventListener("keyup",function(e){
+    if(e.code==="Space"||e.key===" "||e.key==="x"||e.key==="X")releaseJumpKeyV35();
+  },true);
+  window.addEventListener("blur",function(){jumpKeyHeldV35=false});
+
+  const hint=document.getElementById("hint");
+  if(hint)hint.textContent="WASD move · SPACE/X jump (hold = higher) · CLICK combo · E interact · C block · F specialty · Q influence · SHIFT dash";
+  const helpGrid=document.querySelector("#helpTab .helpGrid");
+  if(helpGrid)for(const key of helpGrid.querySelectorAll(".key")){
+    const label=(key.textContent||"").trim(),text=key.nextElementSibling;
+    if(!text)continue;
+    if(label==="Space")text.textContent="Jump. Tap for a short hop, hold for a higher jump, and press again in the air to double-jump over low attacks.";
+    if(label==="X")text.textContent="Also jumps, with the same hold-for-height control as Space.";
+    if(label==="Mouse")text.textContent="Aim freely. Left-click attacks toward the reticle; time clicks for a three-hit combo.";
+  }
+
+  window.__egglandsVariableJumpV35={tuning:JUMP_TUNING_V35,active:function(){return variableJumpActiveV35}};
+  toast("v35 loaded: Space now jumps on PC. Tap for a short hop, hold for a higher jump; click to attack.");
+})();
+<\/script>
+
+<script id="velociraptor-v36-script">
+(function(){
+  "use strict";
+  const RAPTOR_V36={
+    wildCount:3,maxTotal:4,
+    prowlSpeed:22,chaseSpeed:56,fleeSpeed:66,huntSpeed:58,followSpeed:64,
+    biteDamage:2,biteCooldown:.95,
+    detectRadius:70,loudRadius:95,loseRadius:160,
+    mountRange:20,tamedMountRange:14,behindDot:.1,
+    rodeoPrompts:4,rodeoWindow:1.15,
+    rideSpeedBoost:1.65,rideLift:7,maxHp:8,
+    huntRadius:85,tamedHuntRadius:70,huntRestMin:55,huntRestVar:50
+  };
+  const RODEO_KEYS_V36=["w","a","s","d"];
+  const RODEO_KEY_MAP_V36={w:"w",a:"a",s:"s",d:"d",W:"w",A:"a",S:"s",D:"d",ArrowUp:"w",ArrowLeft:"a",ArrowDown:"s",ArrowRight:"d"};
+  let raptorsV36=[],raptorIdV36=1,ridingV36=null,rodeoV36=null,godGiftToastV36=false,godCheckClockV36=0,sneakHintClockV36=0;
+
+  function blockedForRaptorV36(x,y){
+    const cx=Math.floor(x/TILE),cy=Math.floor(y/TILE);
+    if(cx<1||cy<1||cx>=MW-1||cy>=MH-1)return true;
+    if(window.__egglandsNavigationV25&&typeof window.__egglandsNavigationV25.blockedAt==="function")return window.__egglandsNavigationV25.blockedAt(x,y);
+    return solid.has(keyOf(cx,cy));
+  }
+  function makeRaptorV36(x,y,options){
+    return Object.assign({id:raptorIdV36++,x:x,y:y,face:{x:rand()<.5?-1:1,y:0},tamed:false,state:"prowl",targetX:x,targetY:y,moveTimer:rand()*2,biteCd:0,huntCooldown:20+rand()*30,preyId:null,fleeTimer:0,waryTimer:0,alertFlash:0,eatTimer:0,stepPhase:rand()*6,hp:RAPTOR_V36.maxHp,hurtT:0,hurtShowT:0,movingV36:false,navigationV25:null,lastSafeXV25:x,lastSafeYV25:y},options||{});
+  }
+  function spawnDefaultRaptorsV36(){
+    raptorsV36=[];raptorIdV36=1;
+    for(let i=0;i<RAPTOR_V36.wildCount;i++){const p=randomWildPositionV26();raptorsV36.push(makeRaptorV36(p.x,p.y))}
+    ridingV36=null;rodeoV36=null;godGiftToastV36=false;
+  }
+  function restoreRaptorsV36(saved){
+    if(!saved||!Array.isArray(saved.raptors)||!saved.raptors.length){spawnDefaultRaptorsV36();return}
+    raptorsV36=saved.raptors.map(function(r){return makeRaptorV36(Number(r.x)||TILE*4,Number(r.y)||TILE*4,{id:Number(r.id)||undefined,tamed:!!r.tamed,state:r.tamed?"follow":"prowl",huntCooldown:Number(r.huntCooldown)||25,hp:Math.max(1,Math.min(RAPTOR_V36.maxHp,Number(r.hp)||RAPTOR_V36.maxHp))})});
+    raptorIdV36=Math.max(1,...raptorsV36.map(r=>Number(r.id)||0))+1;
+    ridingV36=null;rodeoV36=null;godGiftToastV36=false;
+  }
+  function worldAnimalsV36(){return window.__egglandsAgricultureV26&&typeof window.__egglandsAgricultureV26.animals==="function"?window.__egglandsAgricultureV26.animals():[]}
+  function tamedRaptorV36(){return raptorsV36.find(r=>r.tamed)||null}
+  function nearestRaptorV36(range){
+    let best=null,bestD=range;
+    for(const r of raptorsV36){const d=Math.hypot(player.x+5-r.x,player.y+8-r.y);if(d<bestD){best=r;bestD=d}}
+    return best;
+  }
+  function playerBehindRaptorV36(r){
+    const dx=player.x+5-r.x,dy=player.y+8-r.y,d=Math.max(1,Math.hypot(dx,dy));
+    return (r.face.x*dx+r.face.y*dy)/d<RAPTOR_V36.behindDot;
+  }
+  function findPreyV36(r,radius){
+    let best=null,bestD=radius;
+    for(const animal of worldAnimalsV36()){
+      const d=Math.hypot(animal.x-r.x,animal.y-r.y);
+      if(d<bestD){best=animal;bestD=d}
+    }
+    return best;
+  }
+  function moveRaptorTowardV36(r,tx,ty,speed,dt){
+    const nav=window.__egglandsNavigationV25,raw={x:tx,y:ty};
+    const waypoint=nav&&typeof nav.navigationTarget==="function"?nav.navigationTarget(r,raw):raw;
+    const dx=waypoint.x-r.x,dy=waypoint.y-r.y,d=Math.hypot(dx,dy);
+    r.movingV36=d>3;
+    if(d<=2)return Math.hypot(tx-r.x,ty-r.y);
+    const oldX=r.x,oldY=r.y;
+    r.x+=dx/d*speed*dt;r.y+=dy/d*speed*dt;
+    if(blockedForRaptorV36(r.x,r.y)){r.x=oldX;r.y=oldY;r.navigationV25=null;r.moveTimer=0;r.movingV36=false}
+    else{r.face.x=dx/d;r.face.y=dy/d}
+    return Math.hypot(tx-r.x,ty-r.y);
+  }
+  function pickWanderTargetV36(r){
+    for(let i=0;i<12;i++){
+      const tx=r.x+(rand()-.5)*180,ty=r.y+(rand()-.5)*180,cx=clamp(Math.floor(tx/TILE),1,MW-2),cy=clamp(Math.floor(ty/TILE),1,MH-2);
+      if(!solid.has(keyOf(cx,cy))&&!insideTownBounds(cx*TILE,cy*TILE,2)){r.targetX=cx*TILE+5;r.targetY=cy*TILE+5;return}
+    }
+    const p=randomWildPositionV26();r.targetX=p.x;r.targetY=p.y;
+  }
+  function eatAnimalV36(r,animal){
+    const list=worldAnimalsV36(),index=list.indexOf(animal);
+    if(index>=0)list.splice(index,1);
+    r.preyId=null;r.eatTimer=1.4;r.huntCooldown=RAPTOR_V36.huntRestMin+rand()*RAPTOR_V36.huntRestVar;
+    for(let i=0;i<8;i++)particles.push({scene:"world",x:animal.x,y:animal.y,vx:(rand()-.5)*40,vy:-6-rand()*16,life:.3,color:i%2?"#b04a3a":"#cbbfa4"});
+    playSfx("dash");
+    if(animal.domestic&&animal.homeTown){
+      const town=towns.find(t=>t.name===animal.homeTown);
+      if(town&&typeof recordVillageEvent==="function")try{recordVillageEvent(town,"PREDATOR",town.name+" loses a "+animal.type+" to a hungry velociraptor.",{salience:5,emotion:"fear"})}catch(err){}
+      toast("A velociraptor snatches a "+animal.type+" from "+animal.homeTown+"'s pen!");
+    }
+  }
+
+  function startRodeoV36(r){
+    rodeoV36={raptor:r,step:0,need:RAPTOR_V36.rodeoPrompts,key:RODEO_KEYS_V36[Math.floor(rand()*4)],timer:RAPTOR_V36.rodeoWindow,window:RAPTOR_V36.rodeoWindow,originX:r.x,originY:r.y,clock:0};
+    r.state="rodeo";r.alertFlash=0;r.preyId=null;
+    for(const k of ["w","a","s","d","W","A","S","D","ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Shift"])keys[k]=false;
+    playSfx("dash");screenShake=Math.max(screenShake,3);
+    toast("You leap onto the raptor! Press the keys it shows to stay on its back!");
+  }
+  function advanceRodeoV36(){
+    const p=rodeoV36;p.step++;
+    particles.push({scene:"world",ring:true,x:p.raptor.x,y:p.raptor.y-6,r:2,maxR:12,life:.18,color:"#e2ad45"});
+    if(p.step>=p.need){tameSuccessV36(p.raptor);return}
+    let next=RODEO_KEYS_V36[Math.floor(rand()*4)];
+    if(next===p.key)next=RODEO_KEYS_V36[(RODEO_KEYS_V36.indexOf(next)+1)%4];
+    p.key=next;p.window=Math.max(.62,p.window-.14);p.timer=p.window;
+    playSfx("parry");
+  }
+  function tameSuccessV36(r){
+    rodeoV36=null;r.tamed=true;r.state="follow";r.waryTimer=0;r.fleeTimer=0;r.preyId=null;
+    particles.push({scene:"world",ring:true,x:r.x,y:r.y-4,r:4,maxR:26,life:.35,color:"#f0c969"});
+    for(let i=0;i<10;i++)particles.push({scene:"world",x:r.x,y:r.y-4,vx:(rand()-.5)*55,vy:-10-rand()*25,life:.4,color:"#f0c969"});
+    playSfx("skill");screenShake=Math.max(screenShake,4);
+    toast("The velociraptor accepts you as its rider! It follows you, hunts on its own, and ignores villagers. Press E beside it to ride.");
+    saveGame(true);
+  }
+  function thrownOffV36(reason){
+    const p=rodeoV36,r=p.raptor;rodeoV36=null;
+    r.state="flee";r.fleeTimer=4.5;r.waryTimer=18;r.preyId=null;
+    hurtPlayer(1,r);player.knockX*=1.4;player.knockY*=1.4;
+    toast(reason==="timeout"?"Too slow - the raptor bucks you into the dirt!":"Wrong move - the raptor hurls you off!");
+  }
+  function cancelRodeoV36(){
+    if(!rodeoV36)return;const r=rodeoV36.raptor;rodeoV36=null;
+    r.state="flee";r.fleeTimer=3;r.waryTimer=10;
+  }
+  function mountRaptorV36(r){
+    ridingV36=r;r.state="ridden";r.preyId=null;r.movingV36=false;
+    playSfx("jump");
+    toast("You vault onto your raptor. It carries you swiftly - press E to dismount.");
+  }
+  function dismountRaptorV36(quiet){
+    const r=ridingV36;ridingV36=null;if(!r)return;
+    r.state="follow";
+    r.x=player.x+5-(player.face.x||1)*14;r.y=player.y+10;
+    if(blockedForRaptorV36(r.x,r.y)){r.x=player.x+5;r.y=player.y+16}
+    if(blockedForRaptorV36(r.x,r.y)){r.x=player.x+5;r.y=player.y+8}
+    if(!quiet){playSfx("land");toast("You hop down. The raptor stays at your side.")}
+  }
+  function ensureGodRaptorV36(){
+    if(!godMode||!selectedClass||scene!=="world")return;
+    if(tamedRaptorV36())return;
+    let r=null,bestD=1e9;
+    for(const candidate of raptorsV36){const d=Math.hypot(candidate.x-player.x,candidate.y-player.y);if(d<bestD){r=candidate;bestD=d}}
+    if(!r){const p=randomWildPositionV26();r=makeRaptorV36(p.x,p.y);raptorsV36.push(r)}
+    r.tamed=true;r.state="follow";r.fleeTimer=0;r.waryTimer=0;r.preyId=null;
+    r.x=player.x+5-30;r.y=player.y+8;
+    if(blockedForRaptorV36(r.x,r.y)){r.x=player.x+5;r.y=player.y+40}
+    if(blockedForRaptorV36(r.x,r.y)){r.x=player.x+5;r.y=player.y+8}
+    if(!godGiftToastV36){godGiftToastV36=true;toast("God mode: a bonded velociraptor pads to your side, already tamed.")}
+  }
+
+  function stepRaptorV36(r,dt){
+    r.biteCd=Math.max(0,r.biteCd-dt);r.alertFlash=Math.max(0,r.alertFlash-dt);r.eatTimer=Math.max(0,r.eatTimer-dt);
+    r.fleeTimer=Math.max(0,r.fleeTimer-dt);r.waryTimer=Math.max(0,r.waryTimer-dt);r.huntCooldown=Math.max(0,r.huntCooldown-dt);
+    r.hurtT=Math.max(0,r.hurtT-dt);r.hurtShowT=Math.max(0,r.hurtShowT-dt);
+    r.moveTimer-=dt;
+    if(r.state==="ridden"||r.state==="rodeo")return;
+    if(r.eatTimer>0){r.movingV36=false;return}
+    if(r.hurtT>0){r.movingV36=false;return}
+    const pdx=player.x+5-r.x,pdy=player.y+8-r.y,pd=Math.hypot(pdx,pdy);
+    if(r.state==="flee"){
+      if(r.fleeTimer<=0){r.state=r.tamed?"follow":"prowl";return}
+      moveRaptorTowardV36(r,r.x-pdx/Math.max(1,pd)*80,r.y-pdy/Math.max(1,pd)*80,RAPTOR_V36.fleeSpeed,dt);
+      return;
+    }
+    if(r.tamed){
+      if(pd>320){r.x=player.x+5+(rand()-.5)*30;r.y=player.y+40;if(blockedForRaptorV36(r.x,r.y)){r.x=player.x+5;r.y=player.y+8}r.preyId=null;return}
+      let prey=r.preyId!=null?worldAnimalsV36().find(a=>a.id===r.preyId):null;
+      if(prey&&Math.hypot(prey.x-(player.x+5),prey.y-(player.y+8))>200)prey=null;
+      if(!prey&&r.huntCooldown<=0&&pd<120){
+        const candidate=findPreyV36(r,RAPTOR_V36.tamedHuntRadius);
+        if(candidate&&Math.hypot(candidate.x-(player.x+5),candidate.y-(player.y+8))<160)prey=candidate;
+      }
+      if(prey){
+        r.preyId=prey.id;
+        const d=moveRaptorTowardV36(r,prey.x,prey.y,RAPTOR_V36.huntSpeed,dt);
+        if(d<10)eatAnimalV36(r,prey);
+        return;
+      }
+      r.preyId=null;
+      const anchor={x:player.x+5-(player.face.x||1)*24,y:player.y+18},ad=Math.hypot(anchor.x-r.x,anchor.y-r.y);
+      if(ad>10)moveRaptorTowardV36(r,anchor.x,anchor.y,Math.min(RAPTOR_V36.followSpeed,26+ad*.9),dt);
+      else{r.movingV36=false;if(pd>1){r.face.x=pdx/pd;r.face.y=pdy/pd}}
+      return;
+    }
+    if(r.state==="chase"){
+      if(ridingV36||pd>RAPTOR_V36.loseRadius){r.state="prowl";r.moveTimer=0;return}
+      const d=moveRaptorTowardV36(r,player.x+5,player.y+8,RAPTOR_V36.chaseSpeed,dt);
+      if(d<13&&r.biteCd<=0){
+        r.biteCd=RAPTOR_V36.biteCooldown;
+        if(player.jumpZ>8)particles.push({scene:"world",ring:true,x:player.x+5,y:player.y+11,r:2,maxR:12,life:.14,color:"#a7d9e8"});
+        else hurtPlayer(RAPTOR_V36.biteDamage,r);
+      }
+      return;
+    }
+    if(!ridingV36&&pd<(r.waryTimer>0?RAPTOR_V36.loudRadius:RAPTOR_V36.detectRadius)){
+      const dot=(r.face.x*pdx+r.face.y*pdy)/Math.max(1,pd);
+      const loud=player.dashTime>0||player.swing>0;
+      const frontThreshold=r.waryTimer>0?-.25:.15;
+      if(dot>frontThreshold||loud||pd<8){r.state="chase";r.alertFlash=.9;playSfx("dash");screenShake=Math.max(screenShake,2);return}
+    }
+    let prey=r.preyId!=null?worldAnimalsV36().find(a=>a.id===r.preyId):null;
+    if(!prey&&r.huntCooldown<=0)prey=findPreyV36(r,RAPTOR_V36.huntRadius);
+    if(prey){
+      r.preyId=prey.id;
+      const d=moveRaptorTowardV36(r,prey.x,prey.y,RAPTOR_V36.huntSpeed,dt);
+      if(d<10)eatAnimalV36(r,prey);
+      return;
+    }
+    r.preyId=null;
+    if(r.moveTimer<=0){r.moveTimer=2+rand()*3.5;pickWanderTargetV36(r)}
+    if(Math.hypot(r.targetX-r.x,r.targetY-r.y)>4)moveRaptorTowardV36(r,r.targetX,r.targetY,RAPTOR_V36.prowlSpeed,dt);
+    else r.movingV36=false;
+  }
+  function hurtRaptorV36(r,damage,impact){
+    if(r.tamed||r.state==="rodeo"||r.state==="ridden")return;
+    r.hp-=Math.max(.5,Number(damage)||1);r.hurtT=.3;r.hurtShowT=3;
+    const sx=impact&&Number.isFinite(impact.x)?impact.x:player.x+5,sy=impact&&Number.isFinite(impact.y)?impact.y:player.y+8;
+    const dx=r.x-sx,dy=r.y-sy,d=Math.max(1,Math.hypot(dx,dy));
+    const pushX=r.x+dx/d*9,pushY=r.y+dy/d*9;
+    if(!blockedForRaptorV36(pushX,pushY)){r.x=pushX;r.y=pushY}
+    for(let i=0;i<5;i++)particles.push({scene:"world",x:r.x,y:r.y-4,vx:(rand()-.5)*50,vy:-4-rand()*18,life:.22,color:i%2?"#c0392b":"#8fae5c"});
+    playSfx("hit");
+    if(r.hp<=0){killRaptorV36(r);return}
+    if(r.hp<=3){r.state="flee";r.fleeTimer=5;r.waryTimer=20;r.preyId=null}
+    else if(r.state==="prowl"){r.state="chase";r.alertFlash=.9}
+  }
+  function killRaptorV36(r){
+    const index=raptorsV36.indexOf(r);if(index>=0)raptorsV36.splice(index,1);
+    if(rodeoV36&&rodeoV36.raptor===r)rodeoV36=null;
+    if(ridingV36===r)ridingV36=null;
+    for(let i=0;i<14;i++)particles.push({scene:"world",x:r.x,y:r.y-3,vx:(rand()-.5)*70,vy:-8-rand()*26,life:.4,color:i%3?"#c0392b":"#5d7a38"});
+    particles.push({scene:"world",ring:true,x:r.x,y:r.y-3,r:4,maxR:20,life:.28,color:"#c0392b"});
+    screenShake=Math.max(screenShake,4);playSfx("land");
+    let gained=0;while(gained<2&&canAddCargo(0,gained+1))gained++;
+    if(gained>0){player.cargo[0]+=gained;toast("The velociraptor falls. You claim "+gained+" raptor meat (food).");updateUI()}
+    else toast("The velociraptor falls, but your food cargo is full.");
+    saveGame(true);
+  }
+  const baseDamageEnemiesWhereV36=damageEnemiesWhere;
+  damageEnemiesWhere=function(predicate,amount,impact=null){
+    const result=baseDamageEnemiesWhereV36(predicate,amount,impact);
+    if(scene==="world"&&!rodeoV36)for(const r of raptorsV36.slice()){
+      if(r.tamed)continue;
+      let struck=false;
+      try{struck=!!predicate({x:r.x-5,y:r.y-6,type:"raptorV36"})}catch(err){struck=false}
+      if(struck)hurtRaptorV36(r,amount,impact);
+    }
+    return result;
+  };
+  function stepBoltsVsRaptorsV36(){
+    if(!Array.isArray(bolts)||!bolts.length)return;
+    for(const b of bolts){
+      for(const r of raptorsV36.slice()){
+        if(r.tamed)continue;
+        if(b.raptorHitsV36&&b.raptorHitsV36.has(r.id))continue;
+        if(Math.hypot(b.x-r.x,b.y-(r.y-3))<(b.blastRadius||9)){
+          (b.raptorHitsV36=b.raptorHitsV36||new Set()).add(r.id);
+          hurtRaptorV36(r,b.damage||1,{x:b.x,y:b.y});
+        }
+      }
+    }
+  }
+  function stepRodeoV36(dt){
+    const p=rodeoV36;if(!p)return;
+    if(activePanel||scene!=="world"){cancelRodeoV36();return}
+    p.clock+=dt;p.timer-=dt;
+    const r=p.raptor;
+    r.x=p.originX+Math.sin(p.clock*13)*3.2;
+    r.y=p.originY+Math.sin(p.clock*9+1.7)*2.2;
+    r.face.x=Math.sin(p.clock*7)>=0?1:-1;r.face.y=0;
+    r.movingV36=true;
+    player.x=r.x-5;player.y=r.y-9;player.knockTime=0;
+    if(p.timer<=0)thrownOffV36("timeout");
+  }
+  function stepRidingV36(){
+    const r=ridingV36;if(!r)return;
+    if(scene!=="world"){dismountRaptorV36(true);return}
+    r.x=player.x+5;r.y=player.y+11;
+    if(player.moving){
+      r.face.x=player.face.x||r.face.x;r.face.y=0;r.movingV36=true;
+      if(rand()<.25)particles.push({scene:"world",x:r.x+(rand()-.5)*8,y:r.y+8,vx:(rand()-.5)*14,vy:-3-rand()*6,life:.18,color:"#8d7c5f"});
+    }else r.movingV36=false;
+  }
+
+  const previousStepAgentsV36=stepAgents;
+  stepAgents=function(dt){
+    const result=previousStepAgentsV36(dt);
+    if(scene==="world"&&selectedClass){
+      godCheckClockV36-=dt;
+      if(godCheckClockV36<=0){godCheckClockV36=1;ensureGodRaptorV36()}
+      stepBoltsVsRaptorsV36();
+      stepRodeoV36(dt);
+      stepRidingV36();
+      for(const r of raptorsV36)stepRaptorV36(r,dt);
+      sneakHintClockV36=Math.max(0,sneakHintClockV36-dt);
+      if(sneakHintClockV36<=0&&!rodeoV36&&!ridingV36){
+        const near=nearestRaptorV36(RAPTOR_V36.mountRange);
+        if(near&&!near.tamed&&near.state==="prowl"&&playerBehindRaptorV36(near)&&!player.dashTime){sneakHintClockV36=5;toast("The raptor has not noticed you. Press E to leap on and try to tame it!")}
+      }
+    }else if(scene!=="world"){
+      if(ridingV36)dismountRaptorV36(true);
+      if(rodeoV36)cancelRodeoV36();
+    }
+    return result;
+  };
+
+  const previousInteractV36=interact;
+  interact=function(){
+    if(selectedClass&&!activePanel&&scene==="world"&&!rodeoV36){
+      if(ridingV36){dismountRaptorV36(false);return}
+      const r=nearestRaptorV36(RAPTOR_V36.mountRange);
+      if(r&&r.tamed){
+        const rd=Math.hypot(player.x+5-r.x,player.y+8-r.y);
+        if(rd<=RAPTOR_V36.tamedMountRange){mountRaptorV36(r);return}
+      }else if(r){
+        if(r.state==="prowl"&&playerBehindRaptorV36(r)&&!player.dashTime){startRodeoV36(r);return}
+        if(r.state==="chase"){toast("It is hunting YOU. Fight it off or run!");return}
+        if(r.state==="prowl"){toast("The raptor would see you coming - circle behind it slowly, without dashing.");return}
+        toast("The raptor is too agitated to approach right now.");return;
+      }
+    }
+    return previousInteractV36();
+  };
+  const previousJumpV36=jump;
+  jump=function(){if(rodeoV36)return;return previousJumpV36()};
+  const previousAttackV36=attack;
+  attack=function(){if(rodeoV36)return;return previousAttackV36()};
+  const previousModsV36=mods;
+  mods=function(){
+    const result=previousModsV36();
+    if(ridingV36)result.speed*=RAPTOR_V36.rideSpeedBoost;
+    return result;
+  };
+
+  window.addEventListener("keydown",function(e){
+    if(!rodeoV36)return;
+    const mapped=RODEO_KEY_MAP_V36[e.key];
+    if(!mapped){
+      if(["e","E","f","F","q","Q","Shift","c","C","x","X","m","M","k","K"].includes(e.key)){e.preventDefault();e.stopPropagation()}
+      return;
+    }
+    e.preventDefault();e.stopPropagation();
+    if(e.repeat)return;
+    if(mapped===rodeoV36.key)advanceRodeoV36();else thrownOffV36("wrong");
+  },true);
+
+  function drawRaptorV36(r){
+    const now=performance.now()/1000;
+    const lift=ridingV36===r?Math.round(player.jumpZ||0):0;
+    const x=Math.round(r.x-camera.x),y=Math.round(r.y-camera.y)-lift;
+    if(x<-42||y<-42||x>viewW()+42||y>viewH()+42)return;
+    const dir=r.face.x<0?-1:1,moving=!!r.movingV36;
+    const bob=Math.round(Math.sin(now*(moving?11:3.2)+r.stepPhase)*(moving?1.2:.6));
+    const step=Math.sin(now*11+r.stepPhase);
+    const body=r.tamed?"#6d8a4a":"#5d7a38",belly="#a9ac6f",dark="#3d5326",leg="#4a6030",claw="#d8cba4";
+    const L=function(off,w){return dir>0?x+off:x-off-w};
+    ctx.save();
+    ctx.fillStyle="rgba(0,0,0,.28)";ctx.fillRect(x-8,y+8+lift,17,3);
+    ctx.fillStyle=body;
+    ctx.fillRect(L(-12,4),y-3+bob,4,3);
+    ctx.fillRect(L(-16,4),y-4+bob,4,2);
+    ctx.fillRect(L(-19,3),y-5+bob,3,2);
+    ctx.fillRect(L(-8,15),y-5+bob,15,7);
+    ctx.fillStyle=belly;ctx.fillRect(L(-6,11),y+bob,11,2);
+    ctx.fillStyle=dark;
+    ctx.fillRect(L(-5,2),y-5+bob,2,4);
+    ctx.fillRect(L(0,2),y-5+bob,2,4);
+    ctx.fillRect(L(-10,2),y-4+bob,2,3);
+    ctx.fillStyle=body;
+    ctx.fillRect(L(5,3),y-9+bob,3,5);
+    ctx.fillRect(L(6,7),y-12+bob,7,4);
+    ctx.fillRect(L(12,3),y-11+bob,3,2);
+    ctx.fillStyle="#e8c33b";ctx.fillRect(L(9,1),y-11+bob,1,1);
+    ctx.fillStyle=dark;ctx.fillRect(L(2,2),y-2+bob,2,3);
+    const liftA=moving&&step>0?2:0,liftB=moving&&step<0?2:0;
+    ctx.fillStyle=leg;
+    ctx.fillRect(L(-6,4),y+bob,4,4);
+    ctx.fillRect(L(-5,2),y+3+bob,2,5-liftA);
+    ctx.fillRect(L(-6,4),y+7+bob-liftA,4,2);
+    ctx.fillRect(L(1,3),y+1+bob,3,3);
+    ctx.fillRect(L(2,2),y+3+bob,2,5-liftB);
+    ctx.fillRect(L(1,4),y+7+bob-liftB,4,2);
+    ctx.fillStyle=claw;
+    ctx.fillRect(L(-2,1),y+7+bob-liftA,1,1);
+    ctx.fillRect(L(5,1),y+7+bob-liftB,1,1);
+    if(r.tamed){
+      ctx.fillStyle="#a33c30";
+      ctx.fillRect(L(-4,7),y-6+bob,7,2);
+      ctx.fillRect(L(-2,2),y-4+bob,2,5);
+      ctx.fillStyle="#e2ad45";ctx.fillRect(L(-1,1),y-1+bob,1,1);
+    }
+    if(r.hurtT>0){
+      ctx.fillStyle="rgba(255,120,90,.5)";
+      ctx.fillRect(L(-8,15),y-5+bob,15,7);
+      ctx.fillRect(L(6,7),y-12+bob,7,4);
+    }
+    ctx.restore();
+  }
+  // Depth-correct passes hooked INSIDE the base render's entity section
+  // (which runs before presentV34 copies the frame). Raptors standing above
+  // the player draw before the entity pass; raptors below draw after it.
+  // The ridden mount always draws behind so the rider sits on its back.
+  function drawRaptorLayerV36(front){
+    if(scene!=="world")return;
+    const playerFootY=player.y+16;
+    for(const r of raptorsV36){
+      // The ridden mount is drawn inside the player's depth-sorted entity
+      // draw (between rider layers), never in these world passes.
+      if(ridingV36===r)continue;
+      const behind=r.y+9<=playerFootY;
+      if(front===behind)continue;
+      drawRaptorV36(r);
+    }
+  }
+  const baseDrawGatherHighlightV36=drawGatherHighlight;
+  drawGatherHighlight=function(){const result=baseDrawGatherHighlightV36();drawRaptorLayerV36(false);return result};
+  const baseDrawCombatEffectsV36=drawCombatEffects;
+  drawCombatEffects=function(){const result=baseDrawCombatEffectsV36();drawRaptorLayerV36(true);return result};
+  // Indicators, health bars, and the rodeo prompt render as a UI overlay at
+  // drawHUD time (above fog), still inside the presented frame.
+  function drawRaptorOverlaysV36(){
+    if(scene!=="world")return;
+    ctx.save();ctx.scale(worldZoom,worldZoom);
+    for(const r of raptorsV36){
+      const x=Math.round(r.x-camera.x),y=Math.round(r.y-camera.y);
+      if(x<-42||y<-42||x>viewW()+42||y>viewH()+42)continue;
+      if(r.alertFlash>0){
+        ctx.fillStyle="#e2504a";ctx.font="bold 8px monospace";ctx.textAlign="center";
+        ctx.fillText("!",x,y-17);
+      }else if(!r.tamed&&r.state==="prowl"){
+        const pd=Math.hypot(player.x+5-r.x,player.y+8-r.y);
+        if(pd<70&&playerBehindRaptorV36(r)){ctx.fillStyle="#a69c87";ctx.font="7px monospace";ctx.textAlign="center";ctx.fillText("?",x,y-17)}
+      }
+      if(!r.tamed&&r.hurtShowT>0&&r.hp>0&&r.hp<RAPTOR_V36.maxHp){
+        ctx.fillStyle="rgba(15,18,24,.85)";ctx.fillRect(x-9,y-16,18,3);
+        ctx.fillStyle="#d96a5a";ctx.fillRect(x-8,y-15,Math.max(1,Math.round(16*r.hp/RAPTOR_V36.maxHp)),1);
+      }
+      const p=rodeoV36;
+      if(p&&p.raptor===r){
+        const bw=30,bx=x-15,by=y-38;
+        ctx.fillStyle="#e2ad45";ctx.fillRect(bx-1,by-1,bw+2,22);
+        ctx.fillStyle="rgba(15,18,24,.94)";ctx.fillRect(bx,by,bw,20);
+        ctx.fillStyle="#e2ad45";ctx.font="bold 10px monospace";ctx.textAlign="center";
+        ctx.fillText(p.key.toUpperCase(),x,by+11);
+        const frac=clamp(p.timer/p.window,0,1);
+        ctx.fillStyle="#3a4452";ctx.fillRect(bx+2,by+15,bw-4,3);
+        ctx.fillStyle=frac>.35?"#7fc06a":"#e2504a";ctx.fillRect(bx+2,by+15,Math.round((bw-4)*frac),3);
+        for(let i=0;i<p.need;i++){ctx.fillStyle=i<p.step?"#e2ad45":"#3a4452";ctx.fillRect(bx+2+i*7,by-6,5,3)}
+      }
+    }
+    ctx.restore();
+  }
+  const previousDrawHUDV36=drawHUD;
+  drawHUD=function(){const result=previousDrawHUDV36();drawRaptorOverlaysV36();return result};
+  // ---- Layered rider rendering ----
+  // The character painter is captured into an offscreen buffer each frame,
+  // then re-emitted in planes (far limbs -> mount -> torso/head/near limbs)
+  // so the mount genuinely sits BETWEEN the rider's legs. Capture works by
+  // temporarily redirecting the shared ctx's drawing methods to the buffer;
+  // style properties are synced per call. The rider's ground shadow is
+  // suppressed during capture (the mount casts its own).
+  const RIDER_OC_V36=document.createElement("canvas");RIDER_OC_V36.width=96;RIDER_OC_V36.height=96;
+  const riderOctxV36=RIDER_OC_V36.getContext("2d");
+  const RIDER_OX_V36=48,RIDER_OY_V36=72;
+  const CTX_METHODS_V36=["save","restore","translate","rotate","scale","transform","setTransform","beginPath","closePath","moveTo","lineTo","quadraticCurveTo","bezierCurveTo","arc","arcTo","ellipse","rect","fill","stroke","fillRect","strokeRect","clearRect","drawImage","fillText","strokeText","clip"];
+  const CTX_PROPS_V36=["fillStyle","strokeStyle","lineWidth","globalAlpha","font","textAlign","textBaseline","lineCap","lineJoin"];
+  const baseDrawPersonV36=drawPerson;
+  function captureRiderSpriteV36(color,bob,outlined,guard,child,motion){
+    riderOctxV36.setTransform(1,0,0,1,0,0);
+    riderOctxV36.clearRect(0,0,96,96);
+    riderOctxV36.imageSmoothingEnabled=false;
+    const saved={};
+    for(const name of CTX_METHODS_V36){
+      saved[name]=ctx[name];
+      ctx[name]=(function(method){
+        return function(){
+          for(const prop of CTX_PROPS_V36)riderOctxV36[prop]=ctx[prop];
+          if(method==="ellipse")return;
+          return riderOctxV36[method].apply(riderOctxV36,arguments);
+        };
+      })(name);
+    }
+    try{baseDrawPersonV36(RIDER_OX_V36-5,RIDER_OY_V36-16,color,bob,outlined,guard,child,motion)}
+    finally{for(const name of CTX_METHODS_V36)ctx[name]=saved[name]}
+  }
+  function snapRiderV36(value){return Math.round(value*worldZoom)/Math.max(.001,worldZoom)}
+  function blitRiderSliceV36(footX,footY,lift,x0,y0,x1,y1){
+    const sx=RIDER_OX_V36+x0,sy=RIDER_OY_V36+y0,sw=x1-x0,sh=y1-y0;
+    if(sw<=0||sh<=0)return;
+    ctx.drawImage(RIDER_OC_V36,sx,sy,sw,sh,footX+x0,footY-lift+y0,sw,sh);
+  }
+  function drawMountedRiderV36(r,x,y,color,bob,outlined,guard,child,motion){
+    const footX=snapRiderV36(x+5),footY=snapRiderV36(y+16),lift=RAPTOR_V36.rideLift;
+    captureRiderSpriteV36(color,bob,outlined,guard,child,motion);
+    const face=motion&&motion.face||player.face,horizontal=Math.abs(face.x)>=Math.abs(face.y);
+    if(horizontal){
+      const farIsRight=face.x<0;
+      if(farIsRight)blitRiderSliceV36(footX,footY,lift,2,-20,24,1);
+      else blitRiderSliceV36(footX,footY,lift,-24,-20,-2,1);
+      drawRaptorV36(r);
+      blitRiderSliceV36(footX,footY,lift,-24,-46,24,-20);
+      if(farIsRight)blitRiderSliceV36(footX,footY,lift,-24,-20,2,1);
+      else blitRiderSliceV36(footX,footY,lift,-2,-20,24,1);
+    }else{
+      drawRaptorV36(r);
+      blitRiderSliceV36(footX,footY,lift,-24,-46,24,1);
+    }
+  }
+  drawPerson=function(x,y,color,bob,outlined,guard,child,motion){
+    if(ridingV36&&motion&&motion.face===player.face){drawMountedRiderV36(ridingV36,x,y,color,bob,outlined,guard,child,motion);return}
+    return baseDrawPersonV36(x,y,color,bob,outlined,guard,child,motion);
+  };
+
+  const previousNewDayV36=newDay;
+  newDay=function(){
+    const result=previousNewDayV36();
+    if(raptorsV36.filter(r=>!r.tamed).length<2&&raptorsV36.length<RAPTOR_V36.maxTotal&&rand()<.5){const p=randomWildPositionV26();raptorsV36.push(makeRaptorV36(p.x,p.y))}
+    return result;
+  };
+  const previousSnapshotV36=snapshot;
+  snapshot=function(){
+    const data=previousSnapshotV36();
+    data.version=Math.max(36,Number(data.version)||0);
+    data.raptorsV36={raptors:raptorsV36.map(r=>({id:r.id,x:Math.round(r.x),y:Math.round(r.y),tamed:!!r.tamed,huntCooldown:Math.round(r.huntCooldown),hp:Math.round(r.hp)}))};
+    return data;
+  };
+  const previousApplySaveV36=applySave;
+  applySave=function(data){const result=previousApplySaveV36(data);restoreRaptorsV36(data&&data.raptorsV36);return result};
+  const previousSetupGameV36=setupGame;
+  setupGame=function(newSeed,loading){const result=previousSetupGameV36(newSeed,loading);if(!loading)spawnDefaultRaptorsV36();return result};
+
+  const help=document.querySelector("#helpTab .helpGrid");
+  if(help&&!document.getElementById("raptorHelpV36")){
+    const k=document.createElement("span");k.id="raptorHelpV36";k.className="key";k.textContent="Velociraptors";
+    const t=document.createElement("span");t.textContent="Wild raptors prowl the valley, eat whatever animals they catch, and attack you on sight. Fight back: your attacks and spells wound them - a badly hurt raptor flees, and a felled one yields raptor meat. Or tame one: sneak up slowly from behind (no dashing) and press E to leap on, then press the keys it shows to stay mounted. A tamed raptor follows you, hunts on its own, ignores villagers, and can be ridden with E. God mode grants one already tamed.";
+    help.appendChild(k);help.appendChild(t);
+  }
+
+  spawnDefaultRaptorsV36();
+  window.__egglandsRaptorsV36={config:RAPTOR_V36,list:function(){return raptorsV36},riding:function(){return ridingV36},rodeo:function(){return rodeoV36},riderLayers:{buffer:RIDER_OC_V36,capture:captureRiderSpriteV36,blit:blitRiderSliceV36,origin:{x:RIDER_OX_V36,y:RIDER_OY_V36}}};
+  const title=document.querySelector("header h1");if(title)title.title="Velociraptors v36";
+  toast("v36 loaded: velociraptors prowl the valley. Sneak behind one and press E to try taming it with a wild ride.");
+})();
+<\/script>
+
+<script id="highlands-v37-script">
+(function(){
+  "use strict";
+  const HEIGHT_V37={
+    blendSim:.55,blendNoise:.45,
+    octaves:4,baseFreq:1/13,lacunarity:2.02,gain:.5,
+    shadeStrength:2.4,maxLight:.20,maxShade:.26,
+    altitudeLight:.10,lowlandShade:.08,
+    cliffThreshold:.12,cliffAlpha:.34,
+    cloudCount:3,cloudAlpha:.12,cloudSpeed:5.5,
+    sparkleAlpha:.55
+  };
+  const GRAD_V37=[[1,0],[-1,0],[0,1],[0,-1],[.7071,.7071],[-.7071,.7071],[.7071,-.7071],[-.7071,-.7071]];
+  const permV37=new Uint8Array(512);
+  let heightV37=[],appliedRevisionV37=-1;
+
+  function buildPermV37(s){
+    let a=(s>>>0)||123456789;
+    const rnd=function(){a^=a<<13;a>>>=0;a^=a>>>17;a^=a<<5;a>>>=0;return a/4294967296};
+    const p=Array.from({length:256},function(_,i){return i});
+    for(let i=255;i>0;i--){const j=Math.floor(rnd()*(i+1)),tmp=p[i];p[i]=p[j];p[j]=tmp}
+    for(let i=0;i<512;i++)permV37[i]=p[i&255];
+  }
+  function fadeV37(t){return t*t*t*(t*(t*6-15)+10)}
+  function gradDotV37(hash,dx,dy){const g=GRAD_V37[hash&7];return g[0]*dx+g[1]*dy}
+  function perlinV37(x,y){
+    const X=Math.floor(x)&255,Y=Math.floor(y)&255,fx=x-Math.floor(x),fy=y-Math.floor(y);
+    const u=fadeV37(fx),v=fadeV37(fy);
+    const aa=permV37[permV37[X]+Y],ab=permV37[permV37[X]+Y+1],ba=permV37[permV37[X+1]+Y],bb=permV37[permV37[X+1]+Y+1];
+    const x1=gradDotV37(aa,fx,fy)+u*(gradDotV37(ba,fx-1,fy)-gradDotV37(aa,fx,fy));
+    const x2=gradDotV37(ab,fx,fy-1)+u*(gradDotV37(bb,fx-1,fy-1)-gradDotV37(ab,fx,fy-1));
+    return x1+v*(x2-x1);
+  }
+  function fbmV37(x,y){
+    let total=0,amp=1,freq=1,norm=0;
+    for(let o=0;o<HEIGHT_V37.octaves;o++){total+=perlinV37(x*freq,y*freq)*amp;norm+=amp;amp*=HEIGHT_V37.gain;freq*=HEIGHT_V37.lacunarity}
+    return total/norm;
+  }
+  function buildHeightmapV37(){
+    buildPermV37(typeof seed==="number"?seed:1);
+    heightV37=Array.from({length:MH},function(){return Array(MW).fill(0)});
+    const eco=window.__egglandsWorldEcologyV28;
+    for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
+      const n=(fbmV37(x*HEIGHT_V37.baseFreq,y*HEIGHT_V37.baseFreq)+1)/2;
+      const sim=eco?clamp(Number(eco.cell(x,y).elevation)||0,0,1):n;
+      let h=HEIGHT_V37.blendSim*sim+HEIGHT_V37.blendNoise*n;
+      const tile=tiles[y]&&tiles[y][x];
+      if(tile===2||tile===16)h=Math.min(h,.06);
+      heightV37[y][x]=clamp(h,0,1);
+    }
+    appliedRevisionV37=-1;
+  }
+  function heightAtV37(tx,ty){
+    tx=clamp(Math.floor(tx),0,MW-1);ty=clamp(Math.floor(ty),0,MH-1);
+    return heightV37[ty]?heightV37[ty][tx]:0;
+  }
+  function heightSmoothV37(fx,fy){
+    const x0=clamp(Math.floor(fx),0,MW-1),y0=clamp(Math.floor(fy),0,MH-1),x1=Math.min(x0+1,MW-1),y1=Math.min(y0+1,MH-1);
+    const tx=fx-x0,ty=fy-y0;
+    const a=heightV37[y0][x0],b=heightV37[y0][x1],c=heightV37[y1][x0],d=heightV37[y1][x1];
+    const top=a+(b-a)*tx,bottom=c+(d-c)*tx;
+    return top+(bottom-top)*ty;
+  }
+  // Bake hillshade + altitude tint + cliff edges onto the v34 HD background.
+  // Reapplied automatically whenever v34 rebuilds its layers (revision poll).
+  function applyReliefV37(){
+    if(!heightV37.length)return;
+    const hd=window.__egglandsHD2DV34;if(!hd||typeof hd.layers!=="function")return;
+    const layers=hd.layers();if(!layers||!layers.background)return;
+    if(layers.revision===appliedRevisionV37)return;
+    const g=layers.background.getContext("2d"),art=32,step=.5,size=art*step;
+    g.save();
+    for(let ty=0;ty<MH;ty+=step)for(let tx=0;tx<MW;tx+=step){
+      const cx=tx+step/2,cy=ty+step/2;
+      const s=((heightSmoothV37(cx-.5,cy)-heightSmoothV37(cx+.5,cy))+(heightSmoothV37(cx,cy-.5)-heightSmoothV37(cx,cy+.5)))*HEIGHT_V37.shadeStrength;
+      const h=heightSmoothV37(cx,cy);
+      const light=h*HEIGHT_V37.altitudeLight-(1-h)*HEIGHT_V37.lowlandShade+s;
+      if(light>.008){g.fillStyle="rgba(255,246,220,"+Math.min(HEIGHT_V37.maxLight,light).toFixed(3)+")";g.fillRect(tx*art,ty*art,size,size)}
+      else if(light<-.008){g.fillStyle="rgba(8,10,20,"+Math.min(HEIGHT_V37.maxShade,-light).toFixed(3)+")";g.fillRect(tx*art,ty*art,size,size)}
+    }
+    g.fillStyle="rgba(10,8,14,"+HEIGHT_V37.cliffAlpha+")";
+    for(let ty=0;ty<MH;ty++)for(let tx=0;tx<MW;tx++){
+      const h=heightV37[ty][tx],px=tx*art,py=ty*art;
+      if(ty>0&&heightV37[ty-1][tx]-h>HEIGHT_V37.cliffThreshold)g.fillRect(px,py,art,3);
+      if(ty<MH-1&&heightV37[ty+1][tx]-h>HEIGHT_V37.cliffThreshold)g.fillRect(px,py+art-3,art,3);
+      if(tx>0&&heightV37[ty][tx-1]-h>HEIGHT_V37.cliffThreshold)g.fillRect(px,py,3,art);
+      if(tx<MW-1&&heightV37[ty][tx+1]-h>HEIGHT_V37.cliffThreshold)g.fillRect(px+art-3,py,3,art);
+    }
+    g.restore();
+    appliedRevisionV37=layers.revision;
+  }
+  // Per-frame animated layer: drifting cloud shadows + water sparkle.
+  // Runs inside the base render's world pass (zoom transform active),
+  // after terrain, before entities.
+  function drawHeightFXV37(){
+    if(scene!=="world"||!heightV37.length)return;
+    applyReliefV37();
+    const t=performance.now()/1000,worldW=MW*TILE,worldH=MH*TILE;
+    for(let i=0;i<HEIGHT_V37.cloudCount;i++){
+      const drift=t*HEIGHT_V37.cloudSpeed*(0.7+i*.3),r=110+i*35;
+      const wx=((drift+i*617)%(worldW+2*r))-r;
+      const wy=((i*431+Math.sin(t*.05+i*2.1)*130+worldH*.5*i*.61)%(worldH+2*r))-r;
+      const sx=wx-camera.x,sy=wy-camera.y;
+      if(sx<-r||sy<-r||sx>viewW()+r||sy>viewH()+r)continue;
+      const grad=ctx.createRadialGradient(sx,sy,r*.15,sx,sy,r);
+      grad.addColorStop(0,"rgba(12,16,30,"+HEIGHT_V37.cloudAlpha+")");
+      grad.addColorStop(.7,"rgba(12,16,30,"+(HEIGHT_V37.cloudAlpha*.55).toFixed(3)+")");
+      grad.addColorStop(1,"rgba(12,16,30,0)");
+      ctx.fillStyle=grad;ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.fill();
+    }
+    const x0=Math.max(0,Math.floor(camera.x/TILE)),y0=Math.max(0,Math.floor(camera.y/TILE));
+    const x1=Math.min(MW-1,Math.ceil((camera.x+viewW())/TILE)),y1=Math.min(MH-1,Math.ceil((camera.y+viewH())/TILE));
+    ctx.fillStyle="rgba(235,248,255,"+HEIGHT_V37.sparkleAlpha+")";
+    for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){
+      if(!tiles[ty]||tiles[ty][tx]!==2)continue;
+      for(let k=0;k<2;k++){
+        const hsh=((tx*73856093)^(ty*19349663)^(k*83492791))>>>0;
+        if(Math.sin(t*1.8+(hsh%628)/100)<=.86)continue;
+        ctx.fillRect(tx*TILE+(hsh%13)+1-camera.x,ty*TILE+((hsh>>>4)%13)+1-camera.y,2,1);
+      }
+    }
+  }
+  const previousDrawGatherHighlightV37=drawGatherHighlight;
+  drawGatherHighlight=function(){const result=previousDrawGatherHighlightV37();drawHeightFXV37();return result};
+  const previousSetupGameV37=setupGame;
+  setupGame=function(newSeed,loading){const result=previousSetupGameV37(newSeed,loading);buildHeightmapV37();return result};
+  const previousApplySaveV37=applySave;
+  applySave=function(data){const result=previousApplySaveV37(data);buildHeightmapV37();return result};
+
+  const help=document.querySelector("#helpTab .helpGrid");
+  if(help&&!document.getElementById("heightHelpV37")){
+    const k=document.createElement("span");k.id="heightHelpV37";k.className="key";k.textContent="Highlands";
+    const t=document.createElement("span");t.textContent="The valley's elevation is now visible: Perlin-noise relief shading and cliff edges are painted over the terrain, matched to the same elevation the simulation already uses for travel speed and farming. Cloud shadows drift across the land and water glints in the sun.";
+    help.appendChild(k);help.appendChild(t);
+  }
+  buildHeightmapV37();
+  window.__egglandsHeightV37={config:HEIGHT_V37,height:heightAtV37,smooth:heightSmoothV37,rebuild:buildHeightmapV37,map:function(){return heightV37}};
+  const title=document.querySelector("header h1");if(title)title.title="Highlands v37";
+  toast("v37 loaded: the highlands rise - Perlin relief shading, cliff edges, drifting cloud shadows, and sparkling water.");
+})();
+<\/script>
+
 
 `.replaceAll("<\\/script>","<"+"/script>");
 
-  const COMPOSED_CACHE_KEY="egglands_composed_v34_hd2d_final_305c70f";
+  const COMPOSED_CACHE_KEY="egglands_composed_v37_highlands_305c70f";
   let html="",networkError=null;
   try{
     const response=await fetch(BASE_URL,{cache:"no-store"});
@@ -2927,7 +3688,7 @@
     html=html.replace('entities.push({y:player.y,draw:()=>{','entities.push({y:player.y+16,draw:()=>{');
     if(!html.includes('entities.push({y:a.y+16,draw:')||!html.includes('entities.push({y:player.y+16,draw:()=>{'))throw new Error("The pinned renderer could not be migrated to foot-based sorting.");
 
-    html=html.replace(/<title>The Egg Lands<\/title>/,'<title>The Egg Lands - HD-2D Massive Migration v34<\/title>');
+    html=html.replace(/<title>The Egg Lands<\/title>/,'<title>The Egg Lands - Highlands v37<\/title>');
     if(!html.includes("</body>"))throw new Error("The pinned game build is malformed.");
     html=html.replace("</body>",patch+"\n</body>");
     try{localStorage.setItem(COMPOSED_CACHE_KEY,html)}catch(cacheError){}
