@@ -1,0 +1,34 @@
+{
+  "project": "The Egg Lands",
+  "version": 87,
+  "release_name": "Origin Character Creator",
+  "primary_file": "index.html",
+  "architecture": "single-html loader and accumulated patch compositor",
+  "base_source": {
+    "repository": "RayCarpenterIII/Economics-RPG",
+    "commit": "544ceaaf1a60d4c26ac058a601256d2f49e3077b",
+    "path": "index.html"
+  },
+  "character_assets": {
+    "repository": "LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator",
+    "commit": "b312d60647509b06339ba951c18f4f5ff9cb6b52",
+    "credits_path": "CREDITS.csv",
+    "first_load_network_required": true
+  },
+  "development_rules": {
+    "keep_single_html": true,
+    "return_complete_html_each_iteration": true,
+    "increment_version_each_delivery": true,
+    "preserve_save_compatibility": true,
+    "push_to_github_only_when_explicitly_requested": true
+  },
+  "next_version": 88,
+  "known_priority_tests": [
+    "first-run character creator",
+    "existing save creator migration",
+    "same customized player on foot and mounted",
+    "mounted saddle alignment across body types",
+    "mobile control overlap",
+    "open asset loading fallback"
+  ]
+}
