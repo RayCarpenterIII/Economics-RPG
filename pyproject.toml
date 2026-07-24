@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "the-egg-lands"
+version = "0.27.0"
+description = "Python-authoritative multi-town economy, villager trade, and byte-backed game audio for The Egg Lands."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Ray Carpenter"}]
+dependencies = []
+
+[project.optional-dependencies]
+fast-math = ["numpy>=1.26"]
+
+[project.scripts]
+egglands-build = "tools.build_preview:main"
+egglands-export-content = "tools.export_content:main"
+egglands-serve = "egglands.server.app:main"
+egglands-benchmark = "egglands.economy.benchmark:main"
+egglands-doctor = "tools.doctor:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["egglands*", "tools*"]

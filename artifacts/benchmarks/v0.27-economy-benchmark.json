@@ -1,0 +1,224 @@
+{
+  "average_happiness": 0.8312956845395394,
+  "average_household_wealth_cents": 63152,
+  "average_hunger": 0.0,
+  "building_counts": {
+    "bakery": 6,
+    "farm": 8,
+    "hunter_lodge": 5,
+    "lumber_camp": 4,
+    "market": 2,
+    "mill": 3,
+    "mine": 3,
+    "quarry": 3,
+    "smithy": 3,
+    "weaver": 4
+  },
+  "config": {
+    "days": 365,
+    "population": 1000,
+    "seed": 20260724,
+    "town_name": "Eggford"
+  },
+  "elapsed_seconds": 0.1890384460000405,
+  "employed_population": 558,
+  "employment_rate": 0.8181818181818182,
+  "final_inventory": {
+    "bread": 266975,
+    "cloth": 129460,
+    "flour": 0,
+    "grain": 3114800,
+    "hides": 16758,
+    "iron_ore": 82631,
+    "meat": 289350,
+    "stone": 286700,
+    "timber": 407152,
+    "tools": 32243
+  },
+  "final_prices_cents": {
+    "bread": 14,
+    "cloth": 38,
+    "flour": 28,
+    "grain": 4,
+    "hides": 32,
+    "iron_ore": 25,
+    "meat": 21,
+    "stone": 14,
+    "timber": 18,
+    "tools": 115
+  },
+  "household_count": 308,
+  "invariants": {
+    "bounded_happiness": true,
+    "bounded_hunger": true,
+    "household_members_preserved": true,
+    "nonnegative_inventory": true,
+    "population_preserved": true,
+    "positive_prices": true
+  },
+  "matrix_backend": "numpy",
+  "monthly_trace": [
+    {
+      "average_happiness": 0.72803,
+      "average_household_wealth_cents": 17874,
+      "average_hunger": 0.0,
+      "bread_inventory": 27450,
+      "bread_price_cents": 16,
+      "day": 30,
+      "grain_inventory": 260600
+    },
+    {
+      "average_happiness": 0.79053,
+      "average_household_wealth_cents": 21862,
+      "average_hunger": 0.0,
+      "bread_inventory": 48900,
+      "bread_price_cents": 15,
+      "day": 60,
+      "grain_inventory": 516200
+    },
+    {
+      "average_happiness": 0.81555,
+      "average_household_wealth_cents": 25890,
+      "average_hunger": 0.0,
+      "bread_inventory": 70350,
+      "bread_price_cents": 14,
+      "day": 90,
+      "grain_inventory": 771800
+    },
+    {
+      "average_happiness": 0.82547,
+      "average_household_wealth_cents": 29950,
+      "average_hunger": 0.0,
+      "bread_inventory": 91800,
+      "bread_price_cents": 14,
+      "day": 120,
+      "grain_inventory": 1027400
+    },
+    {
+      "average_happiness": 0.82958,
+      "average_household_wealth_cents": 34009,
+      "average_hunger": 0.0,
+      "bread_inventory": 113250,
+      "bread_price_cents": 14,
+      "day": 150,
+      "grain_inventory": 1283000
+    },
+    {
+      "average_happiness": 0.8314,
+      "average_household_wealth_cents": 38072,
+      "average_hunger": 0.0,
+      "bread_inventory": 134700,
+      "bread_price_cents": 14,
+      "day": 180,
+      "grain_inventory": 1538600
+    },
+    {
+      "average_happiness": 0.83217,
+      "average_household_wealth_cents": 42134,
+      "average_hunger": 0.0,
+      "bread_inventory": 156150,
+      "bread_price_cents": 14,
+      "day": 210,
+      "grain_inventory": 1794200
+    },
+    {
+      "average_happiness": 0.83244,
+      "average_household_wealth_cents": 46197,
+      "average_hunger": 0.0,
+      "bread_inventory": 177600,
+      "bread_price_cents": 14,
+      "day": 240,
+      "grain_inventory": 2049800
+    },
+    {
+      "average_happiness": 0.83235,
+      "average_household_wealth_cents": 50260,
+      "average_hunger": 0.0,
+      "bread_inventory": 199050,
+      "bread_price_cents": 14,
+      "day": 270,
+      "grain_inventory": 2305400
+    },
+    {
+      "average_happiness": 0.83206,
+      "average_household_wealth_cents": 54326,
+      "average_hunger": 0.0,
+      "bread_inventory": 220500,
+      "bread_price_cents": 14,
+      "day": 300,
+      "grain_inventory": 2561000
+    },
+    {
+      "average_happiness": 0.8317,
+      "average_household_wealth_cents": 58399,
+      "average_hunger": 0.0,
+      "bread_inventory": 241950,
+      "bread_price_cents": 14,
+      "day": 330,
+      "grain_inventory": 2816600
+    },
+    {
+      "average_happiness": 0.83135,
+      "average_household_wealth_cents": 62473,
+      "average_hunger": 0.0,
+      "bread_inventory": 263400,
+      "bread_price_cents": 14,
+      "day": 360,
+      "grain_inventory": 3072200
+    },
+    {
+      "average_happiness": 0.8313,
+      "average_household_wealth_cents": 63152,
+      "average_hunger": 0.0,
+      "bread_inventory": 266975,
+      "bread_price_cents": 14,
+      "day": 365,
+      "grain_inventory": 3114800
+    }
+  ],
+  "occupation_counts": {
+    "baker": 62,
+    "builder": 24,
+    "dependent": 318,
+    "farmer": 151,
+    "hunter": 53,
+    "lumberjack": 58,
+    "merchant": 27,
+    "miller": 36,
+    "miner": 41,
+    "quarry_worker": 45,
+    "smith": 22,
+    "unemployed": 124,
+    "weaver": 39
+  },
+  "total_consumption": {
+    "bread": 182500,
+    "cloth": 2190,
+    "flour": 0,
+    "grain": 0,
+    "hides": 0,
+    "iron_ore": 0,
+    "meat": 40150,
+    "stone": 0,
+    "timber": 0,
+    "tools": 730
+  },
+  "total_production": {
+    "bread": 446475,
+    "cloth": 131400,
+    "flour": 295650,
+    "grain": 3504000,
+    "hides": 82125,
+    "iron_ore": 180675,
+    "meat": 328500,
+    "stone": 284700,
+    "timber": 438000,
+    "tools": 32848
+  },
+  "utility_matrix_shape": [
+    1000,
+    6
+  ],
+  "version": "0.27",
+  "working_age_population": 682
+}

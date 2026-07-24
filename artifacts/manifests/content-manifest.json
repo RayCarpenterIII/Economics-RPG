@@ -1,0 +1,439 @@
+{
+  "buildings": {
+    "bakery": {
+      "capacity_per_building": 100,
+      "id": "bakery",
+      "label": "Bakery",
+      "worker_capacity": 12
+    },
+    "farm": {
+      "capacity_per_building": 120,
+      "id": "farm",
+      "label": "Farm",
+      "worker_capacity": 20
+    },
+    "hunter_lodge": {
+      "capacity_per_building": 45,
+      "id": "hunter_lodge",
+      "label": "Hunter Lodge",
+      "worker_capacity": 12
+    },
+    "lumber_camp": {
+      "capacity_per_building": 75,
+      "id": "lumber_camp",
+      "label": "Lumber Camp",
+      "worker_capacity": 16
+    },
+    "market": {
+      "capacity_per_building": 300,
+      "id": "market",
+      "label": "Market",
+      "worker_capacity": 20
+    },
+    "mill": {
+      "capacity_per_building": 90,
+      "id": "mill",
+      "label": "Mill",
+      "worker_capacity": 12
+    },
+    "mine": {
+      "capacity_per_building": 55,
+      "id": "mine",
+      "label": "Mine",
+      "worker_capacity": 18
+    },
+    "quarry": {
+      "capacity_per_building": 65,
+      "id": "quarry",
+      "label": "Quarry",
+      "worker_capacity": 18
+    },
+    "smithy": {
+      "capacity_per_building": 30,
+      "id": "smithy",
+      "label": "Smithy",
+      "worker_capacity": 8
+    },
+    "weaver": {
+      "capacity_per_building": 45,
+      "id": "weaver",
+      "label": "Weaver",
+      "worker_capacity": 10
+    }
+  },
+  "classes": {
+    "mage": {
+      "description": "Magic and specialty-action specialist.",
+      "id": "mage",
+      "label": "Mage"
+    },
+    "noble": {
+      "description": "Hybrid class focused between combat and influence.",
+      "id": "noble",
+      "label": "Noble"
+    },
+    "warrior": {
+      "description": "Physical combat specialist.",
+      "id": "warrior",
+      "label": "Warrior"
+    }
+  },
+  "compatibility_mode": "python-authoritative-town-economy-plus-villager-trade",
+  "items": {
+    "bread": {
+      "base_price_cents": 16,
+      "category": "food",
+      "id": "bread",
+      "label": "Bread",
+      "perishable": true,
+      "stack_limit": 999
+    },
+    "cloth": {
+      "base_price_cents": 55,
+      "category": "material",
+      "id": "cloth",
+      "label": "Cloth",
+      "perishable": false,
+      "stack_limit": 999
+    },
+    "flour": {
+      "base_price_cents": 9,
+      "category": "food_input",
+      "id": "flour",
+      "label": "Flour",
+      "perishable": true,
+      "stack_limit": 999
+    },
+    "grain": {
+      "base_price_cents": 4,
+      "category": "food_input",
+      "id": "grain",
+      "label": "Grain",
+      "perishable": true,
+      "stack_limit": 999
+    },
+    "hides": {
+      "base_price_cents": 34,
+      "category": "material",
+      "id": "hides",
+      "label": "Hides",
+      "perishable": false,
+      "stack_limit": 999
+    },
+    "iron_ore": {
+      "base_price_cents": 25,
+      "category": "material",
+      "id": "iron_ore",
+      "label": "Iron Ore",
+      "perishable": false,
+      "stack_limit": 999
+    },
+    "meat": {
+      "base_price_cents": 28,
+      "category": "food",
+      "id": "meat",
+      "label": "Meat",
+      "perishable": true,
+      "stack_limit": 999
+    },
+    "stone": {
+      "base_price_cents": 14,
+      "category": "material",
+      "id": "stone",
+      "label": "Stone",
+      "perishable": false,
+      "stack_limit": 999
+    },
+    "timber": {
+      "base_price_cents": 18,
+      "category": "material",
+      "id": "timber",
+      "label": "Timber",
+      "perishable": false,
+      "stack_limit": 999
+    },
+    "tools": {
+      "base_price_cents": 180,
+      "category": "equipment",
+      "id": "tools",
+      "label": "Tools",
+      "perishable": false,
+      "stack_limit": 100
+    }
+  },
+  "legacy_game_version": 92,
+  "occupations": {
+    "baker": {
+      "base_daily_wage_cents": 96,
+      "id": "baker",
+      "label": "Baker",
+      "recipe_id": "bake_bread",
+      "target_worker_share": 0.08
+    },
+    "builder": {
+      "base_daily_wage_cents": 105,
+      "id": "builder",
+      "label": "Builder",
+      "recipe_id": null,
+      "target_worker_share": 0.04
+    },
+    "farmer": {
+      "base_daily_wage_cents": 72,
+      "id": "farmer",
+      "label": "Farmer",
+      "recipe_id": "grow_grain",
+      "target_worker_share": 0.25
+    },
+    "hunter": {
+      "base_daily_wage_cents": 102,
+      "id": "hunter",
+      "label": "Hunter",
+      "recipe_id": "hunt_game",
+      "target_worker_share": 0.08
+    },
+    "lumberjack": {
+      "base_daily_wage_cents": 88,
+      "id": "lumberjack",
+      "label": "Lumberjack",
+      "recipe_id": "cut_timber",
+      "target_worker_share": 0.1
+    },
+    "merchant": {
+      "base_daily_wage_cents": 110,
+      "id": "merchant",
+      "label": "Merchant",
+      "recipe_id": null,
+      "target_worker_share": 0.05
+    },
+    "miller": {
+      "base_daily_wage_cents": 92,
+      "id": "miller",
+      "label": "Miller",
+      "recipe_id": "mill_flour",
+      "target_worker_share": 0.06
+    },
+    "miner": {
+      "base_daily_wage_cents": 104,
+      "id": "miner",
+      "label": "Miner",
+      "recipe_id": "mine_ore",
+      "target_worker_share": 0.08
+    },
+    "quarry_worker": {
+      "base_daily_wage_cents": 94,
+      "id": "quarry_worker",
+      "label": "Quarry Worker",
+      "recipe_id": "quarry_stone",
+      "target_worker_share": 0.08
+    },
+    "smith": {
+      "base_daily_wage_cents": 128,
+      "id": "smith",
+      "label": "Smith",
+      "recipe_id": "forge_tools",
+      "target_worker_share": 0.05
+    },
+    "unemployed": {
+      "base_daily_wage_cents": 0,
+      "id": "unemployed",
+      "label": "Unemployed",
+      "recipe_id": null,
+      "target_worker_share": 0.02
+    },
+    "weaver": {
+      "base_daily_wage_cents": 90,
+      "id": "weaver",
+      "label": "Weaver",
+      "recipe_id": "weave_cloth",
+      "target_worker_share": 0.06
+    }
+  },
+  "phase": 3,
+  "project_version": "0.27",
+  "races": {
+    "human": {
+      "id": "human",
+      "label": "Human",
+      "size": "large",
+      "sprite": {
+        "directions": [
+          "down",
+          "left",
+          "right",
+          "up"
+        ],
+        "frame_height": 64,
+        "frame_width": 32,
+        "frames_per_direction": 4,
+        "ground_anchor_x": 16,
+        "ground_anchor_y": 63,
+        "sheet_height": 256,
+        "sheet_width": 128
+      },
+      "supports_ears": false,
+      "supports_fur": false,
+      "supports_horns": false,
+      "supports_tail": false
+    },
+    "khajit": {
+      "id": "khajit",
+      "label": "Khajit",
+      "size": "small",
+      "sprite": {
+        "directions": [
+          "down",
+          "left",
+          "right",
+          "up"
+        ],
+        "frame_height": 32,
+        "frame_width": 32,
+        "frames_per_direction": 4,
+        "ground_anchor_x": 16,
+        "ground_anchor_y": 31,
+        "sheet_height": 128,
+        "sheet_width": 128
+      },
+      "supports_ears": true,
+      "supports_fur": true,
+      "supports_horns": false,
+      "supports_tail": true
+    },
+    "tiefling": {
+      "id": "tiefling",
+      "label": "Tiefling",
+      "size": "large",
+      "sprite": {
+        "directions": [
+          "down",
+          "left",
+          "right",
+          "up"
+        ],
+        "frame_height": 64,
+        "frame_width": 32,
+        "frames_per_direction": 4,
+        "ground_anchor_x": 16,
+        "ground_anchor_y": 63,
+        "sheet_height": 256,
+        "sheet_width": 128
+      },
+      "supports_ears": false,
+      "supports_fur": false,
+      "supports_horns": true,
+      "supports_tail": true
+    }
+  },
+  "recipes": {
+    "bake_bread": {
+      "building_id": "bakery",
+      "id": "bake_bread",
+      "inputs": {
+        "flour": 2
+      },
+      "label": "Bake Bread",
+      "labor_minutes": 20,
+      "occupation_id": "baker",
+      "outputs": {
+        "bread": 3
+      }
+    },
+    "cut_timber": {
+      "building_id": "lumber_camp",
+      "id": "cut_timber",
+      "inputs": {},
+      "label": "Cut Timber",
+      "labor_minutes": 55,
+      "occupation_id": "lumberjack",
+      "outputs": {
+        "timber": 4
+      }
+    },
+    "forge_tools": {
+      "building_id": "smithy",
+      "id": "forge_tools",
+      "inputs": {
+        "iron_ore": 3,
+        "timber": 1
+      },
+      "label": "Forge Tools",
+      "labor_minutes": 120,
+      "occupation_id": "smith",
+      "outputs": {
+        "tools": 1
+      }
+    },
+    "grow_grain": {
+      "building_id": "farm",
+      "id": "grow_grain",
+      "inputs": {},
+      "label": "Grow Grain",
+      "labor_minutes": 60,
+      "occupation_id": "farmer",
+      "outputs": {
+        "grain": 10
+      }
+    },
+    "hunt_game": {
+      "building_id": "hunter_lodge",
+      "id": "hunt_game",
+      "inputs": {},
+      "label": "Hunt Game",
+      "labor_minutes": 80,
+      "occupation_id": "hunter",
+      "outputs": {
+        "hides": 1,
+        "meat": 4
+      }
+    },
+    "mill_flour": {
+      "building_id": "mill",
+      "id": "mill_flour",
+      "inputs": {
+        "grain": 4
+      },
+      "label": "Mill Flour",
+      "labor_minutes": 30,
+      "occupation_id": "miller",
+      "outputs": {
+        "flour": 3
+      }
+    },
+    "mine_ore": {
+      "building_id": "mine",
+      "id": "mine_ore",
+      "inputs": {},
+      "label": "Mine Iron Ore",
+      "labor_minutes": 75,
+      "occupation_id": "miner",
+      "outputs": {
+        "iron_ore": 3
+      }
+    },
+    "quarry_stone": {
+      "building_id": "quarry",
+      "id": "quarry_stone",
+      "inputs": {},
+      "label": "Quarry Stone",
+      "labor_minutes": 65,
+      "occupation_id": "quarry_worker",
+      "outputs": {
+        "stone": 4
+      }
+    },
+    "weave_cloth": {
+      "building_id": "weaver",
+      "id": "weave_cloth",
+      "inputs": {
+        "hides": 1
+      },
+      "label": "Weave Cloth",
+      "labor_minutes": 90,
+      "occupation_id": "weaver",
+      "outputs": {
+        "cloth": 2
+      }
+    }
+  },
+  "schema_version": 4
+}

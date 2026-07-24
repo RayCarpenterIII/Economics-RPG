@@ -1,4 +1,8 @@
-node_modules/
-*.log
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
 .DS_Store
-Thumbs.db
+artifacts/local-logs/

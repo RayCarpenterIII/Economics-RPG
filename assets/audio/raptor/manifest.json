@@ -1,0 +1,98 @@
+{
+  "version": "0.25",
+  "format": "PCM WAV, mono, signed 16-bit little-endian",
+  "sample_rate": 22050,
+  "total_audio_bytes": 135380,
+  "clips": [
+    {
+      "file": "bite_hit_1.wav",
+      "bytes": 12832,
+      "duration_seconds": 0.29,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.92,
+      "category": "bite_hit"
+    },
+    {
+      "file": "bite_hit_2.wav",
+      "bytes": 12832,
+      "duration_seconds": 0.29,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.92,
+      "category": "bite_hit"
+    },
+    {
+      "file": "bite_hit_3.wav",
+      "bytes": 12832,
+      "duration_seconds": 0.29,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.92,
+      "category": "bite_hit"
+    },
+    {
+      "file": "bite_hit_4.wav",
+      "bytes": 12832,
+      "duration_seconds": 0.29,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.92,
+      "category": "bite_hit"
+    },
+    {
+      "file": "bite_miss_1.wav",
+      "bytes": 8422,
+      "duration_seconds": 0.19,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.63297,
+      "category": "bite_miss"
+    },
+    {
+      "file": "bite_miss_2.wav",
+      "bytes": 8422,
+      "duration_seconds": 0.19,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.61683,
+      "category": "bite_miss"
+    },
+    {
+      "file": "mount_chirp.wav",
+      "bytes": 18566,
+      "duration_seconds": 0.42,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.43862,
+      "category": "mount"
+    },
+    {
+      "file": "dismount_huff.wav",
+      "bytes": 16802,
+      "duration_seconds": 0.38,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.32982,
+      "category": "dismount"
+    },
+    {
+      "file": "idle_trill.wav",
+      "bytes": 25622,
+      "duration_seconds": 0.58,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.46029,
+      "category": "idle"
+    },
+    {
+      "file": "run_step.wav",
+      "bytes": 6218,
+      "duration_seconds": 0.14,
+      "sample_rate": 22050,
+      "channels": 1,
+      "peak": 0.51156,
+      "category": "run_step"
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "project_version": "0.27",
+  "phase": 3,
+  "status": "passed",
+  "compiled_file": "the-egg-lands-v0.27-trade-ally-escort-preview.html",
+  "compiled_bytes": 2754678,
+  "compiled_sha256": "42577f8412045d42519a6afe14c772f7d791697b36efdcae29d5fc48fe305d67",
+  "protocol_version": 6,
+  "economy_mode": "python-authoritative-town-economy",
+  "authority_scope": [
+    "town_inventory",
+    "town_prices",
+    "production",
+    "employment",
+    "wages",
+    "consumption"
+  ],
+  "trade_modes": [
+    "villagers",
+    "town_market",
+    "empire_market"
+  ],
+  "checks": [
+    {
+      "name": "build",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "Built: /mnt/data/v027_work/the-egg-lands-v0.27/artifacts/previews/the-egg-lands-v0.27-trade-ally-escort-preview.html\nSHA-256: 42577f8412045d42519a6afe14c772f7d791697b36efdcae29d5fc48fe305d67\n",
+      "stderr": ""
+    },
+    {
+      "name": "python_compile",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "unit_tests",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "test_audio_library_contains_real_pcm_bytes (test_audio_assets.RaptorAudioAssetTests.test_audio_library_contains_real_pcm_bytes) ... ok\ntest_embedded_payload_decodes_to_declared_byte_lengths (test_audio_assets.RaptorAudioAssetTests.test_embedded_payload_decodes_to_declared_byte_lengths) ... ok\ntest_application_is_recorded_and_validated (test_authority.AuthorityTests.test_application_is_recorded_and_validated) ... ok\ntest_oversized_application_is_rejected (test_authority.AuthorityTests.test_oversized_application_is_rejected) ... ok\ntest_proposal_is_manual_and_bounded (test_authority.AuthorityTests.test_proposal_is_manual_and_bounded) ... ok\ntest_ingest_and_status (test_bridge.BridgeTests.test_ingest_and_status) ... ok\ntest_new_session_can_restart_sequence (test_bridge.BridgeTests.test_new_session_can_restart_sequence) ... ok\ntest_protocol_is_validated (test_bridge.BridgeTests.test_protocol_is_validated) ... ok\ntest_sequence_cannot_move_backwards_in_same_session (test_bridge.BridgeTests.test_sequence_cannot_move_backwards_in_same_session) ... ok\ntest_build_markers (test_build_identity.BuildIdentityTests.test_build_markers) ... ok\ntest_manifest (test_content.ContentTests.test_manifest) ... ok\ntest_deterministic_and_invariants (test_economy.EconomyTests.test_deterministic_and_invariants) ... ok\ntest_population_bounds (test_economy.EconomyTests.test_population_bounds) ... ok\ntest_empire_trade_unlocks_after_threshold (test_live_economy.LiveEconomyTests.test_empire_trade_unlocks_after_threshold) ... ok\ntest_market_is_development_gated (test_live_economy.LiveEconomyTests.test_market_is_development_gated) ... ok\ntest_prices_inventory_and_flows_are_python_authoritative (test_live_economy.LiveEconomyTests.test_prices_inventory_and_flows_are_python_authoritative) ... ok\ntest_processed_goods_require_real_inputs (test_live_economy.LiveEconomyTests.test_processed_goods_require_real_inputs) ... ok\ntest_repeated_trade_can_create_protection_ally (test_live_economy.LiveEconomyTests.test_repeated_trade_can_create_protection_ally) ... ok\ntest_shortage_raises_price_and_surplus_can_lower_price (test_live_economy.LiveEconomyTests.test_shortage_raises_price_and_surplus_can_lower_price) ... ok\ntest_villager_demand_and_trade_relationship (test_live_economy.LiveEconomyTests.test_villager_demand_and_trade_relationship) ... ok\ntest_protocol_version (test_protocol.ProtocolTests.test_protocol_version) ... ok\ntest_health (test_server.ServerTests.test_health) ... ok\ntest_reset_clears_sessions (test_shadow.ShadowEconomyTests.test_reset_clears_sessions) ... ok\ntest_shadow_report_is_read_only_and_deterministic (test_shadow.ShadowEconomyTests.test_shadow_report_is_read_only_and_deterministic) ... ok\ntest_stock_delta_is_tracked_by_session (test_shadow.ShadowEconomyTests.test_stock_delta_is_tracked_by_session) ... ok\n\n----------------------------------------------------------------------\nRan 25 tests in 0.036s\n\nOK\n"
+    },
+    {
+      "name": "build_verifier",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "PASS: v0.27 contains Python-authoritative town prices, inventories, production, employment, wages, and consumption.\nPASS: trusted trade allies can be invited, follow the player, fight nearby enemies, recover, and persist through saves.\nPASS: small-town villager trade, development-gated formal markets, and the empire internal-market threshold are present.\nPASS: v0.25 byte-backed raptor audio remains embedded.\nPASS: no function key is required.\nLegacy SHA-256:   421c61c13084f1ee5b06dc48c8aa0d566eadaefc960a057534429396039d6d83\nCompiled SHA-256: 42577f8412045d42519a6afe14c772f7d791697b36efdcae29d5fc48fe305d67\nCompiled bytes:   2754678\n",
+      "stderr": ""
+    },
+    {
+      "name": "character_playtest",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "\"town_name\": \"SOUTHWATCH\",\n              \"world_day\": 5,\n              \"population\": 20,\n              \"building_count\": 0,\n              \"control\": \"conquered\",\n              \"development_score\": 11.6,\n              \"market_available\": true,\n              \"trade_mode\": \"empire_market\",\n              \"working_age_population\": 12,\n              \"employed_population\": 8,\n              \"unemployed_population\": 4,\n              \"employment_rate\": 0.6666666666666666,\n              \"average_daily_wage\": 1.1,\n              \"household_wealth\": 120,\n              \"payroll_last_step\": 0,\n              \"consumption_spending_last_step\": 31.671564576838904,\n              \"treasury\": 50,\n              \"trade_volume\": 0,\n              \"employment\": {\n                \"producers\": 8\n              },\n              \"market_inventory\": {\n                \"fish\": 6.279999999999999,\n                \"log\": 63.35999999999999,\n                \"stone\": 17.520000000000003,\n                \"part\": 8.12,\n                \"grain\": 122.16,\n                \"ore\": 8.08,\n                \"cloth\": 81.968\n              },\n              \"market_prices\": {\n                \"fish\": 2.0829377381953247,\n                \"log\": 0.5223304462167686,\n                \"stone\": 0.638403878709384,\n                \"part\": 1.3928811899113829,\n                \"grain\": 0.464293729970461,\n                \"ore\": 1.276807757418768,\n                \"cloth\": 0.9866241761872295\n              },\n              \"item_flows\": {\n                \"fish\": {\n                  \"item_id\": \"fish\",\n                  \"inventory\": 6.279999999999999,\n                  \"price\": 2.0829377381953247,\n                  \"demand_per_day\": 2.1,\n                  \"production_per_day\": 8.68,\n                  \"consumed_last_step\": 8.4,\n                  \"produced_last_step\": 8.68,\n                  \"coverage_days\": 2.99047619047619\n                },\n                \"log\": {\n                  \"item_id\": \"log\",\n                  \"inventory\": 63.35999999999999,\n                  \"price\": 0.5223304462167686,\n                  \"demand_per_day\": 0.56,\n                  \"production_per_day\": 5.6,\n                  \"consumed_last_step\": 2.24,\n                  \"produced_last_step\": 5.6,\n                  \"coverage_days\": 113.14285714285712\n                },\n                \"stone\": {\n                  \"item_id\": \"stone\",\n                  \"inventory\": 17.520000000000003,\n                  \"price\": 0.638403878709384,\n                  \"demand_per_day\": 0.52,\n                  \"production_per_day\": 5.6,\n                  \"consumed_last_step\": 2.08,\n                  \"produced_last_step\": 5.6,\n                  \"coverage_days\": 33.6923076923077\n                },\n                \"part\": {\n                  \"item_id\": \"part\",\n                  \"inventory\": 8.12,\n                  \"price\": 1.3928811899113829,\n                  \"demand_per_day\": 0.12,\n                  \"production_per_day\": 5.6,\n                  \"consumed_last_step\": 0.48,\n                  \"produced_last_step\": 5.6,\n                  \"coverage_days\": 67.66666666666666\n                },\n                \"grain\": {\n                  \"item_id\": \"grain\",\n                  \"inventory\": 122.16,\n                  \"price\": 0.464293729970461,\n                  \"demand_per_day\": 4.5,\n                  \"production_per_day\": 20.16,\n                  \"consumed_last_step\": 18,\n                  \"produced_last_step\": 20.16,\n                  \"coverage_days\": 27.146666666666665\n                },\n                \"ore\": {\n                  \"item_id\": \"ore\",\n                  \"inventory\": 8.08,\n                  \"price\": 1.276807757418768,\n                  \"demand_per_day\": 0.38,\n                  \"production_per_day\": 5.6,\n                  \"consumed_last_step\": 1.52,\n                  \"produced_last_step\": 5.6,\n                  \"coverage_days\": 21.263157894736842\n                },\n                \"cloth\": {\n                  \"item_id\": \"cloth\",\n                  \"inventory\": 81.968,\n                  \"price\": 0.9866241761872295,\n                  \"demand_per_day\": 0.18,\n                  \"production_per_day\": 2.6879999999999997,\n                  \"consumed_last_step\": 0.72,\n                  \"produced_last_step\": 2.6879999999999997,\n                  \"coverage_days\": 455.3777777777778\n                }\n              },\n              \"villager_count\": 20,\n              \"trade_allies\": 0\n            }\n          },\n          \"updated_at_ms\": 1784899669117\n        },\n        \"towns\": [\n          {\n            \"name\": \"NORTHMARCH\",\n            \"control\": \"conquered\",\n            \"mode\": \"empire_market\",\n            \"market\": true\n          },\n          {\n            \"name\": \"EASTMERE\",\n            \"control\": \"conquered\",\n            \"mode\": \"empire_market\",\n            \"market\": true\n          },\n          {\n            \"name\": \"SOUTHWATCH\",\n            \"control\": \"conquered\",\n            \"mode\": \"empire_market\",\n            \"market\": true\n          }\n        ]\n      }\n    },\n    {\n      \"name\": \"conquered_towns_gain_internal_market\",\n      \"passed\": true,\n      \"detail\": [\n        {\n          \"name\": \"NORTHMARCH\",\n          \"control\": \"conquered\",\n          \"mode\": \"empire_market\",\n          \"market\": true\n        },\n        {\n          \"name\": \"EASTMERE\",\n          \"control\": \"conquered\",\n          \"mode\": \"empire_market\",\n          \"market\": true\n        },\n        {\n          \"name\": \"SOUTHWATCH\",\n          \"control\": \"conquered\",\n          \"mode\": \"empire_market\",\n          \"market\": true\n        }\n      ]\n    },\n    {\n      \"name\": \"touch_settings_controls\",\n      \"passed\": true\n    },\n    {\n      \"name\": \"mounted_khajit_capture\",\n      \"passed\": true\n    }\n  ],\n  \"errors\": [],\n  \"session_actions\": [\n    \"move\",\n    \"attack\",\n    \"jump\",\n    \"dash\",\n    \"interact\",\n    \"move\",\n    \"attack\",\n    \"jump\",\n    \"dash\",\n    \"interact\",\n    \"move\",\n    \"attack\",\n    \"jump\",\n    \"dash\",\n    \"interact\"\n  ],\n  \"passed\": 33,\n  \"total\": 33\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "server_integration",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "rker\",\n            \"recipe_id\": \"quarry_stone\",\n            \"target_worker_share\": 0.08\n          },\n          \"smith\": {\n            \"base_daily_wage_cents\": 128,\n            \"id\": \"smith\",\n            \"label\": \"Smith\",\n            \"recipe_id\": \"forge_tools\",\n            \"target_worker_share\": 0.05\n          },\n          \"unemployed\": {\n            \"base_daily_wage_cents\": 0,\n            \"id\": \"unemployed\",\n            \"label\": \"Unemployed\",\n            \"recipe_id\": null,\n            \"target_worker_share\": 0.02\n          },\n          \"weaver\": {\n            \"base_daily_wage_cents\": 90,\n            \"id\": \"weaver\",\n            \"label\": \"Weaver\",\n            \"recipe_id\": \"weave_cloth\",\n            \"target_worker_share\": 0.06\n          }\n        },\n        \"phase\": 3,\n        \"project_version\": \"0.27\",\n        \"races\": {\n          \"human\": {\n            \"id\": \"human\",\n            \"label\": \"Human\",\n            \"size\": \"large\",\n            \"sprite\": {\n              \"directions\": [\n                \"down\",\n                \"left\",\n                \"right\",\n                \"up\"\n              ],\n              \"frame_height\": 64,\n              \"frame_width\": 32,\n              \"frames_per_direction\": 4,\n              \"ground_anchor_x\": 16,\n              \"ground_anchor_y\": 63,\n              \"sheet_height\": 256,\n              \"sheet_width\": 128\n            },\n            \"supports_ears\": false,\n            \"supports_fur\": false,\n            \"supports_horns\": false,\n            \"supports_tail\": false\n          },\n          \"khajit\": {\n            \"id\": \"khajit\",\n            \"label\": \"Khajit\",\n            \"size\": \"small\",\n            \"sprite\": {\n              \"directions\": [\n                \"down\",\n                \"left\",\n                \"right\",\n                \"up\"\n              ],\n              \"frame_height\": 32,\n              \"frame_width\": 32,\n              \"frames_per_direction\": 4,\n              \"ground_anchor_x\": 16,\n              \"ground_anchor_y\": 31,\n              \"sheet_height\": 128,\n              \"sheet_width\": 128\n            },\n            \"supports_ears\": true,\n            \"supports_fur\": true,\n            \"supports_horns\": false,\n            \"supports_tail\": true\n          },\n          \"tiefling\": {\n            \"id\": \"tiefling\",\n            \"label\": \"Tiefling\",\n            \"size\": \"large\",\n            \"sprite\": {\n              \"directions\": [\n                \"down\",\n                \"left\",\n                \"right\",\n                \"up\"\n              ],\n              \"frame_height\": 64,\n              \"frame_width\": 32,\n              \"frames_per_direction\": 4,\n              \"ground_anchor_x\": 16,\n              \"ground_anchor_y\": 63,\n              \"sheet_height\": 256,\n              \"sheet_width\": 128\n            },\n            \"supports_ears\": false,\n            \"supports_fur\": false,\n            \"supports_horns\": true,\n            \"supports_tail\": true\n          }\n        },\n        \"recipes\": {\n          \"bake_bread\": {\n            \"building_id\": \"bakery\",\n            \"id\": \"bake_bread\",\n            \"inputs\": {\n              \"flour\": 2\n            },\n            \"label\": \"Bake Bread\",\n            \"labor_minutes\": 20,\n            \"occupation_id\": \"baker\",\n            \"outputs\": {\n              \"bread\": 3\n            }\n          },\n          \"cut_timber\": {\n            \"building_id\": \"lumber_camp\",\n            \"id\": \"cut_timber\",\n            \"inputs\": {},\n            \"label\": \"Cut Timber\",\n            \"labor_minutes\": 55,\n            \"occupation_id\": \"lumberjack\",\n            \"outputs\": {\n              \"timber\": 4\n            }\n          },\n          \"forge_tools\": {\n            \"building_id\": \"smithy\",\n            \"id\": \"forge_tools\",\n            \"inputs\": {\n              \"iron_ore\": 3,\n              \"timber\": 1\n            },\n            \"label\": \"Forge Tools\",\n            \"labor_minutes\": 120,\n            \"occupation_id\": \"smith\",\n            \"outputs\": {\n              \"tools\": 1\n            }\n          },\n          \"grow_grain\": {\n            \"building_id\": \"farm\",\n            \"id\": \"grow_grain\",\n            \"inputs\": {},\n            \"label\": \"Grow Grain\",\n            \"labor_minutes\": 60,\n            \"occupation_id\": \"farmer\",\n            \"outputs\": {\n              \"grain\": 10\n            }\n          },\n          \"hunt_game\": {\n            \"building_id\": \"hunter_lodge\",\n            \"id\": \"hunt_game\",\n            \"inputs\": {},\n            \"label\": \"Hunt Game\",\n            \"labor_minutes\": 80,\n            \"occupation_id\": \"hunter\",\n            \"outputs\": {\n              \"hides\": 1,\n              \"meat\": 4\n            }\n          },\n          \"mill_flour\": {\n            \"building_id\": \"mill\",\n            \"id\": \"mill_flour\",\n            \"inputs\": {\n              \"grain\": 4\n            },\n            \"label\": \"Mill Flour\",\n            \"labor_minutes\": 30,\n            \"occupation_id\": \"miller\",\n            \"outputs\": {\n              \"flour\": 3\n            }\n          },\n          \"mine_ore\": {\n            \"building_id\": \"mine\",\n            \"id\": \"mine_ore\",\n            \"inputs\": {},\n            \"label\": \"Mine Iron Ore\",\n            \"labor_minutes\": 75,\n            \"occupation_id\": \"miner\",\n            \"outputs\": {\n              \"iron_ore\": 3\n            }\n          },\n          \"quarry_stone\": {\n            \"building_id\": \"quarry\",\n            \"id\": \"quarry_stone\",\n            \"inputs\": {},\n            \"label\": \"Quarry Stone\",\n            \"labor_minutes\": 65,\n            \"occupation_id\": \"quarry_worker\",\n            \"outputs\": {\n              \"stone\": 4\n            }\n          },\n          \"weave_cloth\": {\n            \"building_id\": \"weaver\",\n            \"id\": \"weave_cloth\",\n            \"inputs\": {\n              \"hides\": 1\n            },\n            \"label\": \"Weave Cloth\",\n            \"labor_minutes\": 90,\n            \"occupation_id\": \"weaver\",\n            \"outputs\": {\n              \"cloth\": 2\n            }\n          }\n        },\n        \"schema_version\": 4\n      }\n    }\n  ],\n  \"errors\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "name": "v0.27-outer-loader_syntax",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "v0.27-bridge-patch_syntax",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "v0.27-audio-patch_syntax",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "v0.27-economy-patch_syntax",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "name": "v0.27-ally-patch_syntax",
+      "passed": true,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "static_checks": {
+    "settings_based_controls": true,
+    "no_function_key_dependency": true,
+    "authoritative_price_inventory": true,
+    "python_labor_flows": true,
+    "real_input_chains": true,
+    "development_gated_market": true,
+    "villager_demand_trade": true,
+    "trade_relationships": true,
+    "autonomous_trade_ally_escort": true,
+    "autonomous_trade_ally_combat": true,
+    "escort_save_persistence": true,
+    "empire_market_foundation": true,
+    "standalone_fallback": true,
+    "byte_backed_raptor_audio": true,
+    "three_races_and_classes": true
+  },
+  "character_playtest": {
+    "status": "passed",
+    "passed": 33,
+    "total": 33
+  },
+  "server_integration": {
+    "status": "passed",
+    "passed": 15,
+    "total": 15
+  },
+  "limitations": [
+    "Direct Chromium navigation through the remote pinned legacy loader is blocked by the execution environment, so the compiled patches were executed in a controlled headless character shell.",
+    "The actual local Python HTTP server and authoritative economy APIs were tested end to end independently.",
+    "Trade allies now escort and fight autonomously, but their behavior is intentionally limited to nearby threats and does not yet include strategic formations, equipment loadouts, or large-squad command.",
+    "Conquered-town control and the three-territory empire market are implemented; the complete raid-to-annexation campaign loop remains a later government/combat integration."
+  ]
+}

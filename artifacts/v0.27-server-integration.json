@@ -1,0 +1,3280 @@
+{
+  "project_version": "0.27",
+  "status": "passed",
+  "passed": 15,
+  "total": 15,
+  "checks": [
+    {
+      "name": "health",
+      "passed": true,
+      "detail": {
+        "audio_bytes": 135380,
+        "audio_clip_count": 10,
+        "authoritative_town_inventory": true,
+        "authoritative_town_prices": true,
+        "authority": {
+          "application_count": 0,
+          "authoritative_scope": "market_prices_manual_only",
+          "latest_application": null,
+          "latest_proposal": null,
+          "max_step_percent": 5.0,
+          "mode": "manual-market-price-pilot",
+          "status": "waiting",
+          "version": "0.27"
+        },
+        "bridge": {
+          "age_seconds": null,
+          "connected": false,
+          "current_session_id": null,
+          "latest": null,
+          "protocol_version": 6,
+          "received_count": 0,
+          "session_count": 0,
+          "status": "waiting"
+        },
+        "bridge_mode": "python-authoritative-town-economy",
+        "byte_backed_audio": true,
+        "compiled_game_exists": true,
+        "development_gated_markets": true,
+        "empire_internal_market_foundation": true,
+        "legacy_game_version": 92,
+        "live_bridge": true,
+        "live_economy": {
+          "authoritative": true,
+          "empire_market_threshold": 3,
+          "mode": "python-authoritative-town-economy",
+          "session_count": 0,
+          "status": "waiting",
+          "version": "0.27"
+        },
+        "market_authority_pilot": false,
+        "phase": 3,
+        "project_version": "0.27",
+        "python_consumption": true,
+        "python_economy": true,
+        "python_employment": true,
+        "python_production": true,
+        "python_wages": true,
+        "shadow": {
+          "authoritative": false,
+          "history_count": 0,
+          "latest": null,
+          "mode": "shadow-read-only",
+          "session_count": 0,
+          "status": "waiting",
+          "version": "0.27"
+        },
+        "shadow_economy": true,
+        "status": "ok",
+        "villager_trade": true
+      }
+    },
+    {
+      "name": "audio_regression",
+      "passed": true,
+      "detail": {
+        "clip_count": 10,
+        "clips": [
+          {
+            "bytes": 12832,
+            "category": "bite_hit",
+            "channels": 1,
+            "duration_seconds": 0.289977,
+            "file": "bite_hit_1.wav",
+            "frame_count": 6394,
+            "key": "bite_hit_1",
+            "nonzero_pcm_bytes": 12169,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "c58e5f4a1e3435c34f0f5c854229908c7a129b5babd8193b1ab8ececeac76fbb"
+          },
+          {
+            "bytes": 12832,
+            "category": "bite_hit",
+            "channels": 1,
+            "duration_seconds": 0.289977,
+            "file": "bite_hit_2.wav",
+            "frame_count": 6394,
+            "key": "bite_hit_2",
+            "nonzero_pcm_bytes": 12207,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "7d54cd61473cbd65ea528f40c04e3c904a320cc176c0ba3f8378fb950f524758"
+          },
+          {
+            "bytes": 12832,
+            "category": "bite_hit",
+            "channels": 1,
+            "duration_seconds": 0.289977,
+            "file": "bite_hit_3.wav",
+            "frame_count": 6394,
+            "key": "bite_hit_3",
+            "nonzero_pcm_bytes": 12138,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "4cd84eeb176b7eee99f1f29af1617bfb887df6c0541c4d468d30765bb5a978f1"
+          },
+          {
+            "bytes": 12832,
+            "category": "bite_hit",
+            "channels": 1,
+            "duration_seconds": 0.289977,
+            "file": "bite_hit_4.wav",
+            "frame_count": 6394,
+            "key": "bite_hit_4",
+            "nonzero_pcm_bytes": 12124,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "72d19de50e5e19fdc3ece2231c8e71cdd5b7a4e9c0b2d3877d9f399db3d168a5"
+          },
+          {
+            "bytes": 8422,
+            "category": "bite_miss",
+            "channels": 1,
+            "duration_seconds": 0.189977,
+            "file": "bite_miss_1.wav",
+            "frame_count": 4189,
+            "key": "bite_miss_1",
+            "nonzero_pcm_bytes": 7609,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "ea04f79f142bc3215d3436cdcb4bb0232120cf50c998b8618e493fe3f7614390"
+          },
+          {
+            "bytes": 8422,
+            "category": "bite_miss",
+            "channels": 1,
+            "duration_seconds": 0.189977,
+            "file": "bite_miss_2.wav",
+            "frame_count": 4189,
+            "key": "bite_miss_2",
+            "nonzero_pcm_bytes": 7638,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "75032496e8c146af9a83a19cafc9efed2fdd2a31919b6a31680be31614589200"
+          },
+          {
+            "bytes": 18566,
+            "category": "mount",
+            "channels": 1,
+            "duration_seconds": 0.42,
+            "file": "mount_chirp.wav",
+            "frame_count": 9261,
+            "key": "mount_chirp",
+            "nonzero_pcm_bytes": 9086,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "c7ebd5abde0366a935dffd7ea0cf7aaeb7a1e452695e36cefcfc258540e6370f"
+          },
+          {
+            "bytes": 16802,
+            "category": "dismount",
+            "channels": 1,
+            "duration_seconds": 0.38,
+            "file": "dismount_huff.wav",
+            "frame_count": 8379,
+            "key": "dismount_huff",
+            "nonzero_pcm_bytes": 16090,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "41736bc5a447141479a93dcbc996a5a55063061bfd79a80b098047b43be20146"
+          },
+          {
+            "bytes": 25622,
+            "category": "idle",
+            "channels": 1,
+            "duration_seconds": 0.58,
+            "file": "idle_trill.wav",
+            "frame_count": 12789,
+            "key": "idle_trill",
+            "nonzero_pcm_bytes": 12484,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "bbefc78cce5efe157a894d99c243996e9b42937d9b61778009eb4b91eadf0420"
+          },
+          {
+            "bytes": 6218,
+            "category": "run_step",
+            "channels": 1,
+            "duration_seconds": 0.14,
+            "file": "run_step.wav",
+            "frame_count": 3087,
+            "key": "run_step",
+            "nonzero_pcm_bytes": 5951,
+            "sample_rate": 22050,
+            "sample_width": 2,
+            "sha256": "70a77565f0d11fa617f47a64443a5d8c689cf663ac3c171f3457f787c1d90409"
+          }
+        ],
+        "total_audio_bytes": 135380,
+        "version": "0.25"
+      }
+    },
+    {
+      "name": "audio_file_bytes",
+      "passed": true,
+      "detail": {
+        "bytes": 12832,
+        "type": "audio/wav"
+      }
+    },
+    {
+      "name": "small_town_direct_trade",
+      "passed": true,
+      "detail": {
+        "average_daily_wage": 0.0,
+        "building_count": 0,
+        "consumption_spending_last_step": 0.0,
+        "control": "independent",
+        "development_score": 17.94,
+        "employed_population": 8,
+        "employment": {
+          "farmer": 0,
+          "fisher": 5,
+          "hunter": 0,
+          "lumberjack": 0,
+          "merchant": 1,
+          "miner": 0,
+          "quarry_worker": 1,
+          "weaver": 1
+        },
+        "employment_rate": 0.72727,
+        "household_wealth": 108.0,
+        "item_flows": {
+          "cloth": {
+            "base_price": 2.0,
+            "consumed_last_step": 0.0,
+            "coverage_days": 18.5185,
+            "demand_per_day": 0.162,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 3.0,
+            "item_id": "cloth",
+            "price": 2.0,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "fish": {
+            "base_price": 1.0,
+            "consumed_last_step": 0.0,
+            "coverage_days": 1.0582,
+            "demand_per_day": 1.89,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 2.0,
+            "item_id": "fish",
+            "price": 1.0,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "grain": {
+            "base_price": 0.8,
+            "consumed_last_step": 0.0,
+            "coverage_days": 29.6296,
+            "demand_per_day": 4.05,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 120.0,
+            "item_id": "grain",
+            "price": 0.8,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "logs": {
+            "base_price": 0.9,
+            "consumed_last_step": 0.0,
+            "coverage_days": 59.5238,
+            "demand_per_day": 0.504,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 30.0,
+            "item_id": "logs",
+            "price": 0.9,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "ore": {
+            "base_price": 1.5,
+            "consumed_last_step": 0.0,
+            "coverage_days": 23.3918,
+            "demand_per_day": 0.342,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 8.0,
+            "item_id": "ore",
+            "price": 1.5,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "parts": {
+            "base_price": 1.8,
+            "consumed_last_step": 0.0,
+            "coverage_days": 37.037,
+            "demand_per_day": 0.108,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 4.0,
+            "item_id": "parts",
+            "price": 1.8,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "stone": {
+            "base_price": 1.0,
+            "consumed_last_step": 0.0,
+            "coverage_days": 42.735,
+            "demand_per_day": 0.468,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 20.0,
+            "item_id": "stone",
+            "price": 1.0,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          }
+        },
+        "last_updated_ms": 0,
+        "market_available": false,
+        "market_inventory": {
+          "cloth": 3.0,
+          "fish": 2.0,
+          "grain": 120.0,
+          "logs": 30.0,
+          "ore": 8.0,
+          "parts": 4.0,
+          "stone": 20.0
+        },
+        "market_prices": {
+          "cloth": 2.0,
+          "fish": 1.0,
+          "grain": 0.8,
+          "logs": 0.9,
+          "ore": 1.5,
+          "parts": 1.8,
+          "stone": 1.0
+        },
+        "payroll_last_step": 0.0,
+        "population": 18,
+        "town_name": "Smallford",
+        "trade_allies": 0,
+        "trade_mode": "villagers",
+        "trade_volume": 0.0,
+        "treasury": 45.0,
+        "unemployed_population": 3,
+        "version": "0.27",
+        "villager_count": 2,
+        "working_age_population": 11,
+        "world_day": 1.0
+      }
+    },
+    {
+      "name": "developed_town_market",
+      "passed": true,
+      "detail": {
+        "average_daily_wage": 0.0,
+        "building_count": 5,
+        "consumption_spending_last_step": 0.0,
+        "control": "independent",
+        "development_score": 127.2,
+        "employed_population": 48,
+        "employment": {
+          "farmer": 5,
+          "fisher": 15,
+          "hunter": 4,
+          "lumberjack": 3,
+          "merchant": 3,
+          "miner": 6,
+          "quarry_worker": 4,
+          "weaver": 8
+        },
+        "employment_rate": 0.85714,
+        "household_wealth": 540.0,
+        "item_flows": {
+          "cloth": {
+            "base_price": 2.0,
+            "consumed_last_step": 0.0,
+            "coverage_days": 3.7037,
+            "demand_per_day": 0.81,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 3.0,
+            "item_id": "cloth",
+            "price": 2.0,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "fish": {
+            "base_price": 1.0,
+            "consumed_last_step": 0.0,
+            "coverage_days": 0.2116,
+            "demand_per_day": 9.45,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 2.0,
+            "item_id": "fish",
+            "price": 1.0,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "grain": {
+            "base_price": 0.8,
+            "consumed_last_step": 0.0,
+            "coverage_days": 5.9259,
+            "demand_per_day": 20.25,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 120.0,
+            "item_id": "grain",
+            "price": 0.8,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "logs": {
+            "base_price": 0.9,
+            "consumed_last_step": 0.0,
+            "coverage_days": 11.9048,
+            "demand_per_day": 2.52,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 30.0,
+            "item_id": "logs",
+            "price": 0.9,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "ore": {
+            "base_price": 1.5,
+            "consumed_last_step": 0.0,
+            "coverage_days": 4.6784,
+            "demand_per_day": 1.71,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 8.0,
+            "item_id": "ore",
+            "price": 1.5,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "parts": {
+            "base_price": 1.8,
+            "consumed_last_step": 0.0,
+            "coverage_days": 7.4074,
+            "demand_per_day": 0.54,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 4.0,
+            "item_id": "parts",
+            "price": 1.8,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          },
+          "stone": {
+            "base_price": 1.0,
+            "consumed_last_step": 0.0,
+            "coverage_days": 8.547,
+            "demand_per_day": 2.34,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 20.0,
+            "item_id": "stone",
+            "price": 1.0,
+            "produced_last_step": 0.0,
+            "production_per_day": 0.0,
+            "unmet_last_step": 0.0
+          }
+        },
+        "last_updated_ms": 0,
+        "market_available": true,
+        "market_inventory": {
+          "cloth": 3.0,
+          "fish": 2.0,
+          "grain": 120.0,
+          "logs": 30.0,
+          "ore": 8.0,
+          "parts": 4.0,
+          "stone": 20.0
+        },
+        "market_prices": {
+          "cloth": 2.0,
+          "fish": 1.0,
+          "grain": 0.8,
+          "logs": 0.9,
+          "ore": 1.5,
+          "parts": 1.8,
+          "stone": 1.0
+        },
+        "payroll_last_step": 0.0,
+        "population": 90,
+        "town_name": "Egg Lands",
+        "trade_allies": 0,
+        "trade_mode": "town_market",
+        "trade_volume": 0.0,
+        "treasury": 225.0,
+        "unemployed_population": 8,
+        "version": "0.27",
+        "villager_count": 2,
+        "working_age_population": 56,
+        "world_day": 1.0
+      }
+    },
+    {
+      "name": "employment_created",
+      "passed": true,
+      "detail": {
+        "farmer": 5,
+        "fisher": 15,
+        "hunter": 4,
+        "lumberjack": 3,
+        "merchant": 3,
+        "miner": 6,
+        "quarry_worker": 4,
+        "weaver": 8
+      }
+    },
+    {
+      "name": "production_consumption_wages",
+      "passed": true,
+      "detail": {
+        "average_daily_wage": 0.6106,
+        "building_count": 5,
+        "consumption_spending_last_step": 158.649,
+        "control": "independent",
+        "development_score": 127.2,
+        "employed_population": 48,
+        "employment": {
+          "farmer": 7,
+          "fisher": 6,
+          "hunter": 26,
+          "lumberjack": 2,
+          "merchant": 3,
+          "miner": 2,
+          "quarry_worker": 1,
+          "weaver": 1
+        },
+        "employment_rate": 0.85714,
+        "household_wealth": 498.582,
+        "item_flows": {
+          "cloth": {
+            "base_price": 2.0,
+            "consumed_last_step": 3.4344,
+            "coverage_days": 19.0832,
+            "demand_per_day": 0.8586,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 16.3848,
+            "item_id": "cloth",
+            "price": 1.3256,
+            "produced_last_step": 16.8192,
+            "production_per_day": 4.2048,
+            "unmet_last_step": 0.0
+          },
+          "fish": {
+            "base_price": 1.0,
+            "consumed_last_step": 40.068,
+            "coverage_days": 6.3659,
+            "demand_per_day": 10.017,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 63.767,
+            "item_id": "fish",
+            "price": 1.1066,
+            "produced_last_step": 101.835,
+            "production_per_day": 25.4587,
+            "unmet_last_step": 0.0
+          },
+          "grain": {
+            "base_price": 0.8,
+            "consumed_last_step": 85.86,
+            "coverage_days": 5.2635,
+            "demand_per_day": 21.465,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 112.98,
+            "item_id": "grain",
+            "price": 0.951,
+            "produced_last_step": 78.84,
+            "production_per_day": 19.71,
+            "unmet_last_step": 0.0
+          },
+          "logs": {
+            "base_price": 0.9,
+            "consumed_last_step": 10.6848,
+            "coverage_days": 14.1177,
+            "demand_per_day": 2.6712,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 37.7112,
+            "item_id": "logs",
+            "price": 0.5965,
+            "produced_last_step": 18.396,
+            "production_per_day": 4.599,
+            "unmet_last_step": 0.0
+          },
+          "ore": {
+            "base_price": 1.5,
+            "consumed_last_step": 7.2504,
+            "coverage_days": 12.3023,
+            "demand_per_day": 1.8126,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 22.2992,
+            "item_id": "ore",
+            "price": 1.0922,
+            "produced_last_step": 21.5496,
+            "production_per_day": 5.3874,
+            "unmet_last_step": 0.0
+          },
+          "parts": {
+            "base_price": 1.8,
+            "consumed_last_step": 2.2896,
+            "coverage_days": 1.1516,
+            "demand_per_day": 0.5724,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 8.4096,
+            "inventory": 0.6592,
+            "item_id": "parts",
+            "price": 2.855,
+            "produced_last_step": 7.3584,
+            "production_per_day": 1.8396,
+            "unmet_last_step": 0.0
+          },
+          "stone": {
+            "base_price": 1.0,
+            "consumed_last_step": 9.9216,
+            "coverage_days": 12.1861,
+            "demand_per_day": 2.4804,
+            "external_flow_last_step": 0.0,
+            "intermediate_consumed_last_step": 0.0,
+            "inventory": 30.2264,
+            "item_id": "stone",
+            "price": 0.7336,
+            "produced_last_step": 20.148,
+            "production_per_day": 5.037,
+            "unmet_last_step": 0.0
+          }
+        },
+        "last_updated_ms": 1784899669789,
+        "market_available": true,
+        "market_inventory": {
+          "cloth": 16.3848,
+          "fish": 63.767,
+          "grain": 112.98,
+          "logs": 37.7112,
+          "ore": 22.2992,
+          "parts": 0.6592,
+          "stone": 30.2264
+        },
+        "market_prices": {
+          "cloth": 1.3256,
+          "fish": 1.1066,
+          "grain": 0.951,
+          "logs": 0.5965,
+          "ore": 1.0922,
+          "parts": 2.855,
+          "stone": 0.7336
+        },
+        "payroll_last_step": 117.231,
+        "population": 90,
+        "town_name": "Egg Lands",
+        "trade_allies": 0,
+        "trade_mode": "town_market",
+        "trade_volume": 0.0,
+        "treasury": 228.266,
+        "unemployed_population": 8,
+        "version": "0.27",
+        "villager_count": 2,
+        "working_age_population": 56,
+        "world_day": 5.0
+      }
+    },
+    {
+      "name": "demand_changes_price_and_stock",
+      "passed": true,
+      "detail": {
+        "before": {
+          "base_price": 1.0,
+          "consumed_last_step": 0.0,
+          "coverage_days": 0.2116,
+          "demand_per_day": 9.45,
+          "external_flow_last_step": 0.0,
+          "intermediate_consumed_last_step": 0.0,
+          "inventory": 2.0,
+          "item_id": "fish",
+          "price": 1.0,
+          "produced_last_step": 0.0,
+          "production_per_day": 0.0,
+          "unmet_last_step": 0.0
+        },
+        "after": {
+          "base_price": 1.0,
+          "consumed_last_step": 40.068,
+          "coverage_days": 6.3659,
+          "demand_per_day": 10.017,
+          "external_flow_last_step": 0.0,
+          "intermediate_consumed_last_step": 0.0,
+          "inventory": 63.767,
+          "item_id": "fish",
+          "price": 1.1066,
+          "produced_last_step": 101.835,
+          "production_per_day": 25.4587,
+          "unmet_last_step": 0.0
+        }
+      }
+    },
+    {
+      "name": "villager_demand_visible",
+      "passed": true,
+      "detail": {
+        "activity": "fishing at the shore",
+        "affinity": 0.0,
+        "coins": 56.0,
+        "demand_summary": "fish, ore, cloth",
+        "gratitude": 0.0,
+        "inventory": {
+          "fish": 3.0,
+          "ore": 2.0
+        },
+        "lifetime_trade_value": 0.0,
+        "market_available": false,
+        "name": "Mira",
+        "offers": [
+          {
+            "item_id": "fish",
+            "price": 1.166,
+            "quantity": 3
+          },
+          {
+            "item_id": "ore",
+            "price": 1.173,
+            "quantity": 2
+          }
+        ],
+        "protection_score": 0.0,
+        "relationship_label": "new contact",
+        "town_name": "Smallford",
+        "trade_count": 0,
+        "trade_mode": "villagers",
+        "trust": 0.0,
+        "villager_id": "Smallford-mira",
+        "wants": [
+          {
+            "item_id": "fish",
+            "price": 1.087,
+            "quantity": 1
+          },
+          {
+            "item_id": "ore",
+            "price": 1.094,
+            "quantity": 1
+          },
+          {
+            "item_id": "cloth",
+            "price": 1.458,
+            "quantity": 1
+          }
+        ],
+        "wealth": 80.0,
+        "willing_to_defend": false
+      }
+    },
+    {
+      "name": "villager_trade_updates_real_ledgers",
+      "passed": true,
+      "detail": {
+        "item_id": "fish",
+        "player_delta": {
+          "gold": -1.166,
+          "items": {
+            "fish": 1.0
+          }
+        },
+        "quantity": 1,
+        "side": "buy",
+        "status": "accepted",
+        "total": 1.166,
+        "town": {
+          "average_daily_wage": 0.6114,
+          "building_count": 0,
+          "consumption_spending_last_step": 22.539,
+          "control": "independent",
+          "development_score": 17.969,
+          "employed_population": 9,
+          "employment": {
+            "farmer": 1,
+            "fisher": 3,
+            "hunter": 1,
+            "lumberjack": 1,
+            "merchant": 1,
+            "miner": 1,
+            "quarry_worker": 0,
+            "weaver": 1
+          },
+          "employment_rate": 0.81818,
+          "household_wealth": 105.026,
+          "item_flows": {
+            "cloth": {
+              "base_price": 2.0,
+              "consumed_last_step": 0.6869,
+              "coverage_days": 21.5206,
+              "demand_per_day": 0.1717,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 3.6955,
+              "item_id": "cloth",
+              "price": 1.3256,
+              "produced_last_step": 1.3824,
+              "production_per_day": 0.3456,
+              "unmet_last_step": 0.0
+            },
+            "fish": {
+              "base_price": 1.0,
+              "consumed_last_step": 8.0136,
+              "coverage_days": 8.1394,
+              "demand_per_day": 2.0034,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 16.3064,
+              "item_id": "fish",
+              "price": 0.9885,
+              "produced_last_step": 22.32,
+              "production_per_day": 5.58,
+              "unmet_last_step": 0.0
+            },
+            "grain": {
+              "base_price": 0.8,
+              "consumed_last_step": 17.172,
+              "coverage_days": 23.9525,
+              "demand_per_day": 4.293,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 102.828,
+              "item_id": "grain",
+              "price": 0.5303,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "logs": {
+              "base_price": 0.9,
+              "consumed_last_step": 2.137,
+              "coverage_days": 52.1545,
+              "demand_per_day": 0.5342,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 27.863,
+              "item_id": "logs",
+              "price": 0.5965,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "ore": {
+              "base_price": 1.5,
+              "consumed_last_step": 1.4501,
+              "coverage_days": 18.0677,
+              "demand_per_day": 0.3625,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 6.5499,
+              "item_id": "ore",
+              "price": 0.9942,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "parts": {
+              "base_price": 1.8,
+              "consumed_last_step": 0.4579,
+              "coverage_days": 24.9029,
+              "demand_per_day": 0.1145,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.6912,
+              "inventory": 2.8509,
+              "item_id": "parts",
+              "price": 1.2446,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "stone": {
+              "base_price": 1.0,
+              "consumed_last_step": 1.9843,
+              "coverage_days": 42.9924,
+              "demand_per_day": 0.4961,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 21.3277,
+              "item_id": "stone",
+              "price": 0.6628,
+              "produced_last_step": 3.312,
+              "production_per_day": 0.828,
+              "unmet_last_step": 0.0
+            }
+          },
+          "last_updated_ms": 1784899669789,
+          "market_available": false,
+          "market_inventory": {
+            "cloth": 3.6955,
+            "fish": 16.3064,
+            "grain": 102.828,
+            "logs": 27.863,
+            "ore": 6.5499,
+            "parts": 2.8509,
+            "stone": 21.3277
+          },
+          "market_prices": {
+            "cloth": 1.3256,
+            "fish": 0.9885,
+            "grain": 0.5303,
+            "logs": 0.5965,
+            "ore": 0.9942,
+            "parts": 1.2446,
+            "stone": 0.6628
+          },
+          "payroll_last_step": 19.565,
+          "population": 18,
+          "town_name": "Smallford",
+          "trade_allies": 0,
+          "trade_mode": "villagers",
+          "trade_volume": 1.166,
+          "treasury": 45.563,
+          "unemployed_population": 2,
+          "version": "0.27",
+          "villager_count": 2,
+          "working_age_population": 11,
+          "world_day": 5.0
+        },
+        "unit_price": 1.166,
+        "version": "0.27",
+        "villager": {
+          "activity": "fishing at the shore",
+          "affinity": 1.091,
+          "coins": 57.166,
+          "demand_summary": "fish, ore, cloth",
+          "gratitude": 1.1,
+          "inventory": {
+            "fish": 2.0,
+            "ore": 2.0
+          },
+          "lifetime_trade_value": 1.166,
+          "market_available": false,
+          "name": "Mira",
+          "offers": [
+            {
+              "item_id": "fish",
+              "price": 1.158,
+              "quantity": 2
+            },
+            {
+              "item_id": "ore",
+              "price": 1.165,
+              "quantity": 2
+            }
+          ],
+          "protection_score": 1.642,
+          "relationship_label": "regular customer",
+          "town_name": "Smallford",
+          "trade_count": 1,
+          "trade_mode": "villagers",
+          "trust": 2.325,
+          "villager_id": "Smallford-mira",
+          "wants": [
+            {
+              "item_id": "fish",
+              "price": 1.09,
+              "quantity": 1
+            },
+            {
+              "item_id": "ore",
+              "price": 1.096,
+              "quantity": 1
+            },
+            {
+              "item_id": "cloth",
+              "price": 1.461,
+              "quantity": 1
+            }
+          ],
+          "wealth": 80.0,
+          "willing_to_defend": false
+        }
+      }
+    },
+    {
+      "name": "empire_market_unlock",
+      "passed": true,
+      "detail": {
+        "authoritative": true,
+        "empire_market_threshold": 3,
+        "empire_territory_count": 3,
+        "empire_trade_unlocked": true,
+        "last_sequence": 3,
+        "mode": "python-authoritative-town-economy",
+        "session_id": "http-economy-v026",
+        "sync_count": 3,
+        "towns": {
+          "Eastmere": {
+            "average_daily_wage": 0.0,
+            "building_count": 0,
+            "consumption_spending_last_step": 0.0,
+            "control": "conquered",
+            "development_score": 19.1,
+            "employed_population": 8,
+            "employment": {
+              "farmer": 0,
+              "fisher": 5,
+              "hunter": 0,
+              "lumberjack": 0,
+              "merchant": 1,
+              "miner": 0,
+              "quarry_worker": 1,
+              "weaver": 1
+            },
+            "employment_rate": 0.66667,
+            "household_wealth": 120.0,
+            "item_flows": {
+              "cloth": {
+                "base_price": 2.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 16.6667,
+                "demand_per_day": 0.18,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 3.0,
+                "item_id": "cloth",
+                "price": 2.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "fish": {
+                "base_price": 1.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 0.9524,
+                "demand_per_day": 2.1,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 2.0,
+                "item_id": "fish",
+                "price": 1.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "grain": {
+                "base_price": 0.8,
+                "consumed_last_step": 0.0,
+                "coverage_days": 26.6667,
+                "demand_per_day": 4.5,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 120.0,
+                "item_id": "grain",
+                "price": 0.8,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "logs": {
+                "base_price": 0.9,
+                "consumed_last_step": 0.0,
+                "coverage_days": 53.5714,
+                "demand_per_day": 0.56,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 30.0,
+                "item_id": "logs",
+                "price": 0.9,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "ore": {
+                "base_price": 1.5,
+                "consumed_last_step": 0.0,
+                "coverage_days": 21.0526,
+                "demand_per_day": 0.38,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 8.0,
+                "item_id": "ore",
+                "price": 1.5,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "parts": {
+                "base_price": 1.8,
+                "consumed_last_step": 0.0,
+                "coverage_days": 33.3333,
+                "demand_per_day": 0.12,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 4.0,
+                "item_id": "parts",
+                "price": 1.8,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "stone": {
+                "base_price": 1.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 38.4615,
+                "demand_per_day": 0.52,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 20.0,
+                "item_id": "stone",
+                "price": 1.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              }
+            },
+            "last_updated_ms": 0,
+            "market_available": true,
+            "market_inventory": {
+              "cloth": 3.0,
+              "fish": 2.0,
+              "grain": 120.0,
+              "logs": 30.0,
+              "ore": 8.0,
+              "parts": 4.0,
+              "stone": 20.0
+            },
+            "market_prices": {
+              "cloth": 2.0,
+              "fish": 1.0,
+              "grain": 0.8,
+              "logs": 0.9,
+              "ore": 1.5,
+              "parts": 1.8,
+              "stone": 1.0
+            },
+            "payroll_last_step": 0.0,
+            "population": 20,
+            "town_name": "Eastmere",
+            "trade_allies": 0,
+            "trade_mode": "empire_market",
+            "trade_volume": 0.0,
+            "treasury": 50.0,
+            "unemployed_population": 4,
+            "version": "0.27",
+            "villager_count": 2,
+            "working_age_population": 12,
+            "world_day": 5.0
+          },
+          "Egg Lands": {
+            "average_daily_wage": 0.6106,
+            "building_count": 5,
+            "consumption_spending_last_step": 158.649,
+            "control": "independent",
+            "development_score": 127.2,
+            "employed_population": 48,
+            "employment": {
+              "farmer": 7,
+              "fisher": 6,
+              "hunter": 26,
+              "lumberjack": 2,
+              "merchant": 3,
+              "miner": 2,
+              "quarry_worker": 1,
+              "weaver": 1
+            },
+            "employment_rate": 0.85714,
+            "household_wealth": 498.582,
+            "item_flows": {
+              "cloth": {
+                "base_price": 2.0,
+                "consumed_last_step": 3.4344,
+                "coverage_days": 19.0832,
+                "demand_per_day": 0.8586,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 16.3848,
+                "item_id": "cloth",
+                "price": 1.3256,
+                "produced_last_step": 16.8192,
+                "production_per_day": 4.2048,
+                "unmet_last_step": 0.0
+              },
+              "fish": {
+                "base_price": 1.0,
+                "consumed_last_step": 40.068,
+                "coverage_days": 6.3659,
+                "demand_per_day": 10.017,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 63.767,
+                "item_id": "fish",
+                "price": 1.1066,
+                "produced_last_step": 101.835,
+                "production_per_day": 25.4587,
+                "unmet_last_step": 0.0
+              },
+              "grain": {
+                "base_price": 0.8,
+                "consumed_last_step": 85.86,
+                "coverage_days": 5.2635,
+                "demand_per_day": 21.465,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 112.98,
+                "item_id": "grain",
+                "price": 0.951,
+                "produced_last_step": 78.84,
+                "production_per_day": 19.71,
+                "unmet_last_step": 0.0
+              },
+              "logs": {
+                "base_price": 0.9,
+                "consumed_last_step": 10.6848,
+                "coverage_days": 14.1177,
+                "demand_per_day": 2.6712,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 37.7112,
+                "item_id": "logs",
+                "price": 0.5965,
+                "produced_last_step": 18.396,
+                "production_per_day": 4.599,
+                "unmet_last_step": 0.0
+              },
+              "ore": {
+                "base_price": 1.5,
+                "consumed_last_step": 7.2504,
+                "coverage_days": 12.3023,
+                "demand_per_day": 1.8126,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 22.2992,
+                "item_id": "ore",
+                "price": 1.0922,
+                "produced_last_step": 21.5496,
+                "production_per_day": 5.3874,
+                "unmet_last_step": 0.0
+              },
+              "parts": {
+                "base_price": 1.8,
+                "consumed_last_step": 2.2896,
+                "coverage_days": 1.1516,
+                "demand_per_day": 0.5724,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 8.4096,
+                "inventory": 0.6592,
+                "item_id": "parts",
+                "price": 2.855,
+                "produced_last_step": 7.3584,
+                "production_per_day": 1.8396,
+                "unmet_last_step": 0.0
+              },
+              "stone": {
+                "base_price": 1.0,
+                "consumed_last_step": 9.9216,
+                "coverage_days": 12.1861,
+                "demand_per_day": 2.4804,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 30.2264,
+                "item_id": "stone",
+                "price": 0.7336,
+                "produced_last_step": 20.148,
+                "production_per_day": 5.037,
+                "unmet_last_step": 0.0
+              }
+            },
+            "last_updated_ms": 1784899669789,
+            "market_available": true,
+            "market_inventory": {
+              "cloth": 16.3848,
+              "fish": 63.767,
+              "grain": 112.98,
+              "logs": 37.7112,
+              "ore": 22.2992,
+              "parts": 0.6592,
+              "stone": 30.2264
+            },
+            "market_prices": {
+              "cloth": 1.3256,
+              "fish": 1.1066,
+              "grain": 0.951,
+              "logs": 0.5965,
+              "ore": 1.0922,
+              "parts": 2.855,
+              "stone": 0.7336
+            },
+            "payroll_last_step": 117.231,
+            "population": 90,
+            "town_name": "Egg Lands",
+            "trade_allies": 0,
+            "trade_mode": "town_market",
+            "trade_volume": 0.0,
+            "treasury": 228.266,
+            "unemployed_population": 8,
+            "version": "0.27",
+            "villager_count": 2,
+            "working_age_population": 56,
+            "world_day": 5.0
+          },
+          "Northmarch": {
+            "average_daily_wage": 0.0,
+            "building_count": 0,
+            "consumption_spending_last_step": 0.0,
+            "control": "conquered",
+            "development_score": 19.1,
+            "employed_population": 8,
+            "employment": {
+              "farmer": 0,
+              "fisher": 5,
+              "hunter": 0,
+              "lumberjack": 0,
+              "merchant": 1,
+              "miner": 0,
+              "quarry_worker": 1,
+              "weaver": 1
+            },
+            "employment_rate": 0.66667,
+            "household_wealth": 120.0,
+            "item_flows": {
+              "cloth": {
+                "base_price": 2.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 16.6667,
+                "demand_per_day": 0.18,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 3.0,
+                "item_id": "cloth",
+                "price": 2.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "fish": {
+                "base_price": 1.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 0.9524,
+                "demand_per_day": 2.1,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 2.0,
+                "item_id": "fish",
+                "price": 1.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "grain": {
+                "base_price": 0.8,
+                "consumed_last_step": 0.0,
+                "coverage_days": 26.6667,
+                "demand_per_day": 4.5,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 120.0,
+                "item_id": "grain",
+                "price": 0.8,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "logs": {
+                "base_price": 0.9,
+                "consumed_last_step": 0.0,
+                "coverage_days": 53.5714,
+                "demand_per_day": 0.56,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 30.0,
+                "item_id": "logs",
+                "price": 0.9,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "ore": {
+                "base_price": 1.5,
+                "consumed_last_step": 0.0,
+                "coverage_days": 21.0526,
+                "demand_per_day": 0.38,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 8.0,
+                "item_id": "ore",
+                "price": 1.5,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "parts": {
+                "base_price": 1.8,
+                "consumed_last_step": 0.0,
+                "coverage_days": 33.3333,
+                "demand_per_day": 0.12,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 4.0,
+                "item_id": "parts",
+                "price": 1.8,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "stone": {
+                "base_price": 1.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 38.4615,
+                "demand_per_day": 0.52,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 20.0,
+                "item_id": "stone",
+                "price": 1.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              }
+            },
+            "last_updated_ms": 0,
+            "market_available": true,
+            "market_inventory": {
+              "cloth": 3.0,
+              "fish": 2.0,
+              "grain": 120.0,
+              "logs": 30.0,
+              "ore": 8.0,
+              "parts": 4.0,
+              "stone": 20.0
+            },
+            "market_prices": {
+              "cloth": 2.0,
+              "fish": 1.0,
+              "grain": 0.8,
+              "logs": 0.9,
+              "ore": 1.5,
+              "parts": 1.8,
+              "stone": 1.0
+            },
+            "payroll_last_step": 0.0,
+            "population": 20,
+            "town_name": "Northmarch",
+            "trade_allies": 0,
+            "trade_mode": "empire_market",
+            "trade_volume": 0.0,
+            "treasury": 50.0,
+            "unemployed_population": 4,
+            "version": "0.27",
+            "villager_count": 2,
+            "working_age_population": 12,
+            "world_day": 5.0
+          },
+          "Smallford": {
+            "average_daily_wage": 0.6114,
+            "building_count": 0,
+            "consumption_spending_last_step": 22.539,
+            "control": "independent",
+            "development_score": 17.969,
+            "employed_population": 9,
+            "employment": {
+              "farmer": 1,
+              "fisher": 3,
+              "hunter": 1,
+              "lumberjack": 1,
+              "merchant": 1,
+              "miner": 1,
+              "quarry_worker": 0,
+              "weaver": 1
+            },
+            "employment_rate": 0.81818,
+            "household_wealth": 105.026,
+            "item_flows": {
+              "cloth": {
+                "base_price": 2.0,
+                "consumed_last_step": 0.6869,
+                "coverage_days": 21.5206,
+                "demand_per_day": 0.1717,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 3.6955,
+                "item_id": "cloth",
+                "price": 1.3256,
+                "produced_last_step": 1.3824,
+                "production_per_day": 0.3456,
+                "unmet_last_step": 0.0
+              },
+              "fish": {
+                "base_price": 1.0,
+                "consumed_last_step": 8.0136,
+                "coverage_days": 8.1394,
+                "demand_per_day": 2.0034,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 16.3064,
+                "item_id": "fish",
+                "price": 0.9885,
+                "produced_last_step": 22.32,
+                "production_per_day": 5.58,
+                "unmet_last_step": 0.0
+              },
+              "grain": {
+                "base_price": 0.8,
+                "consumed_last_step": 17.172,
+                "coverage_days": 23.9525,
+                "demand_per_day": 4.293,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 102.828,
+                "item_id": "grain",
+                "price": 0.5303,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "logs": {
+                "base_price": 0.9,
+                "consumed_last_step": 2.137,
+                "coverage_days": 52.1545,
+                "demand_per_day": 0.5342,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 27.863,
+                "item_id": "logs",
+                "price": 0.5965,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "ore": {
+                "base_price": 1.5,
+                "consumed_last_step": 1.4501,
+                "coverage_days": 18.0677,
+                "demand_per_day": 0.3625,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 6.5499,
+                "item_id": "ore",
+                "price": 0.9942,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "parts": {
+                "base_price": 1.8,
+                "consumed_last_step": 0.4579,
+                "coverage_days": 24.9029,
+                "demand_per_day": 0.1145,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.6912,
+                "inventory": 2.8509,
+                "item_id": "parts",
+                "price": 1.2446,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "stone": {
+                "base_price": 1.0,
+                "consumed_last_step": 1.9843,
+                "coverage_days": 42.9924,
+                "demand_per_day": 0.4961,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 21.3277,
+                "item_id": "stone",
+                "price": 0.6628,
+                "produced_last_step": 3.312,
+                "production_per_day": 0.828,
+                "unmet_last_step": 0.0
+              }
+            },
+            "last_updated_ms": 1784899669789,
+            "market_available": false,
+            "market_inventory": {
+              "cloth": 3.6955,
+              "fish": 16.3064,
+              "grain": 102.828,
+              "logs": 27.863,
+              "ore": 6.5499,
+              "parts": 2.8509,
+              "stone": 21.3277
+            },
+            "market_prices": {
+              "cloth": 1.3256,
+              "fish": 0.9885,
+              "grain": 0.5303,
+              "logs": 0.5965,
+              "ore": 0.9942,
+              "parts": 1.2446,
+              "stone": 0.6628
+            },
+            "payroll_last_step": 19.565,
+            "population": 18,
+            "town_name": "Smallford",
+            "trade_allies": 0,
+            "trade_mode": "villagers",
+            "trade_volume": 1.166,
+            "treasury": 45.563,
+            "unemployed_population": 2,
+            "version": "0.27",
+            "villager_count": 2,
+            "working_age_population": 11,
+            "world_day": 5.0
+          },
+          "Southwatch": {
+            "average_daily_wage": 0.0,
+            "building_count": 0,
+            "consumption_spending_last_step": 0.0,
+            "control": "conquered",
+            "development_score": 19.1,
+            "employed_population": 8,
+            "employment": {
+              "farmer": 0,
+              "fisher": 5,
+              "hunter": 0,
+              "lumberjack": 0,
+              "merchant": 1,
+              "miner": 0,
+              "quarry_worker": 1,
+              "weaver": 1
+            },
+            "employment_rate": 0.66667,
+            "household_wealth": 120.0,
+            "item_flows": {
+              "cloth": {
+                "base_price": 2.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 16.6667,
+                "demand_per_day": 0.18,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 3.0,
+                "item_id": "cloth",
+                "price": 2.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "fish": {
+                "base_price": 1.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 0.9524,
+                "demand_per_day": 2.1,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 2.0,
+                "item_id": "fish",
+                "price": 1.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "grain": {
+                "base_price": 0.8,
+                "consumed_last_step": 0.0,
+                "coverage_days": 26.6667,
+                "demand_per_day": 4.5,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 120.0,
+                "item_id": "grain",
+                "price": 0.8,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "logs": {
+                "base_price": 0.9,
+                "consumed_last_step": 0.0,
+                "coverage_days": 53.5714,
+                "demand_per_day": 0.56,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 30.0,
+                "item_id": "logs",
+                "price": 0.9,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "ore": {
+                "base_price": 1.5,
+                "consumed_last_step": 0.0,
+                "coverage_days": 21.0526,
+                "demand_per_day": 0.38,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 8.0,
+                "item_id": "ore",
+                "price": 1.5,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "parts": {
+                "base_price": 1.8,
+                "consumed_last_step": 0.0,
+                "coverage_days": 33.3333,
+                "demand_per_day": 0.12,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 4.0,
+                "item_id": "parts",
+                "price": 1.8,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              },
+              "stone": {
+                "base_price": 1.0,
+                "consumed_last_step": 0.0,
+                "coverage_days": 38.4615,
+                "demand_per_day": 0.52,
+                "external_flow_last_step": 0.0,
+                "intermediate_consumed_last_step": 0.0,
+                "inventory": 20.0,
+                "item_id": "stone",
+                "price": 1.0,
+                "produced_last_step": 0.0,
+                "production_per_day": 0.0,
+                "unmet_last_step": 0.0
+              }
+            },
+            "last_updated_ms": 0,
+            "market_available": true,
+            "market_inventory": {
+              "cloth": 3.0,
+              "fish": 2.0,
+              "grain": 120.0,
+              "logs": 30.0,
+              "ore": 8.0,
+              "parts": 4.0,
+              "stone": 20.0
+            },
+            "market_prices": {
+              "cloth": 2.0,
+              "fish": 1.0,
+              "grain": 0.8,
+              "logs": 0.9,
+              "ore": 1.5,
+              "parts": 1.8,
+              "stone": 1.0
+            },
+            "payroll_last_step": 0.0,
+            "population": 20,
+            "town_name": "Southwatch",
+            "trade_allies": 0,
+            "trade_mode": "empire_market",
+            "trade_volume": 0.0,
+            "treasury": 50.0,
+            "unemployed_population": 4,
+            "version": "0.27",
+            "villager_count": 2,
+            "working_age_population": 12,
+            "world_day": 5.0
+          }
+        },
+        "updated_at_ms": 1784899669793,
+        "version": "0.27"
+      }
+    },
+    {
+      "name": "empire_internal_trade_modes",
+      "passed": true,
+      "detail": {
+        "Eastmere": {
+          "average_daily_wage": 0.0,
+          "building_count": 0,
+          "consumption_spending_last_step": 0.0,
+          "control": "conquered",
+          "development_score": 19.1,
+          "employed_population": 8,
+          "employment": {
+            "farmer": 0,
+            "fisher": 5,
+            "hunter": 0,
+            "lumberjack": 0,
+            "merchant": 1,
+            "miner": 0,
+            "quarry_worker": 1,
+            "weaver": 1
+          },
+          "employment_rate": 0.66667,
+          "household_wealth": 120.0,
+          "item_flows": {
+            "cloth": {
+              "base_price": 2.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 16.6667,
+              "demand_per_day": 0.18,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 3.0,
+              "item_id": "cloth",
+              "price": 2.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "fish": {
+              "base_price": 1.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 0.9524,
+              "demand_per_day": 2.1,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 2.0,
+              "item_id": "fish",
+              "price": 1.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "grain": {
+              "base_price": 0.8,
+              "consumed_last_step": 0.0,
+              "coverage_days": 26.6667,
+              "demand_per_day": 4.5,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 120.0,
+              "item_id": "grain",
+              "price": 0.8,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "logs": {
+              "base_price": 0.9,
+              "consumed_last_step": 0.0,
+              "coverage_days": 53.5714,
+              "demand_per_day": 0.56,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 30.0,
+              "item_id": "logs",
+              "price": 0.9,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "ore": {
+              "base_price": 1.5,
+              "consumed_last_step": 0.0,
+              "coverage_days": 21.0526,
+              "demand_per_day": 0.38,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 8.0,
+              "item_id": "ore",
+              "price": 1.5,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "parts": {
+              "base_price": 1.8,
+              "consumed_last_step": 0.0,
+              "coverage_days": 33.3333,
+              "demand_per_day": 0.12,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 4.0,
+              "item_id": "parts",
+              "price": 1.8,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "stone": {
+              "base_price": 1.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 38.4615,
+              "demand_per_day": 0.52,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 20.0,
+              "item_id": "stone",
+              "price": 1.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            }
+          },
+          "last_updated_ms": 0,
+          "market_available": true,
+          "market_inventory": {
+            "cloth": 3.0,
+            "fish": 2.0,
+            "grain": 120.0,
+            "logs": 30.0,
+            "ore": 8.0,
+            "parts": 4.0,
+            "stone": 20.0
+          },
+          "market_prices": {
+            "cloth": 2.0,
+            "fish": 1.0,
+            "grain": 0.8,
+            "logs": 0.9,
+            "ore": 1.5,
+            "parts": 1.8,
+            "stone": 1.0
+          },
+          "payroll_last_step": 0.0,
+          "population": 20,
+          "town_name": "Eastmere",
+          "trade_allies": 0,
+          "trade_mode": "empire_market",
+          "trade_volume": 0.0,
+          "treasury": 50.0,
+          "unemployed_population": 4,
+          "version": "0.27",
+          "villager_count": 2,
+          "working_age_population": 12,
+          "world_day": 5.0
+        },
+        "Egg Lands": {
+          "average_daily_wage": 0.6106,
+          "building_count": 5,
+          "consumption_spending_last_step": 158.649,
+          "control": "independent",
+          "development_score": 127.2,
+          "employed_population": 48,
+          "employment": {
+            "farmer": 7,
+            "fisher": 6,
+            "hunter": 26,
+            "lumberjack": 2,
+            "merchant": 3,
+            "miner": 2,
+            "quarry_worker": 1,
+            "weaver": 1
+          },
+          "employment_rate": 0.85714,
+          "household_wealth": 498.582,
+          "item_flows": {
+            "cloth": {
+              "base_price": 2.0,
+              "consumed_last_step": 3.4344,
+              "coverage_days": 19.0832,
+              "demand_per_day": 0.8586,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 16.3848,
+              "item_id": "cloth",
+              "price": 1.3256,
+              "produced_last_step": 16.8192,
+              "production_per_day": 4.2048,
+              "unmet_last_step": 0.0
+            },
+            "fish": {
+              "base_price": 1.0,
+              "consumed_last_step": 40.068,
+              "coverage_days": 6.3659,
+              "demand_per_day": 10.017,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 63.767,
+              "item_id": "fish",
+              "price": 1.1066,
+              "produced_last_step": 101.835,
+              "production_per_day": 25.4587,
+              "unmet_last_step": 0.0
+            },
+            "grain": {
+              "base_price": 0.8,
+              "consumed_last_step": 85.86,
+              "coverage_days": 5.2635,
+              "demand_per_day": 21.465,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 112.98,
+              "item_id": "grain",
+              "price": 0.951,
+              "produced_last_step": 78.84,
+              "production_per_day": 19.71,
+              "unmet_last_step": 0.0
+            },
+            "logs": {
+              "base_price": 0.9,
+              "consumed_last_step": 10.6848,
+              "coverage_days": 14.1177,
+              "demand_per_day": 2.6712,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 37.7112,
+              "item_id": "logs",
+              "price": 0.5965,
+              "produced_last_step": 18.396,
+              "production_per_day": 4.599,
+              "unmet_last_step": 0.0
+            },
+            "ore": {
+              "base_price": 1.5,
+              "consumed_last_step": 7.2504,
+              "coverage_days": 12.3023,
+              "demand_per_day": 1.8126,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 22.2992,
+              "item_id": "ore",
+              "price": 1.0922,
+              "produced_last_step": 21.5496,
+              "production_per_day": 5.3874,
+              "unmet_last_step": 0.0
+            },
+            "parts": {
+              "base_price": 1.8,
+              "consumed_last_step": 2.2896,
+              "coverage_days": 1.1516,
+              "demand_per_day": 0.5724,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 8.4096,
+              "inventory": 0.6592,
+              "item_id": "parts",
+              "price": 2.855,
+              "produced_last_step": 7.3584,
+              "production_per_day": 1.8396,
+              "unmet_last_step": 0.0
+            },
+            "stone": {
+              "base_price": 1.0,
+              "consumed_last_step": 9.9216,
+              "coverage_days": 12.1861,
+              "demand_per_day": 2.4804,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 30.2264,
+              "item_id": "stone",
+              "price": 0.7336,
+              "produced_last_step": 20.148,
+              "production_per_day": 5.037,
+              "unmet_last_step": 0.0
+            }
+          },
+          "last_updated_ms": 1784899669789,
+          "market_available": true,
+          "market_inventory": {
+            "cloth": 16.3848,
+            "fish": 63.767,
+            "grain": 112.98,
+            "logs": 37.7112,
+            "ore": 22.2992,
+            "parts": 0.6592,
+            "stone": 30.2264
+          },
+          "market_prices": {
+            "cloth": 1.3256,
+            "fish": 1.1066,
+            "grain": 0.951,
+            "logs": 0.5965,
+            "ore": 1.0922,
+            "parts": 2.855,
+            "stone": 0.7336
+          },
+          "payroll_last_step": 117.231,
+          "population": 90,
+          "town_name": "Egg Lands",
+          "trade_allies": 0,
+          "trade_mode": "town_market",
+          "trade_volume": 0.0,
+          "treasury": 228.266,
+          "unemployed_population": 8,
+          "version": "0.27",
+          "villager_count": 2,
+          "working_age_population": 56,
+          "world_day": 5.0
+        },
+        "Northmarch": {
+          "average_daily_wage": 0.0,
+          "building_count": 0,
+          "consumption_spending_last_step": 0.0,
+          "control": "conquered",
+          "development_score": 19.1,
+          "employed_population": 8,
+          "employment": {
+            "farmer": 0,
+            "fisher": 5,
+            "hunter": 0,
+            "lumberjack": 0,
+            "merchant": 1,
+            "miner": 0,
+            "quarry_worker": 1,
+            "weaver": 1
+          },
+          "employment_rate": 0.66667,
+          "household_wealth": 120.0,
+          "item_flows": {
+            "cloth": {
+              "base_price": 2.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 16.6667,
+              "demand_per_day": 0.18,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 3.0,
+              "item_id": "cloth",
+              "price": 2.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "fish": {
+              "base_price": 1.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 0.9524,
+              "demand_per_day": 2.1,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 2.0,
+              "item_id": "fish",
+              "price": 1.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "grain": {
+              "base_price": 0.8,
+              "consumed_last_step": 0.0,
+              "coverage_days": 26.6667,
+              "demand_per_day": 4.5,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 120.0,
+              "item_id": "grain",
+              "price": 0.8,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "logs": {
+              "base_price": 0.9,
+              "consumed_last_step": 0.0,
+              "coverage_days": 53.5714,
+              "demand_per_day": 0.56,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 30.0,
+              "item_id": "logs",
+              "price": 0.9,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "ore": {
+              "base_price": 1.5,
+              "consumed_last_step": 0.0,
+              "coverage_days": 21.0526,
+              "demand_per_day": 0.38,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 8.0,
+              "item_id": "ore",
+              "price": 1.5,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "parts": {
+              "base_price": 1.8,
+              "consumed_last_step": 0.0,
+              "coverage_days": 33.3333,
+              "demand_per_day": 0.12,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 4.0,
+              "item_id": "parts",
+              "price": 1.8,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "stone": {
+              "base_price": 1.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 38.4615,
+              "demand_per_day": 0.52,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 20.0,
+              "item_id": "stone",
+              "price": 1.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            }
+          },
+          "last_updated_ms": 0,
+          "market_available": true,
+          "market_inventory": {
+            "cloth": 3.0,
+            "fish": 2.0,
+            "grain": 120.0,
+            "logs": 30.0,
+            "ore": 8.0,
+            "parts": 4.0,
+            "stone": 20.0
+          },
+          "market_prices": {
+            "cloth": 2.0,
+            "fish": 1.0,
+            "grain": 0.8,
+            "logs": 0.9,
+            "ore": 1.5,
+            "parts": 1.8,
+            "stone": 1.0
+          },
+          "payroll_last_step": 0.0,
+          "population": 20,
+          "town_name": "Northmarch",
+          "trade_allies": 0,
+          "trade_mode": "empire_market",
+          "trade_volume": 0.0,
+          "treasury": 50.0,
+          "unemployed_population": 4,
+          "version": "0.27",
+          "villager_count": 2,
+          "working_age_population": 12,
+          "world_day": 5.0
+        },
+        "Smallford": {
+          "average_daily_wage": 0.6114,
+          "building_count": 0,
+          "consumption_spending_last_step": 22.539,
+          "control": "independent",
+          "development_score": 17.969,
+          "employed_population": 9,
+          "employment": {
+            "farmer": 1,
+            "fisher": 3,
+            "hunter": 1,
+            "lumberjack": 1,
+            "merchant": 1,
+            "miner": 1,
+            "quarry_worker": 0,
+            "weaver": 1
+          },
+          "employment_rate": 0.81818,
+          "household_wealth": 105.026,
+          "item_flows": {
+            "cloth": {
+              "base_price": 2.0,
+              "consumed_last_step": 0.6869,
+              "coverage_days": 21.5206,
+              "demand_per_day": 0.1717,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 3.6955,
+              "item_id": "cloth",
+              "price": 1.3256,
+              "produced_last_step": 1.3824,
+              "production_per_day": 0.3456,
+              "unmet_last_step": 0.0
+            },
+            "fish": {
+              "base_price": 1.0,
+              "consumed_last_step": 8.0136,
+              "coverage_days": 8.1394,
+              "demand_per_day": 2.0034,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 16.3064,
+              "item_id": "fish",
+              "price": 0.9885,
+              "produced_last_step": 22.32,
+              "production_per_day": 5.58,
+              "unmet_last_step": 0.0
+            },
+            "grain": {
+              "base_price": 0.8,
+              "consumed_last_step": 17.172,
+              "coverage_days": 23.9525,
+              "demand_per_day": 4.293,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 102.828,
+              "item_id": "grain",
+              "price": 0.5303,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "logs": {
+              "base_price": 0.9,
+              "consumed_last_step": 2.137,
+              "coverage_days": 52.1545,
+              "demand_per_day": 0.5342,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 27.863,
+              "item_id": "logs",
+              "price": 0.5965,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "ore": {
+              "base_price": 1.5,
+              "consumed_last_step": 1.4501,
+              "coverage_days": 18.0677,
+              "demand_per_day": 0.3625,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 6.5499,
+              "item_id": "ore",
+              "price": 0.9942,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "parts": {
+              "base_price": 1.8,
+              "consumed_last_step": 0.4579,
+              "coverage_days": 24.9029,
+              "demand_per_day": 0.1145,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.6912,
+              "inventory": 2.8509,
+              "item_id": "parts",
+              "price": 1.2446,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "stone": {
+              "base_price": 1.0,
+              "consumed_last_step": 1.9843,
+              "coverage_days": 42.9924,
+              "demand_per_day": 0.4961,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 21.3277,
+              "item_id": "stone",
+              "price": 0.6628,
+              "produced_last_step": 3.312,
+              "production_per_day": 0.828,
+              "unmet_last_step": 0.0
+            }
+          },
+          "last_updated_ms": 1784899669789,
+          "market_available": false,
+          "market_inventory": {
+            "cloth": 3.6955,
+            "fish": 16.3064,
+            "grain": 102.828,
+            "logs": 27.863,
+            "ore": 6.5499,
+            "parts": 2.8509,
+            "stone": 21.3277
+          },
+          "market_prices": {
+            "cloth": 1.3256,
+            "fish": 0.9885,
+            "grain": 0.5303,
+            "logs": 0.5965,
+            "ore": 0.9942,
+            "parts": 1.2446,
+            "stone": 0.6628
+          },
+          "payroll_last_step": 19.565,
+          "population": 18,
+          "town_name": "Smallford",
+          "trade_allies": 0,
+          "trade_mode": "villagers",
+          "trade_volume": 1.166,
+          "treasury": 45.563,
+          "unemployed_population": 2,
+          "version": "0.27",
+          "villager_count": 2,
+          "working_age_population": 11,
+          "world_day": 5.0
+        },
+        "Southwatch": {
+          "average_daily_wage": 0.0,
+          "building_count": 0,
+          "consumption_spending_last_step": 0.0,
+          "control": "conquered",
+          "development_score": 19.1,
+          "employed_population": 8,
+          "employment": {
+            "farmer": 0,
+            "fisher": 5,
+            "hunter": 0,
+            "lumberjack": 0,
+            "merchant": 1,
+            "miner": 0,
+            "quarry_worker": 1,
+            "weaver": 1
+          },
+          "employment_rate": 0.66667,
+          "household_wealth": 120.0,
+          "item_flows": {
+            "cloth": {
+              "base_price": 2.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 16.6667,
+              "demand_per_day": 0.18,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 3.0,
+              "item_id": "cloth",
+              "price": 2.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "fish": {
+              "base_price": 1.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 0.9524,
+              "demand_per_day": 2.1,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 2.0,
+              "item_id": "fish",
+              "price": 1.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "grain": {
+              "base_price": 0.8,
+              "consumed_last_step": 0.0,
+              "coverage_days": 26.6667,
+              "demand_per_day": 4.5,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 120.0,
+              "item_id": "grain",
+              "price": 0.8,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "logs": {
+              "base_price": 0.9,
+              "consumed_last_step": 0.0,
+              "coverage_days": 53.5714,
+              "demand_per_day": 0.56,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 30.0,
+              "item_id": "logs",
+              "price": 0.9,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "ore": {
+              "base_price": 1.5,
+              "consumed_last_step": 0.0,
+              "coverage_days": 21.0526,
+              "demand_per_day": 0.38,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 8.0,
+              "item_id": "ore",
+              "price": 1.5,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "parts": {
+              "base_price": 1.8,
+              "consumed_last_step": 0.0,
+              "coverage_days": 33.3333,
+              "demand_per_day": 0.12,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 4.0,
+              "item_id": "parts",
+              "price": 1.8,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            },
+            "stone": {
+              "base_price": 1.0,
+              "consumed_last_step": 0.0,
+              "coverage_days": 38.4615,
+              "demand_per_day": 0.52,
+              "external_flow_last_step": 0.0,
+              "intermediate_consumed_last_step": 0.0,
+              "inventory": 20.0,
+              "item_id": "stone",
+              "price": 1.0,
+              "produced_last_step": 0.0,
+              "production_per_day": 0.0,
+              "unmet_last_step": 0.0
+            }
+          },
+          "last_updated_ms": 0,
+          "market_available": true,
+          "market_inventory": {
+            "cloth": 3.0,
+            "fish": 2.0,
+            "grain": 120.0,
+            "logs": 30.0,
+            "ore": 8.0,
+            "parts": 4.0,
+            "stone": 20.0
+          },
+          "market_prices": {
+            "cloth": 2.0,
+            "fish": 1.0,
+            "grain": 0.8,
+            "logs": 0.9,
+            "ore": 1.5,
+            "parts": 1.8,
+            "stone": 1.0
+          },
+          "payroll_last_step": 0.0,
+          "population": 20,
+          "town_name": "Southwatch",
+          "trade_allies": 0,
+          "trade_mode": "empire_market",
+          "trade_volume": 0.0,
+          "treasury": 50.0,
+          "unemployed_population": 4,
+          "version": "0.27",
+          "villager_count": 2,
+          "working_age_population": 12,
+          "world_day": 5.0
+        }
+      }
+    },
+    {
+      "name": "bridge_returns_authoritative_economy",
+      "passed": true,
+      "detail": {
+        "ack_sequence": 1,
+        "authoritative_economy": {
+          "authoritative": true,
+          "empire_market_threshold": 3,
+          "empire_territory_count": 0,
+          "empire_trade_unlocked": false,
+          "last_sequence": 1,
+          "mode": "python-authoritative-town-economy",
+          "session_id": "bridge-v026",
+          "sync_count": 1,
+          "towns": {
+            "Bridge Town": {
+              "average_daily_wage": 0.0,
+              "building_count": 4,
+              "consumption_spending_last_step": 0.0,
+              "control": "independent",
+              "development_score": 94.12,
+              "employed_population": 32,
+              "employment": {
+                "farmer": 5,
+                "fisher": 21,
+                "merchant": 2,
+                "quarry_worker": 4
+              },
+              "employment_rate": 0.8,
+              "household_wealth": 384.0,
+              "item_flows": {
+                "fish": {
+                  "base_price": 1.5,
+                  "consumed_last_step": 0.0,
+                  "coverage_days": 0.2976,
+                  "demand_per_day": 6.72,
+                  "external_flow_last_step": 0.0,
+                  "intermediate_consumed_last_step": 0.0,
+                  "inventory": 2.0,
+                  "item_id": "fish",
+                  "price": 1.5,
+                  "produced_last_step": 0.0,
+                  "production_per_day": 0.0,
+                  "unmet_last_step": 0.0
+                },
+                "grain": {
+                  "base_price": 0.8,
+                  "consumed_last_step": 0.0,
+                  "coverage_days": 8.3333,
+                  "demand_per_day": 14.4,
+                  "external_flow_last_step": 0.0,
+                  "intermediate_consumed_last_step": 0.0,
+                  "inventory": 120.0,
+                  "item_id": "grain",
+                  "price": 0.8,
+                  "produced_last_step": 0.0,
+                  "production_per_day": 0.0,
+                  "unmet_last_step": 0.0
+                },
+                "stone": {
+                  "base_price": 1.1,
+                  "consumed_last_step": 0.0,
+                  "coverage_days": 12.0192,
+                  "demand_per_day": 1.664,
+                  "external_flow_last_step": 0.0,
+                  "intermediate_consumed_last_step": 0.0,
+                  "inventory": 20.0,
+                  "item_id": "stone",
+                  "price": 1.1,
+                  "produced_last_step": 0.0,
+                  "production_per_day": 0.0,
+                  "unmet_last_step": 0.0
+                }
+              },
+              "last_updated_ms": 0,
+              "market_available": true,
+              "market_inventory": {
+                "fish": 2.0,
+                "grain": 120.0,
+                "stone": 20.0
+              },
+              "market_prices": {
+                "fish": 1.5,
+                "grain": 0.8,
+                "stone": 1.1
+              },
+              "payroll_last_step": 0.0,
+              "population": 64,
+              "town_name": "Bridge Town",
+              "trade_allies": 0,
+              "trade_mode": "town_market",
+              "trade_volume": 0.0,
+              "treasury": 160.0,
+              "unemployed_population": 8,
+              "version": "0.27",
+              "villager_count": 0,
+              "working_age_population": 40,
+              "world_day": 2.0
+            }
+          },
+          "updated_at_ms": 1784899669800,
+          "version": "0.27"
+        },
+        "authority_proposal": {
+          "changes": {
+            "fish": {
+              "item_id": "fish",
+              "observed_price": 1.5,
+              "proposed_price": 1.575,
+              "shadow_target_price": 2.0625,
+              "signal": "raise",
+              "step_percent": 5.0
+            },
+            "grain": {
+              "item_id": "grain",
+              "observed_price": 0.8,
+              "proposed_price": 0.84,
+              "shadow_target_price": 0.8601,
+              "signal": "raise",
+              "step_percent": 5.0
+            }
+          },
+          "generated_at_ms": 1784899669800,
+          "max_step_percent": 5.0,
+          "mode": "manual-market-price-pilot",
+          "notes": [
+            "Only ordinary market-goods prices are eligible in v0.27.",
+            "Each manual application is capped at five percent per item.",
+            "Inventory, production, player gold, movement, combat, and save data remain browser-authoritative.",
+            "Applied pilot prices are session-local and are not intentionally written into saves."
+          ],
+          "proposal_id": "bridge-v026:1",
+          "requires_manual_apply": true,
+          "save_persistent": false,
+          "sequence": 1,
+          "session_id": "bridge-v026",
+          "town_name": "Bridge Town",
+          "version": "0.27",
+          "world_day": 2.0
+        },
+        "bridge": {
+          "age_seconds": 0.001,
+          "connected": true,
+          "current_session_id": "bridge-v026",
+          "latest": {
+            "active_panel": "none",
+            "agent_count": 64,
+            "captured_at_ms": 100,
+            "client_version": "0.27",
+            "inventory_counts": {},
+            "inventory_slots_used": 0,
+            "legacy_keys": [],
+            "market_inventory": {
+              "fish": 2.0,
+              "grain": 120.0
+            },
+            "market_prices": {
+              "fish": 1.5,
+              "grain": 0.8
+            },
+            "material_prices": {
+              "stone": 1.1
+            },
+            "material_stock": {
+              "stone": 20.0
+            },
+            "player_ancestry": "unknown",
+            "player_gold": 50,
+            "player_health": 0.0,
+            "player_level": 0,
+            "player_max_health": 0.0,
+            "player_mounted": true,
+            "player_name": "Ray",
+            "player_race": "khajit",
+            "player_stamina": 0.0,
+            "player_x": 0.0,
+            "player_xp": 0,
+            "player_y": 0.0,
+            "protocol_version": 6,
+            "raptor_count": 2,
+            "received_at_ms": 1784899669800,
+            "remote_address": "127.0.0.1",
+            "save_version": 0,
+            "scene": "world",
+            "selected_class": "unselected",
+            "sequence": 1,
+            "session_id": "bridge-v026",
+            "tamed_raptor_count": 1,
+            "town_building_count": 4,
+            "town_name": "Bridge Town",
+            "town_population": 64,
+            "world_day": 2.0,
+            "world_time": 0.0
+          },
+          "protocol_version": 6,
+          "received_count": 1,
+          "session_count": 1,
+          "status": "connected"
+        },
+        "session_id": "bridge-v026",
+        "shadow": {
+          "building_count": 4,
+          "generated_at_ms": 1784899669800,
+          "items": {
+            "fish": {
+              "coverage_days": 0.3125,
+              "daily_demand": 6.4,
+              "divergence_percent": 37.5,
+              "item_id": "fish",
+              "observed_price": 1.5,
+              "observed_stock": 2.0,
+              "previous_stock": null,
+              "recommended_price": 2.0625,
+              "scarcity_index": 4.0,
+              "signal": "raise",
+              "stock_delta": null,
+              "target_stock": 64.0
+            },
+            "grain": {
+              "coverage_days": 8.5227,
+              "daily_demand": 14.08,
+              "divergence_percent": 7.512,
+              "item_id": "grain",
+              "observed_price": 0.8,
+              "observed_stock": 120.0,
+              "previous_stock": null,
+              "recommended_price": 0.8601,
+              "scarcity_index": 1.1733,
+              "signal": "raise",
+              "stock_delta": null,
+              "target_stock": 140.8
+            },
+            "stone": {
+              "coverage_days": 12.5,
+              "daily_demand": 1.6,
+              "divergence_percent": 2.1,
+              "item_id": "stone",
+              "observed_price": 1.1,
+              "observed_stock": 20.0,
+              "previous_stock": null,
+              "recommended_price": 1.1231,
+              "scarcity_index": 0.8,
+              "signal": "hold",
+              "stock_delta": null,
+              "target_stock": 16.0
+            }
+          },
+          "mean_absolute_divergence_percent": 15.704,
+          "mode": "shadow-read-only",
+          "notes": [
+            "Shadow mode is read-only; no browser economy values were changed.",
+            "Recommendations are intentionally damped until observed production and consumption flows are validated."
+          ],
+          "packet_count": 1,
+          "resident_count": 64,
+          "sequence": 1,
+          "session_id": "bridge-v026",
+          "shortage_count": 1,
+          "stable_count": 2,
+          "surplus_count": 0,
+          "town_name": "Bridge Town",
+          "version": "0.27",
+          "world_day": 2.0
+        },
+        "status": "accepted"
+      }
+    },
+    {
+      "name": "live_state_persists",
+      "passed": true,
+      "detail": {
+        "sync_count": 3,
+        "town_count": 5
+      }
+    },
+    {
+      "name": "content_version",
+      "passed": true,
+      "detail": {
+        "buildings": {
+          "bakery": {
+            "capacity_per_building": 100,
+            "id": "bakery",
+            "label": "Bakery",
+            "worker_capacity": 12
+          },
+          "farm": {
+            "capacity_per_building": 120,
+            "id": "farm",
+            "label": "Farm",
+            "worker_capacity": 20
+          },
+          "hunter_lodge": {
+            "capacity_per_building": 45,
+            "id": "hunter_lodge",
+            "label": "Hunter Lodge",
+            "worker_capacity": 12
+          },
+          "lumber_camp": {
+            "capacity_per_building": 75,
+            "id": "lumber_camp",
+            "label": "Lumber Camp",
+            "worker_capacity": 16
+          },
+          "market": {
+            "capacity_per_building": 300,
+            "id": "market",
+            "label": "Market",
+            "worker_capacity": 20
+          },
+          "mill": {
+            "capacity_per_building": 90,
+            "id": "mill",
+            "label": "Mill",
+            "worker_capacity": 12
+          },
+          "mine": {
+            "capacity_per_building": 55,
+            "id": "mine",
+            "label": "Mine",
+            "worker_capacity": 18
+          },
+          "quarry": {
+            "capacity_per_building": 65,
+            "id": "quarry",
+            "label": "Quarry",
+            "worker_capacity": 18
+          },
+          "smithy": {
+            "capacity_per_building": 30,
+            "id": "smithy",
+            "label": "Smithy",
+            "worker_capacity": 8
+          },
+          "weaver": {
+            "capacity_per_building": 45,
+            "id": "weaver",
+            "label": "Weaver",
+            "worker_capacity": 10
+          }
+        },
+        "classes": {
+          "mage": {
+            "description": "Magic and specialty-action specialist.",
+            "id": "mage",
+            "label": "Mage"
+          },
+          "noble": {
+            "description": "Hybrid class focused between combat and influence.",
+            "id": "noble",
+            "label": "Noble"
+          },
+          "warrior": {
+            "description": "Physical combat specialist.",
+            "id": "warrior",
+            "label": "Warrior"
+          }
+        },
+        "compatibility_mode": "python-authoritative-town-economy-plus-villager-trade",
+        "items": {
+          "bread": {
+            "base_price_cents": 16,
+            "category": "food",
+            "id": "bread",
+            "label": "Bread",
+            "perishable": true,
+            "stack_limit": 999
+          },
+          "cloth": {
+            "base_price_cents": 55,
+            "category": "material",
+            "id": "cloth",
+            "label": "Cloth",
+            "perishable": false,
+            "stack_limit": 999
+          },
+          "flour": {
+            "base_price_cents": 9,
+            "category": "food_input",
+            "id": "flour",
+            "label": "Flour",
+            "perishable": true,
+            "stack_limit": 999
+          },
+          "grain": {
+            "base_price_cents": 4,
+            "category": "food_input",
+            "id": "grain",
+            "label": "Grain",
+            "perishable": true,
+            "stack_limit": 999
+          },
+          "hides": {
+            "base_price_cents": 34,
+            "category": "material",
+            "id": "hides",
+            "label": "Hides",
+            "perishable": false,
+            "stack_limit": 999
+          },
+          "iron_ore": {
+            "base_price_cents": 25,
+            "category": "material",
+            "id": "iron_ore",
+            "label": "Iron Ore",
+            "perishable": false,
+            "stack_limit": 999
+          },
+          "meat": {
+            "base_price_cents": 28,
+            "category": "food",
+            "id": "meat",
+            "label": "Meat",
+            "perishable": true,
+            "stack_limit": 999
+          },
+          "stone": {
+            "base_price_cents": 14,
+            "category": "material",
+            "id": "stone",
+            "label": "Stone",
+            "perishable": false,
+            "stack_limit": 999
+          },
+          "timber": {
+            "base_price_cents": 18,
+            "category": "material",
+            "id": "timber",
+            "label": "Timber",
+            "perishable": false,
+            "stack_limit": 999
+          },
+          "tools": {
+            "base_price_cents": 180,
+            "category": "equipment",
+            "id": "tools",
+            "label": "Tools",
+            "perishable": false,
+            "stack_limit": 100
+          }
+        },
+        "legacy_game_version": 92,
+        "occupations": {
+          "baker": {
+            "base_daily_wage_cents": 96,
+            "id": "baker",
+            "label": "Baker",
+            "recipe_id": "bake_bread",
+            "target_worker_share": 0.08
+          },
+          "builder": {
+            "base_daily_wage_cents": 105,
+            "id": "builder",
+            "label": "Builder",
+            "recipe_id": null,
+            "target_worker_share": 0.04
+          },
+          "farmer": {
+            "base_daily_wage_cents": 72,
+            "id": "farmer",
+            "label": "Farmer",
+            "recipe_id": "grow_grain",
+            "target_worker_share": 0.25
+          },
+          "hunter": {
+            "base_daily_wage_cents": 102,
+            "id": "hunter",
+            "label": "Hunter",
+            "recipe_id": "hunt_game",
+            "target_worker_share": 0.08
+          },
+          "lumberjack": {
+            "base_daily_wage_cents": 88,
+            "id": "lumberjack",
+            "label": "Lumberjack",
+            "recipe_id": "cut_timber",
+            "target_worker_share": 0.1
+          },
+          "merchant": {
+            "base_daily_wage_cents": 110,
+            "id": "merchant",
+            "label": "Merchant",
+            "recipe_id": null,
+            "target_worker_share": 0.05
+          },
+          "miller": {
+            "base_daily_wage_cents": 92,
+            "id": "miller",
+            "label": "Miller",
+            "recipe_id": "mill_flour",
+            "target_worker_share": 0.06
+          },
+          "miner": {
+            "base_daily_wage_cents": 104,
+            "id": "miner",
+            "label": "Miner",
+            "recipe_id": "mine_ore",
+            "target_worker_share": 0.08
+          },
+          "quarry_worker": {
+            "base_daily_wage_cents": 94,
+            "id": "quarry_worker",
+            "label": "Quarry Worker",
+            "recipe_id": "quarry_stone",
+            "target_worker_share": 0.08
+          },
+          "smith": {
+            "base_daily_wage_cents": 128,
+            "id": "smith",
+            "label": "Smith",
+            "recipe_id": "forge_tools",
+            "target_worker_share": 0.05
+          },
+          "unemployed": {
+            "base_daily_wage_cents": 0,
+            "id": "unemployed",
+            "label": "Unemployed",
+            "recipe_id": null,
+            "target_worker_share": 0.02
+          },
+          "weaver": {
+            "base_daily_wage_cents": 90,
+            "id": "weaver",
+            "label": "Weaver",
+            "recipe_id": "weave_cloth",
+            "target_worker_share": 0.06
+          }
+        },
+        "phase": 3,
+        "project_version": "0.27",
+        "races": {
+          "human": {
+            "id": "human",
+            "label": "Human",
+            "size": "large",
+            "sprite": {
+              "directions": [
+                "down",
+                "left",
+                "right",
+                "up"
+              ],
+              "frame_height": 64,
+              "frame_width": 32,
+              "frames_per_direction": 4,
+              "ground_anchor_x": 16,
+              "ground_anchor_y": 63,
+              "sheet_height": 256,
+              "sheet_width": 128
+            },
+            "supports_ears": false,
+            "supports_fur": false,
+            "supports_horns": false,
+            "supports_tail": false
+          },
+          "khajit": {
+            "id": "khajit",
+            "label": "Khajit",
+            "size": "small",
+            "sprite": {
+              "directions": [
+                "down",
+                "left",
+                "right",
+                "up"
+              ],
+              "frame_height": 32,
+              "frame_width": 32,
+              "frames_per_direction": 4,
+              "ground_anchor_x": 16,
+              "ground_anchor_y": 31,
+              "sheet_height": 128,
+              "sheet_width": 128
+            },
+            "supports_ears": true,
+            "supports_fur": true,
+            "supports_horns": false,
+            "supports_tail": true
+          },
+          "tiefling": {
+            "id": "tiefling",
+            "label": "Tiefling",
+            "size": "large",
+            "sprite": {
+              "directions": [
+                "down",
+                "left",
+                "right",
+                "up"
+              ],
+              "frame_height": 64,
+              "frame_width": 32,
+              "frames_per_direction": 4,
+              "ground_anchor_x": 16,
+              "ground_anchor_y": 63,
+              "sheet_height": 256,
+              "sheet_width": 128
+            },
+            "supports_ears": false,
+            "supports_fur": false,
+            "supports_horns": true,
+            "supports_tail": true
+          }
+        },
+        "recipes": {
+          "bake_bread": {
+            "building_id": "bakery",
+            "id": "bake_bread",
+            "inputs": {
+              "flour": 2
+            },
+            "label": "Bake Bread",
+            "labor_minutes": 20,
+            "occupation_id": "baker",
+            "outputs": {
+              "bread": 3
+            }
+          },
+          "cut_timber": {
+            "building_id": "lumber_camp",
+            "id": "cut_timber",
+            "inputs": {},
+            "label": "Cut Timber",
+            "labor_minutes": 55,
+            "occupation_id": "lumberjack",
+            "outputs": {
+              "timber": 4
+            }
+          },
+          "forge_tools": {
+            "building_id": "smithy",
+            "id": "forge_tools",
+            "inputs": {
+              "iron_ore": 3,
+              "timber": 1
+            },
+            "label": "Forge Tools",
+            "labor_minutes": 120,
+            "occupation_id": "smith",
+            "outputs": {
+              "tools": 1
+            }
+          },
+          "grow_grain": {
+            "building_id": "farm",
+            "id": "grow_grain",
+            "inputs": {},
+            "label": "Grow Grain",
+            "labor_minutes": 60,
+            "occupation_id": "farmer",
+            "outputs": {
+              "grain": 10
+            }
+          },
+          "hunt_game": {
+            "building_id": "hunter_lodge",
+            "id": "hunt_game",
+            "inputs": {},
+            "label": "Hunt Game",
+            "labor_minutes": 80,
+            "occupation_id": "hunter",
+            "outputs": {
+              "hides": 1,
+              "meat": 4
+            }
+          },
+          "mill_flour": {
+            "building_id": "mill",
+            "id": "mill_flour",
+            "inputs": {
+              "grain": 4
+            },
+            "label": "Mill Flour",
+            "labor_minutes": 30,
+            "occupation_id": "miller",
+            "outputs": {
+              "flour": 3
+            }
+          },
+          "mine_ore": {
+            "building_id": "mine",
+            "id": "mine_ore",
+            "inputs": {},
+            "label": "Mine Iron Ore",
+            "labor_minutes": 75,
+            "occupation_id": "miner",
+            "outputs": {
+              "iron_ore": 3
+            }
+          },
+          "quarry_stone": {
+            "building_id": "quarry",
+            "id": "quarry_stone",
+            "inputs": {},
+            "label": "Quarry Stone",
+            "labor_minutes": 65,
+            "occupation_id": "quarry_worker",
+            "outputs": {
+              "stone": 4
+            }
+          },
+          "weave_cloth": {
+            "building_id": "weaver",
+            "id": "weave_cloth",
+            "inputs": {
+              "hides": 1
+            },
+            "label": "Weave Cloth",
+            "labor_minutes": 90,
+            "occupation_id": "weaver",
+            "outputs": {
+              "cloth": 2
+            }
+          }
+        },
+        "schema_version": 4
+      }
+    }
+  ],
+  "errors": []
+}
